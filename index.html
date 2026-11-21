@@ -1,0 +1,3765 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador 3D Sistema BCP</title>
+  <meta name="description" content="Aplicación web 3D interactiva de un sistema de Bombeo de Cavidad Progresiva (BCP) con bloque geológico en corte, equipos de superficie y telemetría en tiempo real." />
+  <meta property="og:title" content="Simulador 3D Sistema BCP" />
+  <meta property="og:description" content="Aplicación web 3D interactiva de un sistema de Bombeo de Cavidad Progresiva (BCP) con bloque geológico en corte, equipos de superficie y telemetría en tiempo real." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-canvas: #090b10;
+      --surface-panel: rgba(13, 17, 24, 0.92);
+      --surface-panel-hover: rgba(22, 28, 40, 0.96);
+      --border-subtle: rgba(255, 255, 255, 0.10);
+      --border-active: rgba(59, 130, 246, 0.65);
+      --accent-blue: #2563eb;
+      --accent-blue-light: #60a5fa;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    #viewport {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 55% 48%, #171d28 0%, #0a0d13 62%, #06080c 100%);
+      z-index: 1;
+    }
+
+    #viewport canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      outline: none;
+    }
+
+    /* Header Bar */
+    .top-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(37, 99, 235, 0.16);
+      border: 1px solid rgba(59, 130, 246, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #60a5fa;
+    }
+
+    .brand-text {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 7px;
+      background: var(--surface-panel);
+      border: 1px solid var(--border-subtle);
+      color: #cbd5e1;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+      white-space: nowrap;
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface-panel-hover);
+      border-color: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+    }
+
+    .btn-ghost:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 2px;
+    }
+
+    /* Left Fixed Sidebar + Vertical Rail */
+    .left-dock {
+      position: fixed;
+      top: 56px;
+      left: 16px;
+      bottom: 20px;
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .nav-rail {
+      width: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 26px 0;
+      position: relative;
+      pointer-events: auto;
+    }
+
+    .nav-rail::before {
+      content: '';
+      position: absolute;
+      top: 38px;
+      bottom: 38px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .rail-node {
+      position: relative;
+      z-index: 2;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #0d1118;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 180ms ease, color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .rail-node:hover {
+      border-color: rgba(96, 165, 250, 0.65);
+      color: #cbd5e1;
+    }
+
+    .rail-node.active {
+      background: #172554;
+      border-color: #3b82f6;
+      color: #93c5fd;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.45);
+    }
+
+    .sidebar-cards {
+      width: 256px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      padding-right: 2px;
+      pointer-events: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+    }
+
+    .sidebar-cards::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar-cards::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 4px;
+    }
+
+    .nav-card {
+      background: var(--surface-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 13px 14px;
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+      flex-shrink: 0;
+    }
+
+    .nav-card.active {
+      border-color: var(--border-active);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.20);
+    }
+
+    .nav-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .nav-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #f8fafc;
+      white-space: nowrap;
+    }
+
+    .nav-card-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nav-item-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #cbd5e1;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-item-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+
+    .nav-item-btn.active {
+      background: rgba(37, 99, 235, 0.18);
+      border-color: rgba(59, 130, 246, 0.40);
+      color: #ffffff;
+    }
+
+    .nav-item-btn:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 1px;
+    }
+
+    .nav-bullet {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #475569;
+      flex-shrink: 0;
+      transition: background-color 140ms ease;
+    }
+
+    .nav-item-btn:hover .nav-bullet {
+      background: #93c5fd;
+    }
+
+    .nav-item-btn.active .nav-bullet {
+      background: #3b82f6;
+    }
+
+    .nav-item-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Bottom Center Step Bar */
+    .bottom-center-wrap {
+      position: fixed;
+      left: 316px;
+      right: 320px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .step-caption {
+      max-width: 640px;
+      background: var(--surface-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #cbd5e1;
+      pointer-events: auto;
+    }
+
+    .step-caption strong {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    .step-caption-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .step-caption-close:hover {
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .step-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      pointer-events: auto;
+    }
+
+    .step-btn {
+      height: 40px;
+      padding: 0 18px;
+      border-radius: 8px;
+      background: var(--surface-panel);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #cbd5e1;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .step-btn:hover {
+      background: var(--surface-panel-hover);
+      border-color: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+    }
+
+    .step-btn.active {
+      background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+      border-color: #60a5fa;
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+    }
+
+    .step-btn:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 2px;
+    }
+
+    /* Bottom Right Telemetry Panel */
+    .telemetry-panel {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 282px;
+      background: var(--surface-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 15px 16px;
+      z-index: 20;
+      pointer-events: auto;
+    }
+
+    .telemetry-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #f8fafc;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .telemetry-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .telemetry-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .telemetry-label {
+      font-size: 12.5px;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+
+    .telemetry-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .telemetry-unit {
+      font-size: 11px;
+      font-weight: 500;
+      color: #64748b;
+      margin-left: 3px;
+    }
+
+    .rpm-control {
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .rpm-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .rpm-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .rpm-readout {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: #60a5fa;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rpm-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #1e293b;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .rpm-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #3b82f6;
+      border: 2px solid #e2e8f0;
+      cursor: pointer;
+      transition: transform 120ms ease, background-color 120ms ease;
+    }
+
+    .rpm-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      background: #60a5fa;
+    }
+
+    .rpm-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #3b82f6;
+      border: 2px solid #e2e8f0;
+      cursor: pointer;
+    }
+
+    .rpm-ticks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* WebGL Fallback Notice */
+    .webgl-fallback {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: #090b10;
+      color: #e2e8f0;
+      z-index: 50;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .webgl-fallback.visible {
+      display: flex;
+    }
+
+    @media (max-width: 1180px) {
+      .bottom-center-wrap {
+        left: 296px;
+        right: 296px;
+      }
+      .step-btn {
+        padding: 0 12px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="viewport" aria-label="Visor 3D del Sistema de Bombeo de Cavidad Progresiva"></div>
+
+  <div id="webgl-fallback" class="webgl-fallback" role="alert">
+    <div>
+      <h2 style="font-size: 18px; margin-bottom: 8px;">Contexto WebGL no disponible</h2>
+      <p style="font-size: 13px; color: #94a3b8;">Activa la aceleración gráfica del navegador para visualizar el modelo 3D del sistema BCP.</p>
+    </div>
+  </div>
+
+  <!-- Top Header -->
+  <header class="top-header">
+    <div class="brand-title">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+        </svg>
+      </div>
+      <span class="brand-text">SIMULADOR DE SISTEMA BCP</span>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" id="btn-reset-view" class="btn-ghost" title="Restablecer cámara panorámica">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        <span>Restablecer Vista</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Left Fixed Sidebar -->
+  <aside class="left-dock" aria-label="Navegación de componentes del sistema BCP">
+    <nav class="nav-rail" aria-label="Secciones principales">
+      <button type="button" class="rail-node active" data-rail="superficie" title="Superficie" aria-label="Ir a Superficie">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="12" cy="12" r="4" />
+        </svg>
+      </button>
+      <button type="button" class="rail-node" data-rail="subsuelo" title="Subsuelo / Fondo" aria-label="Ir a Subsuelo / Fondo">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 3v18M5 12h14" />
+        </svg>
+      </button>
+      <button type="button" class="rail-node" data-rail="flujo" title="Flujo y Navegación" aria-label="Ir a Flujo y Navegación">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polygon points="3 11 22 2 13 21 11 13 3 11" />
+        </svg>
+      </button>
+    </nav>
+
+    <div class="sidebar-cards">
+      <!-- Sección 1: SUPERFICIE -->
+      <section class="nav-card active" data-section="superficie">
+        <div class="nav-card-header" data-focus="superficie-overview">
+          <h2 class="nav-card-title">SUPERFICIE</h2>
+          <span class="nav-card-count">05</span>
+        </div>
+        <ul class="nav-list">
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="plataforma-celler" data-section-ref="superficie">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Plataforma, Celler y Cabezal</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="motor-poleas" data-section-ref="superficie">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Motores BCP, Poleas y Transmisión</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="cabezal-barra" data-section-ref="superficie">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Cabezal Rotación, Barra y Estopas</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="acometida-te" data-section-ref="superficie">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Acometida Eléctrica y TE Producción</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="lineas-valvulas" data-section-ref="superficie">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Líneas, Choke, Check y Manómetros</span>
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Sección 2: SUBSUELO / FONDO -->
+      <section class="nav-card" data-section="subsuelo">
+        <div class="nav-card-header" data-focus="subsuelo-overview">
+          <h2 class="nav-card-title">SUBSUELO / FONDO</h2>
+          <span class="nav-card-count">04</span>
+        </div>
+        <ul class="nav-list">
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="bloque-corte" data-section-ref="subsuelo">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Bloque Geológico y Revestimiento</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="sarta-cabillas" data-section-ref="subsuelo">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Sarta de Cabillas y Tubing</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="bomba-bcp" data-section-ref="subsuelo">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Estator Elastómero y Rotor Helicoidal</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="zona-canoneada" data-section-ref="subsuelo">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Niple, Anclas y Cañoneo</span>
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Sección 3: FLUJO Y NAVEGACIÓN -->
+      <section class="nav-card" data-section="flujo">
+        <div class="nav-card-header" data-focus="panoramica">
+          <h2 class="nav-card-title">FLUJO Y NAVEGACIÓN</h2>
+          <span class="nav-card-count">04</span>
+        </div>
+        <ul class="nav-list">
+          <li>
+            <button type="button" class="nav-item-btn active" data-preset="panoramica" data-section-ref="flujo">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Vista Panorámica Completa</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="corte-frontal" data-section-ref="flujo">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Corte Frontal del Pozo Vertical</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="manifold-descarga" data-section-ref="flujo">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Línea de Producción, Gas y Diluente</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item-btn" data-preset="isometrica-superficie" data-section-ref="flujo">
+              <span class="nav-bullet"></span>
+              <span class="nav-item-label">Vista Isométrica de Superficie</span>
+            </button>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </aside>
+
+  <!-- Bottom Center Step Navigation -->
+  <div class="bottom-center-wrap">
+    <div id="step-caption" class="step-caption">
+      <div id="step-caption-text">
+        <strong>01 / Qué es:</strong> El Bombeo de Cavidad Progresiva (BCP) utiliza un rotor helicoidal metálico girando dentro de un estator de elastómero para elevar crudo viscoso de forma continua.
+      </div>
+      <button type="button" id="btn-close-caption" class="step-caption-close" aria-label="Ocultar descripción">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="step-bar" role="tablist" aria-label="Etapas del simulador">
+      <button type="button" class="step-btn active" data-step="01" role="tab" aria-selected="true">01 / QUÉ ES</button>
+      <button type="button" class="step-btn" data-step="02" role="tab" aria-selected="false">02 / CÓMO FUNCIONA</button>
+      <button type="button" class="step-btn" data-step="03" role="tab" aria-selected="false">03 / COMPONENTES</button>
+      <button type="button" class="step-btn" data-step="04" role="tab" aria-selected="false">04 / OPERACIÓN</button>
+    </div>
+  </div>
+
+  <!-- Bottom Right Real-Time Telemetry Panel -->
+  <section class="telemetry-panel" aria-label="Datos en tiempo real">
+    <h2 class="telemetry-title">DATOS EN TIEMPO REAL</h2>
+    <div class="telemetry-grid">
+      <div class="telemetry-row">
+        <span class="telemetry-label">Caudal (BPD)</span>
+        <span class="telemetry-value"><span id="val-bpd">432</span><span class="telemetry-unit">BPD</span></span>
+      </div>
+      <div class="telemetry-row">
+        <span class="telemetry-label">Presión (PSI)</span>
+        <span class="telemetry-value"><span id="val-psi">564</span><span class="telemetry-unit">PSI</span></span>
+      </div>
+      <div class="telemetry-row">
+        <span class="telemetry-label">Temperatura (°C)</span>
+        <span class="telemetry-value"><span id="val-temp">71.8</span><span class="telemetry-unit">°C</span></span>
+      </div>
+      <div class="telemetry-row">
+        <span class="telemetry-label">Velocidad (RPM)</span>
+        <span class="telemetry-value"><span id="val-rpm">180</span><span class="telemetry-unit">RPM</span></span>
+      </div>
+    </div>
+
+    <div class="rpm-control">
+      <div class="rpm-header">
+        <label for="rpm-slider" class="rpm-label">Control de Velocidad</label>
+        <span id="rpm-slider-badge" class="rpm-readout">180 RPM</span>
+      </div>
+      <input id="rpm-slider" class="rpm-slider" type="range" min="0" max="350" step="1" value="180" />
+      <div class="rpm-ticks">
+        <span>0</span>
+        <span>120</span>
+        <span>240</span>
+        <span>350 RPM</span>
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js';
+    import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/environments/RoomEnvironment.js';
+
+    // =========================================================================
+    // 1. SOFTWARE WEBGL DETECTION & RENDERER SETUP
+    // =========================================================================
+    const isSoftwareGl = (() => {
+      try {
+        const probeCanvas = document.createElement('canvas');
+        const gl = probeCanvas.getContext('webgl2') || probeCanvas.getContext('webgl');
+        if (!gl) return true;
+        const ext = gl.getExtension('WEBGL_debug_renderer_info');
+        const param = ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER;
+        const gpu = String(gl.getParameter(param) || '');
+        gl.getExtension('WEBGL_lose_context')?.loseContext();
+        return /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
+      } catch {
+        return true;
+      }
+    })();
+
+    const container = document.getElementById('viewport');
+    const fallbackEl = document.getElementById('webgl-fallback');
+
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: !isSoftwareGl,
+        powerPreference: 'high-performance',
+        alpha: false,
+      });
+    } catch {
+      fallbackEl.classList.add('visible');
+      throw new Error('WebGL initialization failed');
+    }
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    renderer.shadowMap.enabled = !isSoftwareGl;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    renderer.domElement.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      fallbackEl.classList.add('visible');
+    });
+    renderer.domElement.addEventListener('webglcontextrestored', () => {
+      fallbackEl.classList.remove('visible');
+    });
+
+    // =========================================================================
+    // 2. SCENE, CAMERA, ENVIRONMENT & STUDIO LIGHTING
+    // =========================================================================
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x090c12);
+    scene.fog = new THREE.FogExp2(0x090c12, 0.016);
+
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmremGenerator.dispose();
+
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 140);
+    camera.position.set(8.6, 3.2, 16.4);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0.35, -3.1, 0.0);
+    controls.enableDamping = !isSoftwareGl;
+    controls.dampingFactor = 0.06;
+    controls.minDistance = 2.6;
+    controls.maxDistance = 32;
+    controls.maxPolarAngle = Math.PI * 0.88;
+    controls.minPolarAngle = 0.12;
+    controls.update();
+
+    // Three-point studio lighting + reservoir cavity warm light
+    const hemiLight = new THREE.HemisphereLight(0x9dc2f0, 0x1b1511, 0.72);
+    scene.add(hemiLight);
+
+    const keyLight = new THREE.DirectionalLight(0xfff1dc, 2.35);
+    keyLight.position.set(11, 16, 12);
+    keyLight.castShadow = !isSoftwareGl;
+    keyLight.shadow.mapSize.width = 2048;
+    keyLight.shadow.mapSize.height = 2048;
+    keyLight.shadow.camera.near = 2;
+    keyLight.shadow.camera.far = 45;
+    keyLight.shadow.camera.left = -10;
+    keyLight.shadow.camera.right = 10;
+    keyLight.shadow.camera.top = 10;
+    keyLight.shadow.camera.bottom = -14;
+    keyLight.shadow.bias = -0.0005;
+    keyLight.shadow.normalBias = 0.02;
+    scene.add(keyLight);
+
+    const rimLight = new THREE.DirectionalLight(0x7cb8ff, 1.35);
+    rimLight.position.set(-11, 8, -10);
+    scene.add(rimLight);
+
+    const frontFillLight = new THREE.DirectionalLight(0xdbeafe, 0.65);
+    frontFillLight.position.set(0, 2, 14);
+    scene.add(frontFillLight);
+
+    // Warm subsurface glow inside cutaway reservoir / pump cavity
+    const reservoirGlow = new THREE.PointLight(0xff8c3a, 5.5, 11, 1.6);
+    reservoirGlow.position.set(0, -8.8, 1.35);
+    scene.add(reservoirGlow);
+
+    const pumpCavityGlow = new THREE.PointLight(0xffe1b8, 3.0, 9, 1.5);
+    pumpCavityGlow.position.set(0, -5.8, 1.5);
+    scene.add(pumpCavityGlow);
+
+    // =========================================================================
+    // 3. PROCEDURAL TEXTURES (NO EXTERNAL FILES, ZERO 404)
+    // =========================================================================
+    const maxAniso = renderer.capabilities.getMaxAnisotropy();
+
+    function makeSeededRand(seed) {
+      let s = seed >>> 0;
+      return () => {
+        s = (s * 1664525 + 1013904223) >>> 0;
+        return s / 4294967296;
+      };
+    }
+
+    function createOrinocoFormationTextures(formationKey) {
+      const CW = 1024;
+      const CH = 1024;
+      const BW = 512;
+      const BH = 512;
+
+      const colorCanvas = document.createElement('canvas');
+      colorCanvas.width = CW;
+      colorCanvas.height = CH;
+      const cCtx = colorCanvas.getContext('2d');
+
+      const bumpCanvas = document.createElement('canvas');
+      bumpCanvas.width = BW;
+      bumpCanvas.height = BH;
+      const bCtx = bumpCanvas.getContext('2d');
+
+      const roughCanvas = document.createElement('canvas');
+      roughCanvas.width = BW;
+      roughCanvas.height = BH;
+      const rCtx = roughCanvas.getContext('2d');
+
+      // Note: Canvas y=0 maps to v=1 (top of formation), y=height maps to v=0 (bottom)
+      const specs = {
+        mesa: {
+          seed: 101,
+          // Formación Mesa / Las Piedras: top laterite, pebble conglomerate, ochre-sienna fluvial sands, buff clays
+          layers: [
+            { y0: 0.00, y1: 0.08, col: '#2c2724', col2: '#3f362f', bump: 115, rough: 235, wave: 4 },
+            { y0: 0.08, y1: 0.30, col: '#6d4a31', col2: '#8e6241', bump: 175, rough: 228, wave: 9, pebbles: true },
+            { y0: 0.30, y1: 0.50, col: '#b08b63', col2: '#9a754f', bump: 130, rough: 236, wave: 7 },
+            { y0: 0.50, y1: 0.72, col: '#7d5639', col2: '#9e704a', bump: 155, rough: 226, wave: 8 },
+            { y0: 0.72, y1: 0.88, col: '#5c5247', col2: '#766959', bump: 110, rough: 238, wave: 6 },
+            { y0: 0.88, y1: 1.00, col: '#855d3e', col2: '#6b4930', bump: 145, rough: 228, wave: 7 },
+          ],
+          laminaeCount: 150,
+          grainCount: 11000,
+          fractureCount: 10,
+          oilBleeds: 0,
+        },
+        freites: {
+          seed: 202,
+          // Formación Freites: alternating fissile slate/olive-gray marine shales (lutitas) & tan/calcareous sandstone beds
+          layers: [
+            { y0: 0.00, y1: 0.14, col: '#4a5562', col2: '#39424d', bump: 105, rough: 224, wave: 5 },
+            { y0: 0.14, y1: 0.28, col: '#8d7156', col2: '#a48769', bump: 165, rough: 202, wave: 6 },
+            { y0: 0.28, y1: 0.48, col: '#3a444f', col2: '#515d69', bump: 95,  rough: 230, wave: 5 },
+            { y0: 0.48, y1: 0.63, col: '#8e887d', col2: '#a49d90', bump: 178, rough: 192, wave: 4 },
+            { y0: 0.63, y1: 0.82, col: '#46504b', col2: '#5a6660', bump: 102, rough: 228, wave: 6 },
+            { y0: 0.82, y1: 1.00, col: '#7b5c43', col2: '#5f4734', bump: 152, rough: 208, wave: 5 },
+          ],
+          laminaeCount: 220,
+          grainCount: 8500,
+          fractureCount: 24,
+          oilBleeds: 0,
+        },
+        oficina: {
+          seed: 303,
+          // Formación Oficina — Arenas Petrolíferas: dark bitumen-saturated unconsolidated oil sands + amber tar lenses + shale partings
+          layers: [
+            { y0: 0.00, y1: 0.12, col: '#2b2421', col2: '#3a2d24', bump: 120, rough: 205, wave: 6 },
+            { y0: 0.12, y1: 0.34, col: '#16110e', col2: '#241a14', bump: 150, rough: 112, wave: 9 },
+            { y0: 0.34, y1: 0.48, col: '#6d4929', col2: '#8a5d36', bump: 162, rough: 162, wave: 8 },
+            { y0: 0.48, y1: 0.72, col: '#120e0c', col2: '#1f1611', bump: 145, rough: 102, wave: 10 },
+            { y0: 0.72, y1: 0.84, col: '#543924', col2: '#362519', bump: 138, rough: 158, wave: 7 },
+            { y0: 0.84, y1: 1.00, col: '#191310', col2: '#2a1e17', bump: 152, rough: 118, wave: 8 },
+          ],
+          laminaeCount: 170,
+          grainCount: 15000,
+          fractureCount: 12,
+          oilBleeds: 36,
+        },
+        merecure: {
+          seed: 404,
+          // Formación Merecure / Roca Reservorio: massive basal fractured sandstone permeated with heavy crude oil
+          layers: [
+            { y0: 0.00, y1: 0.22, col: '#5b3f29', col2: '#422c1c', bump: 168, rough: 168, wave: 8 },
+            { y0: 0.22, y1: 0.48, col: '#2b1d14', col2: '#3f2a1c', bump: 158, rough: 120, wave: 10 },
+            { y0: 0.48, y1: 0.74, col: '#4a3220', col2: '#241810', bump: 176, rough: 112, wave: 11 },
+            { y0: 0.74, y1: 1.00, col: '#17100c', col2: '#2a1c14', bump: 145, rough: 88,  wave: 8 },
+          ],
+          laminaeCount: 130,
+          grainCount: 13000,
+          fractureCount: 30,
+          oilBleeds: 48,
+        },
+      };
+
+      const spec = specs[formationKey];
+      const rand = makeSeededRand(spec.seed);
+
+      // Helper to trace an organic sedimentary horizon boundary across width W
+      const traceWaveHorizon = (ctx, W, yBase, amp, phase) => {
+        const pts = [];
+        for (let x = 0; x <= W; x += 16) {
+          const u = (x / W) * Math.PI * 2;
+          const y = yBase + Math.sin(u * 2 + phase) * amp + Math.cos(u * 5 + phase * 1.7) * (amp * 0.45);
+          pts.push([x, y]);
+        }
+        return pts;
+      };
+
+      // 1. Paint undulating lithological layers into Color, Bump, and Roughness canvases
+      for (let idx = 0; idx < spec.layers.length; idx++) {
+        const L = spec.layers[idx];
+        const yTopC = L.y0 * CH;
+        const yBotC = L.y1 * CH;
+        const yTopB = L.y0 * BH;
+        const yBotB = L.y1 * BH;
+
+        const topPtsC = idx === 0
+          ? [[0, 0], [CW, 0]]
+          : traceWaveHorizon(cCtx, CW, yTopC, L.wave * 1.4, idx * 1.9);
+        const botPtsC = idx === spec.layers.length - 1
+          ? [[0, CH], [CW, CH]]
+          : traceWaveHorizon(cCtx, CW, yBotC, spec.layers[idx + 1].wave * 1.4, (idx + 1) * 1.9);
+
+        const gradC = cCtx.createLinearGradient(0, yTopC, 0, yBotC);
+        gradC.addColorStop(0.0, L.col);
+        gradC.addColorStop(0.55, L.col2);
+        gradC.addColorStop(1.0, L.col);
+
+        cCtx.beginPath();
+        cCtx.moveTo(topPtsC[0][0], topPtsC[0][1]);
+        for (let i = 1; i < topPtsC.length; i++) cCtx.lineTo(topPtsC[i][0], topPtsC[i][1]);
+        for (let i = botPtsC.length - 1; i >= 0; i--) cCtx.lineTo(botPtsC[i][0], botPtsC[i][1]);
+        cCtx.closePath();
+        cCtx.fillStyle = gradC;
+        cCtx.fill();
+
+        // Crisp dark contact parting line between distinct lithological beds
+        if (idx > 0) {
+          cCtx.beginPath();
+          cCtx.moveTo(topPtsC[0][0], topPtsC[0][1]);
+          for (let i = 1; i < topPtsC.length; i++) cCtx.lineTo(topPtsC[i][0], topPtsC[i][1]);
+          cCtx.strokeStyle = 'rgba(12, 10, 9, 0.55)';
+          cCtx.lineWidth = 3.2;
+          cCtx.stroke();
+        }
+
+        // Matching polygons on Bump & Roughness maps (512x512)
+        const topPtsB = idx === 0
+          ? [[0, 0], [BW, 0]]
+          : traceWaveHorizon(bCtx, BW, yTopB, L.wave * 0.7, idx * 1.9);
+        const botPtsB = idx === spec.layers.length - 1
+          ? [[0, BH], [BW, BH]]
+          : traceWaveHorizon(bCtx, BW, yBotB, spec.layers[idx + 1].wave * 0.7, (idx + 1) * 1.9);
+
+        const drawPoly = (ctx, fillStr) => {
+          ctx.beginPath();
+          ctx.moveTo(topPtsB[0][0], topPtsB[0][1]);
+          for (let i = 1; i < topPtsB.length; i++) ctx.lineTo(topPtsB[i][0], topPtsB[i][1]);
+          for (let i = botPtsB.length - 1; i >= 0; i--) ctx.lineTo(botPtsB[i][0], botPtsB[i][1]);
+          ctx.closePath();
+          ctx.fillStyle = fillStr;
+          ctx.fill();
+        };
+
+        drawPoly(bCtx, `rgb(${L.bump},${L.bump},${L.bump})`);
+        drawPoly(rCtx, `rgb(${L.rough},${L.rough},${L.rough})`);
+
+        if (idx > 0) {
+          bCtx.beginPath();
+          bCtx.moveTo(topPtsB[0][0], topPtsB[0][1]);
+          for (let i = 1; i < topPtsB.length; i++) bCtx.lineTo(topPtsB[i][0], topPtsB[i][1]);
+          bCtx.strokeStyle = 'rgba(28, 28, 28, 0.8)';
+          bCtx.lineWidth = 2.5;
+          bCtx.stroke();
+        }
+
+        // Fluvial cobble / pebble conglomerate band in Mesa / Las Piedras
+        if (L.pebbles) {
+          for (let p = 0; p < 340; p++) {
+            const px = rand() * CW;
+            const py = (L.y0 + 0.02 + rand() * (L.y1 - L.y0 - 0.04)) * CH;
+            const rx = 5 + rand() * 14;
+            const ry = 3 + rand() * 7;
+            const rot = (rand() - 0.5) * 0.55;
+            const darkPebble = rand() > 0.45;
+            cCtx.save();
+            cCtx.translate(px, py);
+            cCtx.rotate(rot);
+            cCtx.beginPath();
+            cCtx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+            cCtx.fillStyle = darkPebble ? 'rgba(28, 22, 18, 0.72)' : 'rgba(176, 146, 114, 0.65)';
+            cCtx.fill();
+            cCtx.strokeStyle = 'rgba(15, 12, 10, 0.5)';
+            cCtx.lineWidth = 1.4;
+            cCtx.stroke();
+            cCtx.restore();
+
+            bCtx.save();
+            bCtx.translate(px * 0.5, py * 0.5);
+            bCtx.rotate(rot);
+            bCtx.beginPath();
+            bCtx.ellipse(0, 0, rx * 0.5, ry * 0.5, 0, 0, Math.PI * 2);
+            bCtx.fillStyle = 'rgba(235, 235, 235, 0.65)';
+            bCtx.fill();
+            bCtx.restore();
+          }
+        }
+      }
+
+      // 2. Fine sedimentary bedding laminae (seamless horizontal WrapS harmonics)
+      for (let i = 0; i < spec.laminaeCount; i++) {
+        const yFrac = (i + rand() * 0.7) / spec.laminaeCount;
+        const yBaseC = yFrac * CH;
+        const ampC = 2.5 + rand() * 4.5;
+        const cycles = 1 + Math.floor(rand() * 3);
+        const phase = rand() * Math.PI * 2;
+
+        cCtx.beginPath();
+        bCtx.beginPath();
+        for (let x = 0; x <= CW; x += 16) {
+          const dy = Math.sin((x / CW) * Math.PI * 2 * cycles + phase) * ampC;
+          if (x === 0) {
+            cCtx.moveTo(x, yBaseC + dy);
+            bCtx.moveTo(x * 0.5, (yBaseC + dy) * 0.5);
+          } else {
+            cCtx.lineTo(x, yBaseC + dy);
+            bCtx.lineTo(x * 0.5, (yBaseC + dy) * 0.5);
+          }
+        }
+        const isLight = rand() > 0.52;
+        if (formationKey === 'freites') {
+          cCtx.strokeStyle = isLight ? 'rgba(182, 186, 188, 0.16)' : 'rgba(18, 22, 28, 0.34)';
+        } else if (formationKey === 'oficina' || formationKey === 'merecure') {
+          cCtx.strokeStyle = isLight ? 'rgba(168, 122, 76, 0.14)' : 'rgba(8, 6, 5, 0.42)';
+        } else {
+          cCtx.strokeStyle = isLight ? 'rgba(218, 184, 144, 0.15)' : 'rgba(26, 18, 14, 0.28)';
+        }
+        cCtx.lineWidth = 1 + (i % 3) * 0.8;
+        cCtx.stroke();
+
+        const bShade = isLight ? 195 : 55;
+        bCtx.strokeStyle = `rgba(${bShade},${bShade},${bShade},0.28)`;
+        bCtx.lineWidth = 1.0;
+        bCtx.stroke();
+      }
+
+      // 3. Mineral sand grains, clay mottling & unconsolidated sandstone texture
+      for (let i = 0; i < spec.grainCount; i++) {
+        const x = rand() * CW;
+        const y = rand() * CH;
+        const sz = (formationKey === 'oficina' || formationKey === 'merecure')
+          ? 0.9 + rand() * 2.4
+          : 0.7 + rand() * 2.0;
+        const isQuartz = rand() > 0.62;
+        if (formationKey === 'oficina') {
+          cCtx.fillStyle = isQuartz ? 'rgba(184, 134, 84, 0.22)' : 'rgba(6, 5, 4, 0.38)';
+        } else if (formationKey === 'merecure') {
+          cCtx.fillStyle = isQuartz ? 'rgba(196, 162, 124, 0.20)' : 'rgba(8, 6, 5, 0.36)';
+        } else if (formationKey === 'freites') {
+          cCtx.fillStyle = isQuartz ? 'rgba(190, 198, 206, 0.16)' : 'rgba(18, 20, 24, 0.26)';
+        } else {
+          cCtx.fillStyle = isQuartz ? 'rgba(222, 194, 158, 0.18)' : 'rgba(38, 24, 16, 0.26)';
+        }
+        cCtx.fillRect(x, y, sz, sz);
+
+        if (i % 2 === 0) {
+          const bv = Math.floor(60 + rand() * 175);
+          bCtx.fillStyle = `rgba(${bv},${bv},${bv},0.34)`;
+          bCtx.fillRect(x * 0.5, y * 0.5, sz * 0.7, sz * 0.7);
+        }
+      }
+
+      // 4. Heavy crude oil bleed streaks & glossy bitumen pores (Oficina & Merecure)
+      for (let o = 0; o < spec.oilBleeds; o++) {
+        const ox = rand() * CW;
+        const oy = (0.14 + rand() * 0.78) * CH;
+        const ow = 14 + rand() * 58;
+        const oh = 4 + rand() * 14;
+        cCtx.fillStyle = 'rgba(8, 6, 5, 0.52)';
+        cCtx.beginPath();
+        cCtx.ellipse(ox, oy, ow, oh, (rand() - 0.5) * 0.15, 0, Math.PI * 2);
+        cCtx.fill();
+
+        // Low roughness (darker in roughnessMap) for wet crude saturation sheen
+        rCtx.fillStyle = 'rgba(72, 72, 72, 0.58)';
+        rCtx.beginPath();
+        rCtx.ellipse(ox * 0.5, oy * 0.5, ow * 0.55, oh * 0.55, 0, 0, Math.PI * 2);
+        rCtx.fill();
+      }
+
+      // 5. Natural tectonic rock fractures & jointing
+      for (let f = 0; f < spec.fractureCount; f++) {
+        let fx = rand() * CW;
+        let fy = rand() * CH * 0.88;
+        const tilt = (rand() - 0.5) * 14;
+        const steps = 10 + Math.floor(rand() * 14);
+        cCtx.beginPath();
+        bCtx.beginPath();
+        cCtx.moveTo(fx, fy);
+        bCtx.moveTo(fx * 0.5, fy * 0.5);
+        for (let s = 0; s < steps; s++) {
+          fx += tilt + (rand() - 0.5) * 16;
+          fy += 9 + rand() * 15;
+          cCtx.lineTo(fx, fy);
+          bCtx.lineTo(fx * 0.5, fy * 0.5);
+        }
+        cCtx.strokeStyle = formationKey === 'freites'
+          ? (f % 4 === 0 ? 'rgba(182, 188, 192, 0.35)' : 'rgba(10, 12, 15, 0.58)')
+          : 'rgba(8, 7, 6, 0.56)';
+        cCtx.lineWidth = 1.2 + rand() * 1.5;
+        cCtx.stroke();
+
+        bCtx.strokeStyle = 'rgba(18, 18, 18, 0.75)';
+        bCtx.lineWidth = 1.3;
+        bCtx.stroke();
+      }
+
+      const map = new THREE.CanvasTexture(colorCanvas);
+      map.colorSpace = THREE.SRGBColorSpace;
+      map.wrapS = THREE.RepeatWrapping;
+      map.wrapT = THREE.ClampToEdgeWrapping;
+      map.anisotropy = maxAniso;
+
+      const bumpMap = new THREE.CanvasTexture(bumpCanvas);
+      bumpMap.wrapS = THREE.RepeatWrapping;
+      bumpMap.wrapT = THREE.ClampToEdgeWrapping;
+      bumpMap.anisotropy = maxAniso;
+
+      const roughnessMap = new THREE.CanvasTexture(roughCanvas);
+      roughnessMap.wrapS = THREE.RepeatWrapping;
+      roughnessMap.wrapT = THREE.ClampToEdgeWrapping;
+      roughnessMap.anisotropy = maxAniso;
+
+      return { map, bumpMap, roughnessMap };
+    }
+
+    function createTopSoilTextures() {
+      const c = document.createElement('canvas');
+      c.width = 512;
+      c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#25262a';
+      ctx.fillRect(0, 0, 512, 512);
+
+      const bc = document.createElement('canvas');
+      bc.width = 512;
+      bc.height = 512;
+      const bctx = bc.getContext('2d');
+      bctx.fillStyle = '#808080';
+      bctx.fillRect(0, 0, 512, 512);
+
+      const rand = makeSeededRand(777);
+      for (let i = 0; i < 8000; i++) {
+        const x = rand() * 512;
+        const y = rand() * 512;
+        const s = 1 + rand() * 3.0;
+        const light = rand() > 0.5;
+        ctx.fillStyle = light ? 'rgba(92, 86, 78, 0.28)' : 'rgba(12, 13, 16, 0.34)';
+        ctx.fillRect(x, y, s, s);
+        const bv = Math.floor(60 + rand() * 140);
+        bctx.fillStyle = `rgba(${bv},${bv},${bv},0.35)`;
+        bctx.fillRect(x, y, s, s);
+      }
+
+      const map = new THREE.CanvasTexture(c);
+      map.colorSpace = THREE.SRGBColorSpace;
+      map.wrapS = THREE.RepeatWrapping;
+      map.wrapT = THREE.RepeatWrapping;
+      map.repeat.set(4, 4);
+      map.anisotropy = maxAniso;
+
+      const bumpMap = new THREE.CanvasTexture(bc);
+      bumpMap.wrapS = THREE.RepeatWrapping;
+      bumpMap.wrapT = THREE.RepeatWrapping;
+      bumpMap.repeat.set(4, 4);
+      bumpMap.anisotropy = maxAniso;
+
+      return { map, bumpMap };
+    }
+
+    function createConcreteTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#474c54';
+      ctx.fillRect(0, 0, 512, 512);
+
+      let seed = 109;
+      const rand = () => {
+        seed = (seed * 1664525 + 1013904223) % 4294967296;
+        return seed / 4294967296;
+      };
+      for (let i = 0; i < 6500; i++) {
+        const x = rand() * 512;
+        const y = rand() * 512;
+        const s = 1 + rand() * 2.5;
+        ctx.fillStyle = rand() > 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+        ctx.fillRect(x, y, s, s);
+      }
+      // Subtle expansion joint grid lines
+      ctx.strokeStyle = 'rgba(18, 22, 28, 0.45)';
+      ctx.lineWidth = 2;
+      for (let g = 128; g < 512; g += 128) {
+        ctx.beginPath();
+        ctx.moveTo(g, 0);
+        ctx.lineTo(g, 512);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, g);
+        ctx.lineTo(512, g);
+        ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 2);
+      tex.anisotropy = maxAniso;
+      return tex;
+    }
+
+    function createGaugeDialTexture(label, maxPsi) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath();
+      ctx.arc(128, 128, 124, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Colored operating zones arc
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.arc(128, 128, 96, Math.PI * 0.75, Math.PI * 1.65);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(128, 128, 96, Math.PI * 1.65, Math.PI * 2.0);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(128, 128, 96, 0, Math.PI * 0.25);
+      ctx.stroke();
+
+      // Scale ticks
+      for (let i = 0; i <= 24; i++) {
+        const a = Math.PI * 0.75 + (i / 24) * Math.PI * 1.5;
+        const isMajor = i % 4 === 0;
+        const r1 = isMajor ? 74 : 82;
+        const r2 = 90;
+        ctx.beginPath();
+        ctx.moveTo(128 + Math.cos(a) * r1, 128 + Math.sin(a) * r1);
+        ctx.lineTo(128 + Math.cos(a) * r2, 128 + Math.sin(a) * r2);
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = isMajor ? 3.5 : 1.5;
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 24px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('PSI', 128, 174);
+
+      ctx.fillStyle = '#475569';
+      ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText(label, 128, 198);
+
+      ctx.font = 'bold 15px "JetBrains Mono", monospace';
+      ctx.fillText('0', 62, 184);
+      ctx.fillText(String(maxPsi), 192, 184);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAniso;
+      return tex;
+    }
+
+    function createBeltTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#14171f';
+      ctx.fillRect(0, 0, 256, 64);
+      ctx.fillStyle = '#2b3240';
+      for (let x = 0; x < 256; x += 16) {
+        ctx.fillRect(x, 0, 6, 64);
+      }
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(8, 1);
+      return tex;
+    }
+
+    function createVfdPanelTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 384;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(0, 0, 256, 384);
+
+      // Door seam
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(12, 12, 232, 360);
+
+      // HMI Display bezel
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(42, 48, 172, 92);
+      ctx.fillStyle = '#0ea5e9';
+      ctx.font = 'bold 18px "JetBrains Mono", monospace';
+      ctx.fillText('VFD - BCP', 62, 82);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '14px "JetBrains Mono", monospace';
+      ctx.fillText('AC DRIVE 480V', 62, 114);
+
+      // High voltage caution stripe
+      ctx.fillStyle = '#eab308';
+      ctx.fillRect(42, 170, 172, 28);
+      ctx.fillStyle = '#090b10';
+      ctx.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('ALTA TENSIÓN 480V', 52, 189);
+
+      // Louvers
+      ctx.fillStyle = '#1e293b';
+      for (let y = 240; y < 340; y += 14) {
+        ctx.fillRect(48, y, 160, 6);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = maxAniso;
+      return tex;
+    }
+
+    const mesaTex = createOrinocoFormationTextures('mesa');
+    const freitesTex = createOrinocoFormationTextures('freites');
+    const oficinaTex = createOrinocoFormationTextures('oficina');
+    const merecureTex = createOrinocoFormationTextures('merecure');
+    const topSoilTex = createTopSoilTextures();
+    const concreteTex = createConcreteTexture();
+    const beltTex = createBeltTexture();
+    const vfdTex = createVfdPanelTexture();
+
+    // =========================================================================
+    // 4. SHARED PBR MATERIALS
+    // =========================================================================
+    const mats = {
+      mesaStrata: new THREE.MeshStandardMaterial({
+        map: mesaTex.map,
+        bumpMap: mesaTex.bumpMap,
+        bumpScale: 0.11,
+        roughnessMap: mesaTex.roughnessMap,
+        roughness: 1.0,
+        metalness: 0.02,
+      }),
+      freitesStrata: new THREE.MeshStandardMaterial({
+        map: freitesTex.map,
+        bumpMap: freitesTex.bumpMap,
+        bumpScale: 0.13,
+        roughnessMap: freitesTex.roughnessMap,
+        roughness: 1.0,
+        metalness: 0.04,
+      }),
+      oficinaStrata: new THREE.MeshStandardMaterial({
+        map: oficinaTex.map,
+        bumpMap: oficinaTex.bumpMap,
+        bumpScale: 0.12,
+        roughnessMap: oficinaTex.roughnessMap,
+        roughness: 1.0,
+        metalness: 0.06,
+      }),
+      merecureStrata: new THREE.MeshStandardMaterial({
+        map: merecureTex.map,
+        bumpMap: merecureTex.bumpMap,
+        bumpScale: 0.14,
+        roughnessMap: merecureTex.roughnessMap,
+        roughness: 1.0,
+        metalness: 0.08,
+      }),
+      topSoil: new THREE.MeshStandardMaterial({
+        map: topSoilTex.map,
+        bumpMap: topSoilTex.bumpMap,
+        bumpScale: 0.045,
+        roughness: 0.92,
+        metalness: 0.03,
+      }),
+      concrete: new THREE.MeshStandardMaterial({
+        map: concreteTex,
+        roughness: 0.88,
+        metalness: 0.04,
+      }),
+      cementSheath: new THREE.MeshStandardMaterial({
+        color: 0x8c8f94,
+        roughness: 0.92,
+        metalness: 0.02,
+      }),
+      steelDark: new THREE.MeshStandardMaterial({
+        color: 0x334155,
+        roughness: 0.42,
+        metalness: 0.82,
+      }),
+      steelCasing: new THREE.MeshStandardMaterial({
+        color: 0x64748b,
+        roughness: 0.36,
+        metalness: 0.86,
+      }),
+      steelPipe: new THREE.MeshStandardMaterial({
+        color: 0x94a3b8,
+        roughness: 0.32,
+        metalness: 0.88,
+      }),
+      chromePolished: new THREE.MeshPhysicalMaterial({
+        color: 0xeaf1f8,
+        roughness: 0.08,
+        metalness: 0.98,
+        clearcoat: 0.6,
+        anisotropy: 0.5,
+      }),
+      bcpBlue: new THREE.MeshPhysicalMaterial({
+        color: 0x1565c0,
+        roughness: 0.28,
+        metalness: 0.45,
+        clearcoat: 0.65,
+        clearcoatRoughness: 0.18,
+      }),
+      safetyYellow: new THREE.MeshStandardMaterial({
+        color: 0xeab308,
+        roughness: 0.38,
+        metalness: 0.28,
+      }),
+      valveRed: new THREE.MeshStandardMaterial({
+        color: 0xdc2626,
+        roughness: 0.35,
+        metalness: 0.35,
+      }),
+      brass: new THREE.MeshStandardMaterial({
+        color: 0xd9a036,
+        roughness: 0.26,
+        metalness: 0.90,
+      }),
+      gasLine: new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        roughness: 0.34,
+        metalness: 0.62,
+      }),
+      diluentLine: new THREE.MeshStandardMaterial({
+        color: 0xd97706,
+        roughness: 0.34,
+        metalness: 0.68,
+      }),
+      prodSightPipe: new THREE.MeshPhysicalMaterial({
+        color: 0x94a3b8,
+        roughness: 0.16,
+        metalness: 0.32,
+        transparent: true,
+        opacity: 0.40,
+        depthWrite: false,
+      }),
+      gasSightPipe: new THREE.MeshPhysicalMaterial({
+        color: 0x38bdf8,
+        roughness: 0.18,
+        metalness: 0.28,
+        transparent: true,
+        opacity: 0.40,
+        depthWrite: false,
+      }),
+      diluentSightPipe: new THREE.MeshPhysicalMaterial({
+        color: 0xf59e0b,
+        roughness: 0.18,
+        metalness: 0.28,
+        transparent: true,
+        opacity: 0.42,
+        depthWrite: false,
+      }),
+      elastomer: new THREE.MeshStandardMaterial({
+        color: 0x161920,
+        roughness: 0.72,
+        metalness: 0.08,
+      }),
+      beltRubber: new THREE.MeshStandardMaterial({
+        map: beltTex,
+        color: 0x20242c,
+        roughness: 0.75,
+        metalness: 0.05,
+      }),
+      crudeOil: new THREE.MeshPhysicalMaterial({
+        color: 0x100b08,
+        roughness: 0.06,
+        metalness: 0.15,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.05,
+      }),
+      conduit: new THREE.MeshStandardMaterial({
+        color: 0x71717a,
+        roughness: 0.36,
+        metalness: 0.85,
+      }),
+      cableArmor: new THREE.MeshStandardMaterial({
+        color: 0x181c24,
+        roughness: 0.65,
+        metalness: 0.25,
+      }),
+      vfdPanel: new THREE.MeshStandardMaterial({
+        map: vfdTex,
+        roughness: 0.45,
+        metalness: 0.45,
+      }),
+    };
+
+    // =========================================================================
+    // 5. GEOMETRY HELPERS (WORLD-ALIGNED UVs, CUTAWAY PIPES, FLANGES, VALVES)
+    // =========================================================================
+    // =========================================================================
+    // Stratigraphic contact horizons for the Faja Petrolífera del Orinoco
+    function horizonTop() { return 0.0; }
+    function horizonMesaFreites(x, z) {
+      return -2.35 + Math.sin(x * 0.34 + z * 0.18) * 0.12 + Math.cos(x * 0.72 - z * 0.28) * 0.05;
+    }
+    function horizonFreitesOficina(x, z) {
+      return -5.55 + Math.sin(x * 0.30 - z * 0.22 + 0.9) * 0.15 + Math.cos(x * 0.64 + z * 0.32) * 0.05;
+    }
+    function horizonOficinaMerecure(x, z) {
+      return -8.85 + Math.sin(x * 0.36 + z * 0.20 + 1.8) * 0.13 + Math.cos(x * 0.76 - z * 0.35) * 0.05;
+    }
+    function horizonBottom() { return -11.50; }
+
+    // Build a watertight stratified rock block volume bounded by undulating stratigraphic horizons
+    function createStratifiedBlockPart({
+      x0, x1, z0, z1,
+      yBotFn, yTopFn,
+      clipYMin = -Infinity,
+      clipYMax = Infinity,
+      segX = 10, segY = 8, segZ = 10,
+      sculptCavern = false,
+      relief = true,
+    }) {
+      const w = x1 - x0;
+      const d = z1 - z0;
+      const cx = (x0 + x1) * 0.5;
+      const cz = (z0 + z1) * 0.5;
+      const geom = new THREE.BoxGeometry(w, 1, d, segX, segY, segZ);
+      geom.translate(cx, 0, cz);
+
+      const pos = geom.attributes.position;
+      const norm = geom.attributes.normal;
+      const uv = geom.attributes.uv;
+
+      for (let i = 0; i < pos.count; i++) {
+        let x = pos.getX(i);
+        const yRaw = pos.getY(i);
+        let z = pos.getZ(i);
+        const nx0 = norm.getX(i);
+        const nz0 = norm.getZ(i);
+
+        const fullBot = yBotFn(x, z);
+        const fullTop = yTopFn(x, z);
+        const yBot = Math.max(fullBot, clipYMin);
+        const yTop = Math.min(fullTop, clipYMax);
+        const tLocal = THREE.MathUtils.clamp(yRaw + 0.5, 0, 1);
+        const y = yBot + tLocal * Math.max(0.001, yTop - yBot);
+
+        // Sculpt smooth reservoir alcove on Merecure inner cavern walls around oilPool
+        // Keeps |x| = 1.15 untouched for Z <= 0.22 so lateral Cañoneo rims sit flush in rock
+        if (sculptCavern && z > 0.22 && y < -9.55) {
+          const cavernZ = THREE.MathUtils.smoothstep(z, 0.22, 1.35) * (1 - THREE.MathUtils.smoothstep(z, 2.35, 3.60));
+          const cavernY = 1 - THREE.MathUtils.smoothstep(y, -10.95, -9.55);
+          const innerMask = 1 - THREE.MathUtils.smoothstep(Math.abs(x), 1.15, 1.65);
+          const push = 0.54 * cavernZ * cavernY * innerMask;
+          x += Math.sign(x) * push;
+        }
+
+        // Subtle 3D bedding ledge relief on outer exposed faces (keeps top/bottom & wellbore cheek seam exact)
+        if (relief && y < -0.14 && y > -11.36) {
+          const edgeMask = (1 - THREE.MathUtils.smoothstep(y, -0.45, -0.14)) * THREE.MathUtils.smoothstep(y, -11.36, -11.05);
+          const ledge = (Math.sin(y * 3.1 + x * 0.22 + z * 0.18) * 0.028 + Math.cos(y * 7.4) * 0.012) * edgeMask;
+          if (z > 4.35) z += ledge;
+          else if (z < -4.35) z -= ledge;
+          if (x < -6.35) x -= ledge;
+          else if (x > 6.35) x += ledge;
+        }
+
+        pos.setXYZ(i, x, y, z);
+
+        // Align UVs cleanly with original orthogonal box faces & true stratigraphic fraction
+        const u = Math.abs(nx0) > Math.abs(nz0)
+          ? (z + 5.0) * 0.145
+          : (x + 6.8) * 0.135;
+        const v = THREE.MathUtils.clamp((y - fullBot) / Math.max(0.01, fullTop - fullBot), 0.004, 0.996);
+        uv.setXY(i, u, v);
+      }
+
+      pos.needsUpdate = true;
+      uv.needsUpdate = true;
+      geom.computeVertexNormals();
+      return geom;
+    }
+
+    // Create solid-walled cutaway half-pipe (back 180° arc leaving front +Z open)
+    function createCutawayPipeGeometry(rInner, rOuter, height, startAngle = Math.PI * 0.5, endAngle = Math.PI * 1.5, segments = 32) {
+      const shape = new THREE.Shape();
+      shape.absarc(0, 0, rOuter, startAngle, endAngle, false);
+      shape.lineTo(Math.cos(endAngle) * rInner, Math.sin(endAngle) * rInner);
+      shape.absarc(0, 0, rInner, endAngle, startAngle, true);
+      shape.closePath();
+
+      const extrudeGeo = new THREE.ExtrudeGeometry(shape, {
+        depth: height,
+        bevelEnabled: false,
+        curveSegments: segments,
+      });
+      // ExtrudeGeometry extrudes along +Z; rotate -90 deg around X so height is along +Y
+      extrudeGeo.rotateX(-Math.PI / 2);
+      return extrudeGeo;
+    }
+
+    // Create flanged pipe coupling ring
+    function createFlange(radius, thickness, boltCount = 8, mat = mats.steelDark, boltMat = mats.steelPipe) {
+      const g = new THREE.Group();
+      const disc = new THREE.Mesh(
+        new THREE.CylinderGeometry(radius, radius, thickness, 24),
+        mat
+      );
+      disc.castShadow = true;
+      disc.receiveShadow = true;
+      g.add(disc);
+
+      const boltGeo = new THREE.CylinderGeometry(radius * 0.085, radius * 0.085, thickness * 1.45, 6);
+      const rBolt = radius * 0.78;
+      for (let i = 0; i < boltCount; i++) {
+        const a = (i / boltCount) * Math.PI * 2;
+        const bolt = new THREE.Mesh(boltGeo, boltMat);
+        bolt.position.set(Math.cos(a) * rBolt, 0, Math.sin(a) * rBolt);
+        g.add(bolt);
+      }
+      return g;
+    }
+
+    // Create pressure gauge (Manómetro) with animated needle reference
+    const gaugeNeedles = [];
+    function createPressureGauge(label, maxPsi, baseAngleRad) {
+      const g = new THREE.Group();
+
+      // Brass stem
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.16, 12), mats.brass);
+      stem.position.y = 0.08;
+      g.add(stem);
+
+      // Isolation petcock
+      const nut = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.05, 6), mats.brass);
+      nut.position.y = 0.14;
+      g.add(nut);
+
+      // Stainless steel bezel case
+      const caseBody = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.075, 24), mats.steelPipe);
+      caseBody.rotation.x = Math.PI / 2;
+      caseBody.position.y = 0.30;
+      caseBody.castShadow = true;
+      g.add(caseBody);
+
+      // Dial face
+      const dialTex = createGaugeDialTexture(label, maxPsi);
+      const dial = new THREE.Mesh(
+        new THREE.CircleGeometry(0.142, 24),
+        new THREE.MeshBasicMaterial({ map: dialTex })
+      );
+      dial.position.set(0, 0.30, 0.039);
+      g.add(dial);
+
+      // Rotating Needle pivoted at dial center
+      const needlePivot = new THREE.Group();
+      needlePivot.position.set(0, 0.30, 0.043);
+      const needleMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(0.012, 0.11, 0.004),
+        mats.valveRed
+      );
+      needleMesh.position.y = 0.042;
+      needlePivot.add(needleMesh);
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.008, 12), mats.steelDark);
+      cap.rotation.x = Math.PI / 2;
+      needlePivot.add(cap);
+      needlePivot.rotation.z = baseAngleRad;
+      g.add(needlePivot);
+
+      gaugeNeedles.push({ pivot: needlePivot, baseAngle: baseAngleRad });
+      return g;
+    }
+
+    // Create bleed / purge valve (Válvula de Purga)
+    function createBleedValve(handleMat = mats.valveRed) {
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.14, 12), mats.brass);
+      body.position.y = -0.07;
+      g.add(body);
+      const hex = new THREE.Mesh(new THREE.CylinderGeometry(0.058, 0.058, 0.05, 6), mats.steelDark);
+      hex.position.y = -0.09;
+      g.add(hex);
+      const tip = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.018, 0.08, 10), mats.steelPipe);
+      tip.position.y = -0.17;
+      g.add(tip);
+      // T-handle stem
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.08, 8), mats.steelPipe);
+      stem.rotation.x = Math.PI / 2;
+      stem.position.set(0, -0.09, 0.07);
+      g.add(stem);
+      const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.14, 8), handleMat);
+      bar.rotation.z = Math.PI / 2;
+      bar.position.set(0, -0.09, 0.105);
+      g.add(bar);
+      return g;
+    }
+
+    // Create handwheel valve (Gate / Choke valve)
+    function createHandwheel(radius = 0.18, mat = mats.valveRed) {
+      const g = new THREE.Group();
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.018, 10, 24), mat);
+      rim.rotation.x = Math.PI / 2;
+      g.add(rim);
+      for (let i = 0; i < 4; i++) {
+        const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, radius * 2, 8), mat);
+        spoke.rotation.z = Math.PI / 2;
+        spoke.rotation.y = (i * Math.PI) / 4;
+        g.add(spoke);
+      }
+      const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.04, 12), mats.steelDark);
+      g.add(hub);
+      return g;
+    }
+
+    // Create swing Check Valve (Válvula Check)
+    function createCheckValve(pipeMat = mats.steelPipe, scale = 1.0) {
+      const g = new THREE.Group();
+      const f1 = createFlange(0.15 * scale, 0.04 * scale, 6, mats.steelDark);
+      f1.rotation.z = Math.PI / 2;
+      f1.position.x = -0.17 * scale;
+      g.add(f1);
+
+      const f2 = createFlange(0.15 * scale, 0.04 * scale, 6, mats.steelDark);
+      f2.rotation.z = Math.PI / 2;
+      f2.position.x = 0.17 * scale;
+      g.add(f2);
+
+      // Bulged cast swing-check body
+      const chamber = new THREE.Mesh(new THREE.SphereGeometry(0.145 * scale, 20, 16), pipeMat);
+      chamber.scale.set(1.25, 1.05, 1.05);
+      chamber.castShadow = true;
+      g.add(chamber);
+
+      // Top bolted bonnet cover
+      const bonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.115 * scale, 0.125 * scale, 0.06 * scale, 16), mats.steelDark);
+      bonnet.position.y = 0.14 * scale;
+      g.add(bonnet);
+
+      // Directional flow arrow indicator on front face
+      const arrowStem = new THREE.Mesh(new THREE.BoxGeometry(0.12 * scale, 0.025 * scale, 0.02 * scale), mats.safetyYellow);
+      arrowStem.position.set(-0.02 * scale, 0, 0.152 * scale);
+      g.add(arrowStem);
+      const arrowHead = new THREE.Mesh(new THREE.ConeGeometry(0.035 * scale, 0.06 * scale, 4), mats.safetyYellow);
+      arrowHead.rotation.z = -Math.PI / 2;
+      arrowHead.position.set(0.06 * scale, 0, 0.152 * scale);
+      g.add(arrowHead);
+
+      return g;
+    }
+
+    // =========================================================================
+    // 6. GEOLOGICAL BLOCK WITH FRONTAL CUTAWAY & OIL RESERVOIR
+    // =========================================================================
+    const rootGroup = new THREE.Group();
+    scene.add(rootGroup);
+
+    const geoGroup = new THREE.Group();
+    rootGroup.add(geoGroup);
+
+    // Faja Petrolífera del Orinoco — 4 Distinct Geological Formations
+    const ORINOCO_FORMATIONS = [
+      { key: 'mesa',     yBotFn: horizonMesaFreites,    yTopFn: horizonTop,             mat: mats.mesaStrata,     segY: 6,  sculpt: false },
+      { key: 'freites',  yBotFn: horizonFreitesOficina, yTopFn: horizonMesaFreites,     mat: mats.freitesStrata,  segY: 8,  sculpt: false },
+      { key: 'oficina',  yBotFn: horizonOficinaMerecure,yTopFn: horizonFreitesOficina,  mat: mats.oficinaStrata,  segY: 8,  sculpt: false },
+      { key: 'merecure', yBotFn: horizonBottom,         yTopFn: horizonOficinaMerecure, mat: mats.merecureStrata, segY: 10, sculpt: true  },
+    ];
+
+    for (const f of ORINOCO_FORMATIONS) {
+      // Left geological wing (X: -6.4 to -1.15, Z: -4.4 to +4.4)
+      const lwGeo = createStratifiedBlockPart({
+        x0: -6.4, x1: -1.15, z0: -4.4, z1: 4.4,
+        yBotFn: f.yBotFn, yTopFn: f.yTopFn,
+        segX: 12, segY: f.segY, segZ: 18,
+        sculptCavern: f.sculpt,
+      });
+      const lwMesh = new THREE.Mesh(lwGeo, f.mat);
+      lwMesh.receiveShadow = true;
+      lwMesh.castShadow = true;
+      geoGroup.add(lwMesh);
+
+      // Right geological wing (X: +1.15 to +6.4, Z: -4.4 to +4.4)
+      const rwGeo = createStratifiedBlockPart({
+        x0: 1.15, x1: 6.4, z0: -4.4, z1: 4.4,
+        yBotFn: f.yBotFn, yTopFn: f.yTopFn,
+        segX: 12, segY: f.segY, segZ: 18,
+        sculptCavern: f.sculpt,
+      });
+      const rwMesh = new THREE.Mesh(rwGeo, f.mat);
+      rwMesh.receiveShadow = true;
+      rwMesh.castShadow = true;
+      geoGroup.add(rwMesh);
+
+      // Center Back Cutaway Wall (X: -1.15 to +1.15, Z: -4.4 to -0.68)
+      const bcGeo = createStratifiedBlockPart({
+        x0: -1.15, x1: 1.15, z0: -4.4, z1: -0.68,
+        yBotFn: f.yBotFn, yTopFn: f.yTopFn,
+        segX: 8, segY: f.segY, segZ: 8,
+        sculptCavern: false,
+      });
+      const bcMesh = new THREE.Mesh(bcGeo, f.mat);
+      bcMesh.receiveShadow = true;
+      geoGroup.add(bcMesh);
+
+      // Recessed strata rock cheeks hugging cement sheath (Y = -9.25 to -0.62)
+      // All 4 formations intersect [-9.25, -0.62]; skip only if clipped range vanishes
+      const lcGeo = createStratifiedBlockPart({
+        x0: -1.15, x1: -0.63, z0: -0.68, z1: 0.0,
+        yBotFn: f.yBotFn, yTopFn: f.yTopFn,
+        clipYMin: -9.25, clipYMax: -0.62,
+        segX: 2, segY: Math.max(3, Math.floor(f.segY * 0.75)), segZ: 2,
+        sculptCavern: false,
+        relief: false,
+      });
+      const lcMesh = new THREE.Mesh(lcGeo, f.mat);
+      lcMesh.receiveShadow = true;
+      geoGroup.add(lcMesh);
+
+      const rcGeo = createStratifiedBlockPart({
+        x0: 0.63, x1: 1.15, z0: -0.68, z1: 0.0,
+        yBotFn: f.yBotFn, yTopFn: f.yTopFn,
+        clipYMin: -9.25, clipYMax: -0.62,
+        segX: 2, segY: Math.max(3, Math.floor(f.segY * 0.75)), segZ: 2,
+        sculptCavern: false,
+        relief: false,
+      });
+      const rcMesh = new THREE.Mesh(rcGeo, f.mat);
+      rcMesh.receiveShadow = true;
+      geoGroup.add(rcMesh);
+    }
+
+    // Lower Merecure Reservoir Cavern Floor (Y: -11.495 to -10.95, wide enough to seat cavern walls without front/bottom Z-fighting)
+    const floorBaseGeo = createStratifiedBlockPart({
+      x0: -1.74, x1: 1.74, z0: -0.70, z1: 4.39,
+      yBotFn: horizonBottom, yTopFn: horizonOficinaMerecure,
+      clipYMin: -11.495, clipYMax: -10.95,
+      segX: 8, segY: 2, segZ: 10,
+      sculptCavern: false,
+      relief: false,
+    });
+    const floorBase = new THREE.Mesh(floorBaseGeo, mats.merecureStrata);
+    floorBase.receiveShadow = true;
+    geoGroup.add(floorBase);
+
+    // Oil Reservoir Pool at bottom of cutaway (Y = -10.90)
+    const oilPoolGeo = new THREE.CylinderGeometry(1.55, 1.35, 0.24, 36);
+    oilPoolGeo.scale(1.05, 1, 1.35);
+    const oilPool = new THREE.Mesh(oilPoolGeo, mats.crudeOil);
+    oilPool.position.set(0, -10.88, 0.95);
+    oilPool.receiveShadow = true;
+    geoGroup.add(oilPool);
+
+    // Glossy oil meniscus ring around bottom of gas anchor
+    const meniscus = new THREE.Mesh(
+      new THREE.TorusGeometry(0.45, 0.045, 12, 32),
+      mats.crudeOil
+    );
+    meniscus.rotation.x = Math.PI / 2;
+    meniscus.position.set(0, -10.76, 0.0);
+    geoGroup.add(meniscus);
+
+    // Top Soil / Surface Terrain Cap (thin beveled gravel pads left & right of concrete platform)
+    const topSoilLeft = new THREE.Mesh(new THREE.BoxGeometry(5.25, 0.04, 8.8), mats.topSoil);
+    topSoilLeft.position.set(-3.775, 0.01, 0);
+    topSoilLeft.receiveShadow = true;
+    geoGroup.add(topSoilLeft);
+
+    const topSoilRight = new THREE.Mesh(new THREE.BoxGeometry(5.25, 0.04, 8.8), mats.topSoil);
+    topSoilRight.position.set(3.775, 0.01, 0);
+    topSoilRight.receiveShadow = true;
+    geoGroup.add(topSoilRight);
+
+    const topSoilBack = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.04, 3.72), mats.topSoil);
+    topSoilBack.position.set(0, 0.01, -2.54);
+    topSoilBack.receiveShadow = true;
+    geoGroup.add(topSoilBack);
+
+    // =========================================================================
+    // 7. SUBSURFACE WELLBORE: CASING, TUBING, ROD STRING, BCP PUMP & ANCHORS
+    // =========================================================================
+    const downholeGroup = new THREE.Group();
+    rootGroup.add(downholeGroup);
+
+    // A. Outer Cement Sheath (Cutaway half-pipe: Y = -10.70 to -0.35)
+    const cementGeo = createCutawayPipeGeometry(0.495, 0.635, 10.35, 0, Math.PI, 32);
+    const cementMesh = new THREE.Mesh(cementGeo, mats.cementSheath);
+    cementMesh.position.y = -10.70;
+    cementMesh.receiveShadow = true;
+    downholeGroup.add(cementMesh);
+
+    // B. Production Steel Casing (Cutaway half-pipe: Y = -10.70 to +0.35)
+    const casingGeo = createCutawayPipeGeometry(0.425, 0.49, 11.05, 0, Math.PI, 32);
+    const casingMesh = new THREE.Mesh(casingGeo, mats.steelCasing);
+    casingMesh.position.y = -10.70;
+    casingMesh.castShadow = true;
+    casingMesh.receiveShadow = true;
+    downholeGroup.add(casingMesh);
+
+    // Casing collars (cutaway half-rings)
+    const casingCollarGeo = createCutawayPipeGeometry(0.49, 0.535, 0.14, 0, Math.PI, 28);
+    for (let cy = -9.0; cy <= -1.0; cy += 2.0) {
+      const collar = new THREE.Mesh(casingCollarGeo, mats.steelDark);
+      collar.position.y = cy;
+      downholeGroup.add(collar);
+    }
+
+    // C. Cañoneo en las paredes del fondo comunicando con el yacimiento (Y = -10.55 to -9.35)
+    const perfGroup = new THREE.Group();
+    downholeGroup.add(perfGroup);
+    const perfHoleMat = new THREE.MeshStandardMaterial({ color: 0x090706, roughness: 0.92, metalness: 0.15 });
+    const perfRimMat = new THREE.MeshStandardMaterial({ color: 0x9a3412, roughness: 0.52, metalness: 0.68 });
+    const perfChannelMat = new THREE.MeshStandardMaterial({ color: 0x1c120c, roughness: 0.85, metalness: 0.1 });
+
+    // Radial perforation shots piercing casing + cement + penetrating into formation rock walls
+    for (let row = 0; row < 6; row++) {
+      const py = -10.48 + row * 0.21;
+      const phaseShift = (row % 2) * 0.14;
+      for (let col = 0; col < 5; col++) {
+        const angle = 0.16 + phaseShift + (col / 4) * (Math.PI - 0.46);
+        const dirX = Math.cos(angle);
+        const dirZ = -Math.sin(angle);
+
+        // Perforation tunnel extending through casing, cement and into rock wall
+        const tunnel = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.044, 0.62, 10), perfHoleMat);
+        tunnel.position.set(dirX * 0.68, py, dirZ * 0.68);
+        tunnel.rotation.z = Math.PI / 2;
+        tunnel.rotation.y = angle;
+        perfGroup.add(tunnel);
+
+        // Burred steel casing entry rim
+        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.042, 0.013, 8, 12), perfRimMat);
+        rim.position.set(dirX * 0.43, py, dirZ * 0.43);
+        rim.lookAt(dirX * 2, py, dirZ * 2);
+        perfGroup.add(rim);
+      }
+    }
+
+    // Lateral rock-wall perforation fractures & oil seepage channels visible on left/right reservoir walls (X = ±1.15)
+    for (const side of [-1, 1]) {
+      for (let r = 0; r < 5; r++) {
+        const fy = -10.45 + r * 0.24;
+        const fz = -0.35 + (r % 2) * 0.28;
+        const rockPort = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.065, 0.36, 10), perfChannelMat);
+        rockPort.rotation.z = Math.PI / 2;
+        rockPort.position.set(side * 1.08, fy, fz);
+        perfGroup.add(rockPort);
+
+        const rockRim = new THREE.Mesh(new THREE.TorusGeometry(0.058, 0.018, 8, 14), perfRimMat);
+        rockRim.rotation.y = Math.PI / 2;
+        rockRim.position.set(side * 1.15, fy, fz);
+        perfGroup.add(rockRim);
+      }
+    }
+
+    // D. Tubería de Producción (Cutaway half-pipe: Y = -5.82 to +0.86, connected to Tubing Head Spool)
+    const tubingUpperGeo = createCutawayPipeGeometry(0.235, 0.295, 6.68, 0, Math.PI, 28);
+    const tubingUpper = new THREE.Mesh(tubingUpperGeo, mats.steelPipe);
+    tubingUpper.position.y = -5.82;
+    tubingUpper.castShadow = true;
+    tubingUpper.receiveShadow = true;
+    downholeGroup.add(tubingUpper);
+
+    // Threaded Tubing Couplings (Cuplas de Tubing)
+    const tubingCollarGeo = createCutawayPipeGeometry(0.295, 0.335, 0.13, 0, Math.PI, 24);
+    for (let ty = -5.4; ty <= -0.2; ty += 1.55) {
+      const tc = new THREE.Mesh(tubingCollarGeo, mats.steelDark);
+      tc.position.y = ty;
+      downholeGroup.add(tc);
+    }
+
+    // E. Estator y Elastómero en Corte (Y = -8.92 to -5.82)
+    const statorGroup = new THREE.Group();
+    downholeGroup.add(statorGroup);
+
+    // Upper & Lower Stator Crossover Collars (connecting Tubing above and Niple de Paro below)
+    const statorTopCollar = new THREE.Mesh(createCutawayPipeGeometry(0.235, 0.34, 0.16, 0, Math.PI, 28), mats.steelDark);
+    statorTopCollar.position.y = -5.90;
+    statorGroup.add(statorTopCollar);
+
+    const statorBotCollar = new THREE.Mesh(createCutawayPipeGeometry(0.235, 0.34, 0.16, 0, Math.PI, 28), mats.steelDark);
+    statorBotCollar.position.y = -8.96;
+    statorGroup.add(statorBotCollar);
+
+    // Outer steel stator barrel (cutaway half-pipe)
+    const statorHousingGeo = createCutawayPipeGeometry(0.255, 0.325, 3.04, 0, Math.PI, 32);
+    const statorHousing = new THREE.Mesh(statorHousingGeo, mats.steelDark);
+    statorHousing.position.y = -8.90;
+    statorHousing.castShadow = true;
+    statorGroup.add(statorHousing);
+
+    // Sculpted continuous double-lobe helical Elastomer Lining in cutaway (Z <= 0, open toward +Z)
+    function createCutawayElastomerGeometry(yStart, height, rOuter, rBase, lobeAmp, turns, ny = 72, nTheta = 32) {
+      const positions = [];
+      const indices = [];
+
+      // Grid of inner cavity vertices + outer wall vertices for each vertical slice
+      const stride = (nTheta + 1) * 2;
+      for (let iy = 0; iy <= ny; iy++) {
+        const t = iy / ny;
+        const y = yStart + t * height;
+        const phi = t * Math.PI * 2 * turns;
+
+        for (let it = 0; it <= nTheta; it++) {
+          const alpha = (it / nTheta) * Math.PI; // 0 (+X) -> PI/2 (-Z) -> PI (-X)
+          const rIn = rBase + lobeAmp * Math.cos(2 * (alpha - phi));
+          const cosA = Math.cos(alpha);
+          const sinA = Math.sin(alpha);
+
+          // Inner cavity point (even index)
+          positions.push(cosA * rIn, y, -sinA * rIn);
+          // Outer elastomer wall point bonded to stator barrel (odd index)
+          positions.push(cosA * rOuter, y, -sinA * rOuter);
+        }
+      }
+
+      for (let iy = 0; iy < ny; iy++) {
+        const row0 = iy * stride;
+        const row1 = (iy + 1) * stride;
+
+        // Inner helical cavity surface
+        for (let it = 0; it < nTheta; it++) {
+          const a = row0 + it * 2;
+          const b = row0 + (it + 1) * 2;
+          const c = row1 + it * 2;
+          const d = row1 + (it + 1) * 2;
+          indices.push(a, c, b, b, c, d);
+        }
+
+        // Right cutaway cross-section face (alpha = 0, facing +Z)
+        {
+          const aIn = row0;
+          const aOut = row0 + 1;
+          const bIn = row1;
+          const bOut = row1 + 1;
+          indices.push(aIn, aOut, bIn, bIn, aOut, bOut);
+        }
+
+        // Left cutaway cross-section face (alpha = PI, facing +Z)
+        {
+          const base0 = row0 + nTheta * 2;
+          const base1 = row1 + nTheta * 2;
+          const aIn = base0;
+          const aOut = base0 + 1;
+          const bIn = base1;
+          const bOut = base1 + 1;
+          indices.push(aIn, bIn, aOut, bIn, bOut, aOut);
+        }
+      }
+
+      // Bottom & Top elastomer rim caps
+      for (let it = 0; it < nTheta; it++) {
+        const bIn0 = it * 2;
+        const bOut0 = bIn0 + 1;
+        const bIn1 = (it + 1) * 2;
+        const bOut1 = bIn1 + 1;
+        indices.push(bIn0, bIn1, bOut0, bIn1, bOut1, bOut0);
+
+        const topRow = ny * stride;
+        const tIn0 = topRow + it * 2;
+        const tOut0 = tIn0 + 1;
+        const tIn1 = topRow + (it + 1) * 2;
+        const tOut1 = tIn1 + 1;
+        indices.push(tIn0, tOut0, tIn1, tIn1, tOut0, tOut1);
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.setIndex(indices);
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    const elastomerGeo = createCutawayElastomerGeometry(-8.88, 2.98, 0.256, 0.148, 0.044, 2.25);
+    const elastomerMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1f28,
+      roughness: 0.68,
+      metalness: 0.08,
+      side: THREE.DoubleSide,
+    });
+    const elastomerMesh = new THREE.Mesh(elastomerGeo, elastomerMat);
+    elastomerMesh.receiveShadow = true;
+    statorGroup.add(elastomerMesh);
+
+    // F. Niple de Paro (Stop Pin / Seating Nipple: Y = -8.96 to -9.24)
+    const stopNippleGroup = new THREE.Group();
+    downholeGroup.add(stopNippleGroup);
+
+    const stopBody = new THREE.Mesh(createCutawayPipeGeometry(0.19, 0.31, 0.28, 0, Math.PI, 28), mats.steelCasing);
+    stopBody.position.y = -9.24;
+    stopNippleGroup.add(stopBody);
+
+    // Internal horizontal Pin de Paro (Stop Pin) crossing bore beneath the rotor tip
+    const stopPinBar = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.44, 14), mats.brass);
+    stopPinBar.rotation.z = Math.PI / 2;
+    stopPinBar.position.set(0, -9.10, -0.02);
+    stopNippleGroup.add(stopPinBar);
+
+    const stopPinCollarL = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.04, 12), mats.steelDark);
+    stopPinCollarL.rotation.z = Math.PI / 2;
+    stopPinCollarL.position.set(-0.22, -9.10, -0.02);
+    stopNippleGroup.add(stopPinCollarL);
+
+    const stopPinCollarR = stopPinCollarL.clone();
+    stopPinCollarR.position.x = 0.22;
+    stopNippleGroup.add(stopPinCollarR);
+
+    // G. Ancla Antitorque (Mechanical Torque Anchor gripping casing: Y = -9.24 to -9.76)
+    const torqueAnchorGroup = new THREE.Group();
+    downholeGroup.add(torqueAnchorGroup);
+
+    const anchorMandrel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.52, 24), mats.steelDark);
+    anchorMandrel.position.y = -9.50;
+    anchorMandrel.castShadow = true;
+    torqueAnchorGroup.add(anchorMandrel);
+
+    // Upper & lower cone wedges driving the anchor slips against casing
+    const upperCone = new THREE.Mesh(new THREE.CylinderGeometry(0.23, 0.31, 0.12, 20), mats.steelCasing);
+    upperCone.position.y = -9.32;
+    torqueAnchorGroup.add(upperCone);
+
+    const lowerCone = new THREE.Mesh(new THREE.CylinderGeometry(0.31, 0.23, 0.12, 20), mats.steelCasing);
+    lowerCone.position.y = -9.68;
+    torqueAnchorGroup.add(lowerCone);
+
+    // 3 Serrated gripping slips (cuñas antitorque) engaging casing wall + drag springs
+    for (let k = 0; k < 3; k++) {
+      const a = 0.32 + k * 1.25; // positioned on back & side arcs so clearly visible in cutaway
+      const cx = Math.cos(a);
+      const cz = -Math.sin(a);
+
+      const slip = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.26, 0.13), mats.safetyYellow);
+      slip.position.set(cx * 0.35, -9.50, cz * 0.35);
+      slip.rotation.y = a;
+      torqueAnchorGroup.add(slip);
+
+      // Serrated grip teeth ribs on outer slip face
+      for (let t = -1; t <= 1; t++) {
+        const tooth = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.035, 0.135), mats.steelDark);
+        tooth.position.set(cx * 0.405, -9.50 + t * 0.075, cz * 0.405);
+        tooth.rotation.y = a;
+        torqueAnchorGroup.add(tooth);
+      }
+
+      // Bowed centralizer / drag spring (fleje)
+      const dragSpring = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.38, 0.06), mats.steelPipe);
+      dragSpring.position.set(cx * 0.34, -9.50, cz * 0.34);
+      dragSpring.rotation.y = a;
+      torqueAnchorGroup.add(dragSpring);
+    }
+
+    // H. Ancla de Gas (Cutaway Poor-Boy Gas Separator: Y = -9.76 to -10.84)
+    const gasAnchorGroup = new THREE.Group();
+    downholeGroup.add(gasAnchorGroup);
+
+    // Upper crossover collar connecting torque anchor to gas anchor outer barrel
+    const gasAnchorTop = new THREE.Mesh(createCutawayPipeGeometry(0.17, 0.25, 0.12, 0, Math.PI, 24), mats.steelDark);
+    gasAnchorTop.position.y = -9.88;
+    gasAnchorGroup.add(gasAnchorTop);
+
+    // Outer cutaway separator barrel (Y = -10.82 to -9.88)
+    const gasOuterBarrel = new THREE.Mesh(createCutawayPipeGeometry(0.185, 0.235, 0.94, 0, Math.PI, 28), mats.steelCasing);
+    gasOuterBarrel.position.y = -10.82;
+    gasOuterBarrel.castShadow = true;
+    gasAnchorGroup.add(gasOuterBarrel);
+
+    // Upper gas-vent / fluid-entry slots milled into outer barrel (gas separates upward into annulus)
+    for (let s = 0; s < 4; s++) {
+      const slotAngle = 0.35 + (s / 3) * (Math.PI - 0.70);
+      const slot = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.20, 0.07), perfHoleMat);
+      slot.position.set(Math.cos(slotAngle) * 0.21, -10.04, -Math.sin(slotAngle) * 0.21);
+      slot.rotation.y = slotAngle;
+      gasAnchorGroup.add(slot);
+    }
+
+    // Internal concentric Dip Tube (Tubo Pescador / Suction Tube) visible inside cutaway barrel
+    const dipTube = new THREE.Mesh(new THREE.CylinderGeometry(0.082, 0.082, 0.78, 18), mats.steelPipe);
+    dipTube.position.y = -10.28;
+    gasAnchorGroup.add(dipTube);
+
+    // Dip tube flared intake bell near bottom of gas anchor
+    const dipBell = new THREE.Mesh(new THREE.CylinderGeometry(0.082, 0.115, 0.09, 18), mats.brass);
+    dipBell.position.y = -10.70;
+    gasAnchorGroup.add(dipBell);
+
+    // Bottom Bull-Plug / Desander cap at base of gas anchor (submerged in oil pool)
+    const bullPlug = new THREE.Mesh(new THREE.CylinderGeometry(0.235, 0.16, 0.14, 24), mats.steelDark);
+    bullPlug.position.y = -10.86;
+    gasAnchorGroup.add(bullPlug);
+
+    // I. Rotating Downhole Assembly (Rotor Metálico Helicoidal + Sarta de Cabillas continua hasta superficie)
+    const rotatingRodAssembly = new THREE.Group();
+    downholeGroup.add(rotatingRodAssembly);
+
+    // True mathematical single-helix Rotor Metálico Helicoidal (Y = -8.92 to -5.85)
+    const helixPts = [];
+    const helixSteps = 96;
+    const rotorTurns = 4.5;
+    const rotorRadius = 0.058;
+    for (let i = 0; i <= helixSteps; i++) {
+      const t = i / helixSteps;
+      const y = -8.90 + t * 3.05;
+      const theta = t * Math.PI * 2 * rotorTurns;
+      helixPts.push(new THREE.Vector3(
+        Math.cos(theta) * rotorRadius,
+        y,
+        Math.sin(theta) * rotorRadius
+      ));
+    }
+    const rotorCurve = new THREE.CatmullRomCurve3(helixPts);
+    const rotorGeo = new THREE.TubeGeometry(rotorCurve, 128, 0.086, 20, false);
+    const rotorMesh = new THREE.Mesh(rotorGeo, mats.chromePolished);
+    rotorMesh.castShadow = true;
+    rotatingRodAssembly.add(rotorMesh);
+
+    // Rounded hemispherical nose cap at bottom of helical rotor (resting just above stop pin)
+    const rotorTip = new THREE.Mesh(new THREE.SphereGeometry(0.086, 16, 16), mats.chromePolished);
+    rotorTip.position.copy(helixPts[0]);
+    rotatingRodAssembly.add(rotorTip);
+
+    // Rotor head crossover coupling & Pony Rod connecting seamlessly to Sucker Rod String
+    const rotorCoupling = new THREE.Mesh(new THREE.CylinderGeometry(0.084, 0.084, 0.24, 16), mats.steelDark);
+    rotorCoupling.position.set(0, -5.75, 0);
+    rotatingRodAssembly.add(rotorCoupling);
+
+    // Sarta de Cabillas (Continuous Sucker Rod String: Y = -5.65 up to +1.56 connecting to Barra Pulida)
+    const suckerRod = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 7.22, 16), mats.steelPipe);
+    suckerRod.position.y = -2.04;
+    suckerRod.castShadow = true;
+    rotatingRodAssembly.add(suckerRod);
+
+    // Forged Rod Couplings (Cuplas de Cabilla) & Rod Centralizers along entire tubing length
+    for (let ry = -4.9; ry <= 0.7; ry += 1.12) {
+      const cupla = new THREE.Mesh(new THREE.CylinderGeometry(0.078, 0.078, 0.16, 14), mats.steelDark);
+      cupla.position.y = ry;
+      rotatingRodAssembly.add(cupla);
+
+      // Molded rod centralizer guides inside tubing
+      for (let f = 0; f < 3; f++) {
+        const fin = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.13, 0.19), mats.brass);
+        fin.position.y = ry + 0.24;
+        fin.rotation.y = (f * Math.PI) / 3;
+        rotatingRodAssembly.add(fin);
+      }
+    }
+
+    // =========================================================================
+    // 8. SURFACE: PLATAFORMA, CELLER, CABEZAL, MOTORES, POLEAS & PIPING
+    // =========================================================================
+    const surfaceGroup = new THREE.Group();
+    rootGroup.add(surfaceGroup);
+
+    // 8.1 Plataforma de Concreto (Cutaway front slot X: -1.15..+1.15, Z: 0..+3.8 left open for wellbore visibility)
+    const padGroup = new THREE.Group();
+    surfaceGroup.add(padGroup);
+
+    const padLeft = new THREE.Mesh(new THREE.BoxGeometry(3.85, 0.22, 6.8), mats.concrete);
+    padLeft.position.set(-3.075, 0.11, 0.0);
+    padLeft.receiveShadow = true;
+    padLeft.castShadow = true;
+    padGroup.add(padLeft);
+
+    const padRight = new THREE.Mesh(new THREE.BoxGeometry(3.85, 0.22, 6.8), mats.concrete);
+    padRight.position.set(3.075, 0.11, 0.0);
+    padRight.receiveShadow = true;
+    padRight.castShadow = true;
+    padGroup.add(padRight);
+
+    const padBack = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.22, 2.55), mats.concrete);
+    padBack.position.set(0, 0.11, -2.125);
+    padBack.receiveShadow = true;
+    padBack.castShadow = true;
+    padGroup.add(padBack);
+
+    // Safety yellow perimeter curb bollards at pad corners
+    const bollardGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.52, 12);
+    const bollardCoords = [
+      [-4.85, -3.2], [4.85, -3.2], [-4.85, 3.2], [4.85, 3.2],
+    ];
+    for (const [bx, bz] of bollardCoords) {
+      const bol = new THREE.Mesh(bollardGeo, mats.safetyYellow);
+      bol.position.set(bx, 0.48, bz);
+      bol.castShadow = true;
+      padGroup.add(bol);
+    }
+
+    // 8.2 Celler (Contrapozo U-shaped concrete pit with steel grating rim)
+    const cellarGroup = new THREE.Group();
+    surfaceGroup.add(cellarGroup);
+
+    // Left, Right & Back cellar walls (Y = -0.62 to +0.25)
+    const cellarWallL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.87, 1.85), mats.concrete);
+    cellarWallL.position.set(-1.06, -0.185, -0.02);
+    cellarWallL.receiveShadow = true;
+    cellarGroup.add(cellarWallL);
+
+    const cellarWallR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.87, 1.85), mats.concrete);
+    cellarWallR.position.set(1.06, -0.185, -0.02);
+    cellarWallR.receiveShadow = true;
+    cellarGroup.add(cellarWallR);
+
+    const cellarWallB = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.87, 0.18), mats.concrete);
+    cellarWallB.position.set(0, -0.185, -0.86);
+    cellarWallB.receiveShadow = true;
+    cellarGroup.add(cellarWallB);
+
+    // Cellar floor slab (cutaway back half)
+    const cellarFloor = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.12, 1.0), mats.concrete);
+    cellarFloor.position.set(0, -0.56, -0.35);
+    cellarFloor.receiveShadow = true;
+    cellarGroup.add(cellarFloor);
+
+    // Yellow steel angle-iron cellar rim guards
+    const rimL = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.04, 1.88), mats.safetyYellow);
+    rimL.position.set(-1.06, 0.26, -0.02);
+    cellarGroup.add(rimL);
+    const rimR = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.04, 1.88), mats.safetyYellow);
+    rimR.position.set(1.06, 0.26, -0.02);
+    cellarGroup.add(rimR);
+    const rimB = new THREE.Mesh(new THREE.BoxGeometry(2.32, 0.04, 0.20), mats.safetyYellow);
+    rimB.position.set(0, 0.26, -0.86);
+    cellarGroup.add(rimB);
+
+    // 8.3 Cabezal del Pozo (Wellhead: Casing Head + Tubing Head + Master Valve)
+    const wellheadGroup = new THREE.Group();
+    surfaceGroup.add(wellheadGroup);
+
+    // Casing head spool rising out of cellar (Y = -0.35 to +0.35)
+    const casingHeadBody = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.38, 0.68, 24), mats.steelDark);
+    casingHeadBody.position.y = -0.01;
+    casingHeadBody.castShadow = true;
+    wellheadGroup.add(casingHeadBody);
+
+    const casingFlangeTop = createFlange(0.42, 0.07, 10, mats.steelDark);
+    casingFlangeTop.position.y = 0.34;
+    wellheadGroup.add(casingFlangeTop);
+
+    // Tubing head spool (Y = +0.37 to +0.86)
+    const tubingHeadBody = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.44, 24), mats.steelDark);
+    tubingHeadBody.position.y = 0.60;
+    tubingHeadBody.castShadow = true;
+    wellheadGroup.add(tubingHeadBody);
+
+    const tubingFlangeBot = createFlange(0.42, 0.06, 10, mats.steelDark);
+    tubingFlangeBot.position.y = 0.40;
+    wellheadGroup.add(tubingFlangeBot);
+
+    const tubingFlangeTop = createFlange(0.32, 0.06, 8, mats.steelDark);
+    tubingFlangeTop.position.y = 0.84;
+    wellheadGroup.add(tubingFlangeTop);
+
+    // Lockdown pins on tubing head
+    for (let i = 0; i < 4; i++) {
+      const a = Math.PI * 0.25 + (i * Math.PI) / 2;
+      const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.14, 8), mats.brass);
+      pin.rotation.z = Math.PI / 2;
+      pin.rotation.y = a;
+      pin.position.set(Math.cos(a) * 0.28, 0.66, Math.sin(a) * 0.28);
+      wellheadGroup.add(pin);
+    }
+
+    // Left Casing Side Valve + Bull Plug
+    const leftSideStub = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.26, 14), mats.steelPipe);
+    leftSideStub.rotation.z = Math.PI / 2;
+    leftSideStub.position.set(-0.36, 0.14, 0);
+    wellheadGroup.add(leftSideStub);
+    const leftGateWheel = createHandwheel(0.14, mats.valveRed);
+    leftGateWheel.rotation.z = Math.PI / 2;
+    leftGateWheel.position.set(-0.54, 0.14, 0);
+    wellheadGroup.add(leftGateWheel);
+
+    // Master Valve / Adapter Spool (Y = +0.87 to +1.12)
+    const masterAdapter = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.20, 0.22, 20), mats.steelCasing);
+    masterAdapter.position.y = 0.98;
+    wellheadGroup.add(masterAdapter);
+
+    // 8.4 TE de Producción (Flow Tee at Y = +1.10 to +1.52)
+    const teProdGroup = new THREE.Group();
+    surfaceGroup.add(teProdGroup);
+
+    const teVert = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.42, 20), mats.steelDark);
+    teVert.position.y = 1.30;
+    teVert.castShadow = true;
+    teProdGroup.add(teVert);
+
+    const teBotFlange = createFlange(0.24, 0.055, 8, mats.steelDark);
+    teBotFlange.position.y = 1.11;
+    teProdGroup.add(teBotFlange);
+
+    const teTopFlange = createFlange(0.22, 0.055, 8, mats.steelDark);
+    teTopFlange.position.y = 1.50;
+    teProdGroup.add(teTopFlange);
+
+    // Right (+X) outlet branch to Production Line
+    const teRightBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.34, 16), mats.steelDark);
+    teRightBranch.rotation.z = Math.PI / 2;
+    teRightBranch.position.set(0.18, 1.30, 0);
+    teProdGroup.add(teRightBranch);
+
+    const teRightFlange = createFlange(0.18, 0.05, 6, mats.steelDark);
+    teRightFlange.rotation.z = Math.PI / 2;
+    teRightFlange.position.set(0.34, 1.30, 0);
+    teProdGroup.add(teRightFlange);
+
+    // Rear (-Z) injection port for Diluent Injection Line
+    const teBackBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.28, 14), mats.steelDark);
+    teBackBranch.rotation.x = Math.PI / 2;
+    teBackBranch.position.set(0, 1.30, -0.18);
+    teProdGroup.add(teBackBranch);
+
+    const teBackFlange = createFlange(0.13, 0.04, 6, mats.steelDark);
+    teBackFlange.rotation.x = Math.PI / 2;
+    teBackFlange.position.set(0, 1.30, -0.32);
+    teProdGroup.add(teBackFlange);
+
+    // 8.5 Prensa de Estopas (Stuffing Box, Y = +1.53 to +2.06)
+    const stuffingGroup = new THREE.Group();
+    surfaceGroup.add(stuffingGroup);
+
+    const sbBaseFlange = createFlange(0.21, 0.05, 8, mats.steelPipe);
+    sbBaseFlange.position.y = 1.555;
+    stuffingGroup.add(sbBaseFlange);
+
+    const sbBody = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.135, 0.32, 20), mats.brass);
+    sbBody.position.y = 1.74;
+    sbBody.castShadow = true;
+    stuffingGroup.add(sbBody);
+
+    // Packing compression gland + dual side bolts
+    const sbGland = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.06, 16), mats.steelDark);
+    sbGland.position.y = 1.93;
+    stuffingGroup.add(sbGland);
+
+    for (const sx of [-0.11, 0.11]) {
+      const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.26, 8), mats.steelPipe);
+      bolt.position.set(sx, 1.84, 0);
+      stuffingGroup.add(bolt);
+    }
+
+    const sbCap = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.11, 0.10, 16), mats.brass);
+    sbCap.position.y = 2.01;
+    stuffingGroup.add(sbCap);
+
+    // 8.6 Pedestal & Cabezal de Rotación (BCP Drive Head, Y = +1.52 to +4.05)
+    const driveHeadGroup = new THREE.Group();
+    surfaceGroup.add(driveHeadGroup);
+
+    // Heavy structural pedestal legs straddling the stuffing box
+    const legGeo = new THREE.CylinderGeometry(0.055, 0.065, 0.72, 12);
+    for (const [lx, lz] of [[-0.28, -0.22], [0.28, -0.22], [-0.28, 0.22], [0.28, 0.22]]) {
+      const leg = new THREE.Mesh(legGeo, mats.steelDark);
+      leg.position.set(lx, 1.88, lz);
+      leg.castShadow = true;
+      driveHeadGroup.add(leg);
+    }
+    const pedestalBase = createFlange(0.36, 0.05, 8, mats.steelDark);
+    pedestalBase.position.y = 1.54;
+    driveHeadGroup.add(pedestalBase);
+
+    const pedestalTopPlate = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.08, 0.64), mats.bcpBlue);
+    pedestalTopPlate.position.y = 2.26;
+    pedestalTopPlate.castShadow = true;
+    driveHeadGroup.add(pedestalTopPlate);
+
+    // Main Drive Head Cast Housing (Industrial Blue)
+    const dhMainBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.40, 1.18, 28), mats.bcpBlue);
+    dhMainBarrel.position.y = 2.89;
+    dhMainBarrel.castShadow = true;
+    driveHeadGroup.add(dhMainBarrel);
+
+    // Cooling fins on drive head barrel
+    for (let fy = 2.48; fy <= 3.30; fy += 0.14) {
+      const fin = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.03, 24), mats.bcpBlue);
+      fin.position.y = fy;
+      driveHeadGroup.add(fin);
+    }
+
+    // Front inspection nameplate plaque
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.14, 0.04), mats.steelDark);
+    plate.position.set(0, 2.95, 0.41);
+    driveHeadGroup.add(plate);
+    const badgeStripe = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.035, 0.045), mats.valveRed);
+    badgeStripe.position.set(0, 2.99, 0.412);
+    driveHeadGroup.add(badgeStripe);
+
+    // Backspin Brake Drum & Caliper on right side of drive head
+    const brakeDrum = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.20, 0.18, 20), mats.steelDark);
+    brakeDrum.rotation.z = Math.PI / 2;
+    brakeDrum.position.set(0.44, 2.75, 0);
+    driveHeadGroup.add(brakeDrum);
+    const caliper = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.22, 0.18), mats.valveRed);
+    caliper.position.set(0.46, 2.75, 0.14);
+    driveHeadGroup.add(caliper);
+
+    // Upper thrust bearing housing collar
+    const dhTopCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.36, 0.24, 24), mats.bcpBlue);
+    dhTopCollar.position.y = 3.59;
+    driveHeadGroup.add(dhTopCollar);
+
+    // Cantilevered Motor Mount Frame extending Left (-X) to X = -1.35
+    const motorBridge = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.14, 0.62), mats.bcpBlue);
+    motorBridge.position.set(-0.72, 2.29, 0);
+    motorBridge.castShadow = true;
+    driveHeadGroup.add(motorBridge);
+
+    // Diagonal gusset brace under motor bridge
+    const gusset = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.10, 0.12), mats.steelDark);
+    gusset.position.set(-0.75, 1.98, 0);
+    gusset.rotation.z = 0.56;
+    driveHeadGroup.add(gusset);
+
+    // 8.7 Motores BCP (Vertical TEFC Industrial Motor at X = -1.30)
+    const motorGroup = new THREE.Group();
+    surfaceGroup.add(motorGroup);
+
+    const motorBaseFlange = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.40, 0.12, 24), mats.steelDark);
+    motorBaseFlange.position.set(-1.30, 2.42, 0);
+    motorGroup.add(motorBaseFlange);
+
+    // Main motor stator body
+    const motorBody = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.96, 24), mats.bcpBlue);
+    motorBody.position.set(-1.30, 2.96, 0);
+    motorBody.castShadow = true;
+    motorGroup.add(motorBody);
+
+    // Longitudinal TEFC cooling fins around motor perimeter
+    for (let f = 0; f < 16; f++) {
+      const a = (f / 16) * Math.PI * 2;
+      const mFin = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.88, 0.05), mats.bcpBlue);
+      mFin.position.set(-1.30 + Math.cos(a) * 0.35, 2.96, Math.sin(a) * 0.35);
+      mFin.rotation.y = -a;
+      motorGroup.add(mFin);
+    }
+
+    // Fan shroud / cowl at bottom of motor
+    const fanCowl = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.32, 0.24, 24), mats.steelDark);
+    fanCowl.position.set(-1.30, 2.52, 0);
+    motorGroup.add(fanCowl);
+
+    // Upper bearing bell + motor shaft rising to drive pulley (Y = 3.44 to 3.98)
+    const motorTopBell = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.34, 0.18, 24), mats.bcpBlue);
+    motorTopBell.position.set(-1.30, 3.53, 0);
+    motorGroup.add(motorTopBell);
+
+    const motorShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.45, 16), mats.chromePolished);
+    motorShaft.position.set(-1.30, 3.82, 0);
+    motorGroup.add(motorShaft);
+
+    // Motor Terminal Junction Box (Caja de Conexiones) on left side
+    const junctionBox = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.26, 0.24), mats.bcpBlue);
+    junctionBox.position.set(-1.72, 2.98, 0);
+    junctionBox.castShadow = true;
+    motorGroup.add(junctionBox);
+
+    // 8.8 Relación de Transmisión y Poleas (Drive & Driven Pulleys + V-Belts + Cutaway Guard)
+    const transmissionGroup = new THREE.Group();
+    surfaceGroup.add(transmissionGroup);
+
+    // Motor Drive Pulley (Smaller sheave, X = -1.30, Y = 3.86) -> rotates faster!
+    const drivePulleyGroup = new THREE.Group();
+    drivePulleyGroup.position.set(-1.30, 3.86, 0);
+    transmissionGroup.add(drivePulleyGroup);
+
+    const driveSheave = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.20, 24), mats.steelDark);
+    driveSheave.castShadow = true;
+    drivePulleyGroup.add(driveSheave);
+    for (const gy of [-0.07, -0.023, 0.023, 0.07]) {
+      const groove = new THREE.Mesh(new THREE.TorusGeometry(0.222, 0.012, 8, 28), mats.steelPipe);
+      groove.rotation.x = Math.PI / 2;
+      groove.position.y = gy;
+      drivePulleyGroup.add(groove);
+    }
+    // Visual spoke cross on top of drive pulley so rotation ratio is crystal clear!
+    const driveSpoke = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.025, 0.045), mats.safetyYellow);
+    driveSpoke.position.y = 0.11;
+    drivePulleyGroup.add(driveSpoke);
+
+    // Driven Pulley on Drive Head Hollow Shaft (Larger sheave, X = 0.0, Y = 3.86) -> ratio ~2.45:1
+    const drivenPulleyGroup = new THREE.Group();
+    drivenPulleyGroup.position.set(0.0, 3.86, 0);
+    transmissionGroup.add(drivenPulleyGroup);
+
+    const drivenSheave = new THREE.Mesh(new THREE.CylinderGeometry(0.54, 0.54, 0.20, 32), mats.steelDark);
+    drivenSheave.castShadow = true;
+    drivenPulleyGroup.add(drivenSheave);
+    for (const gy of [-0.07, -0.023, 0.023, 0.07]) {
+      const groove = new THREE.Mesh(new THREE.TorusGeometry(0.542, 0.014, 8, 36), mats.steelPipe);
+      groove.rotation.x = Math.PI / 2;
+      groove.position.y = gy;
+      drivenPulleyGroup.add(groove);
+    }
+    for (let sp = 0; sp < 3; sp++) {
+      const spBar = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.025, 0.06), mats.safetyYellow);
+      spBar.position.y = 0.11;
+      spBar.rotation.y = (sp * Math.PI) / 3;
+      drivenPulleyGroup.add(spBar);
+    }
+
+    // 3 Ribbed V-Belts wrapping accurately around both sheaves (tangent geometry)
+    function createBeltLoop(x1, r1, x2, r2, thickness = 0.032) {
+      // Tangent angle between circles (x1, r1) and (x2, r2)
+      const dx = x2 - x1;
+      const sinA = (r2 - r1) / dx;
+      const cosA = Math.sqrt(1 - sinA * sinA);
+      const shape = new THREE.Shape();
+      // Outer loop points
+      const aStart1 = Math.PI / 2 + Math.asin(sinA);
+      const aEnd1 = (3 * Math.PI) / 2 - Math.asin(sinA);
+      shape.absarc(x1, 0, r1 + thickness, aStart1, aEnd1, false);
+      shape.absarc(x2, 0, r2 + thickness, aEnd1, aStart1 + Math.PI * 2, false);
+      shape.closePath();
+
+      const hole = new THREE.Path();
+      hole.absarc(x1, 0, r1, aEnd1, aStart1, true);
+      hole.absarc(x2, 0, r2, aStart1 + Math.PI * 2, aEnd1, true);
+      hole.closePath();
+      shape.holes.push(hole);
+
+      const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.034, bevelEnabled: false, curveSegments: 24 });
+      geo.rotateX(Math.PI / 2);
+      return geo;
+    }
+
+    const beltLoopGeo = createBeltLoop(-1.30, 0.22, 0.0, 0.54, 0.028);
+    for (const by of [3.80, 3.86, 3.92]) {
+      const belt = new THREE.Mesh(beltLoopGeo, mats.beltRubber);
+      belt.position.y = by;
+      transmissionGroup.add(belt);
+    }
+
+    // Cutaway Safety-Yellow Belt Guard (Back & Top/Bottom shell open on +Z so sheaves & belts stay visible!)
+    const guardBack = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.34, 0.04), mats.safetyYellow);
+    guardBack.position.set(-0.62, 3.86, -0.62);
+    transmissionGroup.add(guardBack);
+
+    const guardTop = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.035, 0.65), mats.safetyYellow);
+    guardTop.position.set(-0.62, 4.03, -0.30);
+    transmissionGroup.add(guardTop);
+
+    const guardBot = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.035, 0.65), mats.safetyYellow);
+    guardBot.position.set(-0.62, 3.69, -0.30);
+    transmissionGroup.add(guardBot);
+
+    const guardLeftCap = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.34, 16, 1, false, Math.PI * 0.5, Math.PI), mats.safetyYellow);
+    guardLeftCap.position.set(-1.58, 3.86, -0.30);
+    transmissionGroup.add(guardLeftCap);
+
+    // 8.9 Barra Pulida & Grampa de Barra Pulida (Rotating with driven pulley!)
+    const surfaceSpinAssembly = new THREE.Group();
+    surfaceGroup.add(surfaceSpinAssembly);
+
+    // Barra Pulida (Polished chrome rod from stuffing box Y = 1.55 up to Y = 4.65)
+    const polishedRod = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 3.12, 24), mats.chromePolished);
+    polishedRod.position.y = 3.11;
+    polishedRod.castShadow = true;
+    surfaceSpinAssembly.add(polishedRod);
+
+    // Hollow drive carrier hub at top of drive head (Y = 4.02 to 4.18)
+    const carrierHub = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 0.14, 20), mats.steelDark);
+    carrierHub.position.y = 4.07;
+    surfaceSpinAssembly.add(carrierHub);
+
+    // Grampa de Barra Pulida (Polished Rod Clamp at Y = 4.16 to 4.38)
+    const clampBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.20, 0.15), mats.steelDark);
+    clampBody.position.y = 4.24;
+    clampBody.castShadow = true;
+    surfaceSpinAssembly.add(clampBody);
+
+    for (const cz of [-0.09, 0.09]) {
+      const cBolt = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.30, 8), mats.brass);
+      cBolt.rotation.z = Math.PI / 2;
+      cBolt.position.set(0, 4.24, cz);
+      surfaceSpinAssembly.add(cBolt);
+    }
+
+    // 8.10 Acometida Eléctrica (VFD Starter Panel + Conduit + Armored Power Cables)
+    const electricalGroup = new THREE.Group();
+    surfaceGroup.add(electricalGroup);
+
+    // Concrete plinth & VFD Electrical Cabinet on left pad (X = -3.8, Z = -0.8)
+    const vfdPlinth = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.14, 0.78), mats.concrete);
+    vfdPlinth.position.set(-3.75, 0.29, -0.75);
+    electricalGroup.add(vfdPlinth);
+
+    const vfdCabinet = new THREE.Mesh(new THREE.BoxGeometry(0.92, 1.52, 0.62), [
+      mats.steelDark,
+      mats.steelDark,
+      mats.steelDark,
+      mats.steelDark,
+      mats.vfdPanel,
+      mats.steelDark,
+    ]);
+    vfdCabinet.position.set(-3.75, 1.12, -0.75);
+    vfdCabinet.castShadow = true;
+    electricalGroup.add(vfdCabinet);
+
+    // Disconnect lever handle on cabinet
+    const discHandle = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.16, 0.06), mats.valveRed);
+    discHandle.position.set(-3.40, 1.38, -0.42);
+    electricalGroup.add(discHandle);
+
+    // Galvanized conduit stanchion + armored power cables sweeping into motor terminal box
+    const conduitPost = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.95, 12), mats.conduit);
+    conduitPost.position.set(-2.55, 1.18, -0.75);
+    conduitPost.castShadow = true;
+    electricalGroup.add(conduitPost);
+
+    const cableCurve1 = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-3.30, 1.65, -0.75),
+      new THREE.Vector3(-2.55, 2.08, -0.75),
+      new THREE.Vector3(-2.15, 2.48, -0.35),
+      new THREE.Vector3(-1.72, 2.86, 0.0),
+    ]);
+    const cable1 = new THREE.Mesh(new THREE.TubeGeometry(cableCurve1, 36, 0.036, 12, false), mats.cableArmor);
+    cable1.castShadow = true;
+    electricalGroup.add(cable1);
+
+    const cableCurve2 = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-3.30, 1.48, -0.68),
+      new THREE.Vector3(-2.55, 1.92, -0.68),
+      new THREE.Vector3(-2.12, 2.34, -0.28),
+      new THREE.Vector3(-1.72, 2.84, 0.07),
+    ]);
+    const cable2 = new THREE.Mesh(new THREE.TubeGeometry(cableCurve2, 36, 0.024, 10, false), mats.cableArmor);
+    cable2.castShadow = true;
+    electricalGroup.add(cable2);
+
+    // Brass cable gland at motor junction box
+    const cableGland = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.10, 12), mats.brass);
+    cableGland.rotation.z = Math.PI / 3;
+    cableGland.position.set(-1.82, 2.88, 0.0);
+    electricalGroup.add(cableGland);
+
+    // 8.11 Línea de Producción o Tubing (Right +X from TE at Y = +1.30)
+    const prodLineGroup = new THREE.Group();
+    surfaceGroup.add(prodLineGroup);
+
+    // Main horizontal production pipe (X = 0.34 to 4.55, Y = 1.30, Z = 0)
+    const prodPipeMain = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 4.22, 20), mats.prodSightPipe);
+    prodPipeMain.rotation.z = Math.PI / 2;
+    prodPipeMain.position.set(2.45, 1.30, 0);
+    prodPipeMain.renderOrder = 3;
+    prodLineGroup.add(prodPipeMain);
+
+    // Pipe support stanchions bolted to concrete pad
+    for (const sx of [1.15, 2.75, 4.25]) {
+      const stanchion = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.055, 1.02, 12), mats.steelDark);
+      stanchion.position.set(sx, 0.72, 0);
+      stanchion.castShadow = true;
+      prodLineGroup.add(stanchion);
+
+      const foot = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.04, 0.24), mats.steelDark);
+      foot.position.set(sx, 0.23, 0);
+      prodLineGroup.add(foot);
+
+      const saddle = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.08, 0.22), mats.steelDark);
+      saddle.position.set(sx, 1.21, 0);
+      prodLineGroup.add(saddle);
+    }
+
+    // Manómetro de Producción (X = 0.88, Y = 1.38)
+    const gaugeProd = createPressureGauge('PROD', 1200, 0.25);
+    gaugeProd.position.set(0.88, 1.38, 0);
+    prodLineGroup.add(gaugeProd);
+
+    // Válvula de Purga de Producción (X = 1.48, Y = 1.25)
+    const bleedProd = createBleedValve(mats.valveRed);
+    bleedProd.position.set(1.48, 1.23, 0);
+    prodLineGroup.add(bleedProd);
+
+    // Choke (Estrangulador Ajustable) at X = 2.18, Y = 1.30
+    const chokeGroup = new THREE.Group();
+    chokeGroup.position.set(2.18, 1.30, 0);
+    prodLineGroup.add(chokeGroup);
+
+    const chokeBody = new THREE.Mesh(new THREE.CylinderGeometry(0.145, 0.145, 0.36, 16), mats.bcpBlue);
+    chokeBody.rotation.z = Math.PI / 2;
+    chokeBody.castShadow = true;
+    chokeGroup.add(chokeBody);
+
+    const chokeFlangeL = createFlange(0.16, 0.045, 6, mats.steelDark);
+    chokeFlangeL.rotation.z = Math.PI / 2;
+    chokeFlangeL.position.x = -0.19;
+    chokeGroup.add(chokeFlangeL);
+
+    const chokeFlangeR = createFlange(0.16, 0.045, 6, mats.steelDark);
+    chokeFlangeR.rotation.z = Math.PI / 2;
+    chokeFlangeR.position.x = 0.19;
+    chokeGroup.add(chokeFlangeR);
+
+    const chokeBonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.11, 0.26, 16), mats.steelDark);
+    chokeBonnet.position.y = 0.20;
+    chokeGroup.add(chokeBonnet);
+
+    const chokeDial = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.06, 16), mats.brass);
+    chokeDial.position.y = 0.34;
+    chokeGroup.add(chokeDial);
+
+    const chokeStem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.16, 12), mats.chromePolished);
+    chokeStem.position.y = 0.44;
+    chokeGroup.add(chokeStem);
+
+    const chokeWheel = createHandwheel(0.16, mats.safetyYellow);
+    chokeWheel.position.y = 0.52;
+    chokeGroup.add(chokeWheel);
+
+    // Válvula Check de Producción at X = 3.12, Y = 1.30
+    const checkProd = createCheckValve(mats.steelPipe, 1.08);
+    checkProd.position.set(3.12, 1.30, 0);
+    prodLineGroup.add(checkProd);
+
+    // Toma de Muestra (Sample Point) at X = 3.84, Y = 1.30
+    const sampleGroup = new THREE.Group();
+    sampleGroup.position.set(3.84, 1.24, 0.04);
+    prodLineGroup.add(sampleGroup);
+
+    const sampleTee = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.14, 12), mats.brass);
+    sampleTee.position.y = -0.04;
+    sampleGroup.add(sampleTee);
+
+    const sampleValve = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), mats.steelDark);
+    sampleValve.position.y = -0.14;
+    sampleGroup.add(sampleValve);
+
+    const sampleLever = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, 0.03), mats.safetyYellow);
+    sampleLever.position.set(0.07, -0.14, 0.05);
+    sampleGroup.add(sampleLever);
+
+    const sampleSpoutCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, -0.18, 0),
+      new THREE.Vector3(0, -0.26, 0.06),
+      new THREE.Vector3(0, -0.34, 0.12),
+    ]);
+    const sampleSpout = new THREE.Mesh(new THREE.TubeGeometry(sampleSpoutCurve, 12, 0.018, 8, false), mats.chromePolished);
+    sampleGroup.add(sampleSpout);
+
+    // Drip cup under sample point
+    const dripCup = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 0.12, 16), mats.steelDark);
+    dripCup.position.set(0, -0.52, 0.12);
+    sampleGroup.add(dripCup);
+
+    // Downstream header elbow going down into pad collector at X = 4.55
+    const endFlange = createFlange(0.16, 0.05, 6, mats.steelDark);
+    endFlange.rotation.z = Math.PI / 2;
+    endFlange.position.set(4.52, 1.30, 0);
+    prodLineGroup.add(endFlange);
+
+    const prodEndCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(4.52, 1.30, 0),
+      new THREE.Vector3(4.78, 1.26, 0),
+      new THREE.Vector3(4.85, 0.95, 0),
+      new THREE.Vector3(4.85, 0.22, 0),
+    ]);
+    const prodEndPipe = new THREE.Mesh(new THREE.TubeGeometry(prodEndCurve, 20, 0.095, 16, false), mats.prodSightPipe);
+    prodEndPipe.renderOrder = 3;
+    prodLineGroup.add(prodEndPipe);
+
+    // 8.12 Línea de Gas del Anular (Branching from Casing Head +X side outlet at Y = 0.25)
+    const gasLineGroup = new THREE.Group();
+    surfaceGroup.add(gasLineGroup);
+
+    const gasPath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.32, 0.16, 0.0),
+      new THREE.Vector3(0.75, 0.16, 0.42),
+      new THREE.Vector3(0.95, 0.72, 0.56),
+      new THREE.Vector3(2.85, 0.72, 0.56),
+      new THREE.Vector3(3.65, 0.72, 0.56),
+      new THREE.Vector3(4.25, 1.05, 0.25),
+      new THREE.Vector3(4.25, 1.28, 0.0),
+    ]);
+    const gasPipe = new THREE.Mesh(new THREE.TubeGeometry(gasPath, 48, 0.048, 14, false), mats.gasSightPipe);
+    gasPipe.renderOrder = 3;
+    gasLineGroup.add(gasPipe);
+
+    // Annulus isolation gate valve
+    const gasIsoWheel = createHandwheel(0.12, mats.gasLine);
+    gasIsoWheel.position.set(0.66, 0.34, 0.34);
+    gasLineGroup.add(gasIsoWheel);
+
+    // Manómetro del Anular
+    const gaugeGas = createPressureGauge('GAS AN.', 600, -0.4);
+    gaugeGas.scale.setScalar(0.82);
+    gaugeGas.position.set(1.42, 0.75, 0.56);
+    gasLineGroup.add(gaugeGas);
+
+    // Válvula de Purga del Anular
+    const bleedGas = createBleedValve(mats.gasLine);
+    bleedGas.scale.setScalar(0.85);
+    bleedGas.position.set(2.02, 0.69, 0.56);
+    gasLineGroup.add(bleedGas);
+
+    // Válvula Check del Anular
+    const checkGas = createCheckValve(mats.gasLine, 0.68);
+    checkGas.position.set(2.82, 0.72, 0.56);
+    gasLineGroup.add(checkGas);
+
+    // Gas line support posts
+    for (const gx of [1.75, 3.25]) {
+      const gPost = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.03, 0.50, 10), mats.steelDark);
+      gPost.position.set(gx, 0.46, 0.56);
+      gasLineGroup.add(gPost);
+    }
+
+    // 8.13 Línea de Inyección de Diluente (Industrial Amber-Gold piping into Rear TE port)
+    const diluentGroup = new THREE.Group();
+    surfaceGroup.add(diluentGroup);
+
+    const diluentPath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(3.45, 0.22, -2.35),
+      new THREE.Vector3(3.45, 0.92, -2.35),
+      new THREE.Vector3(3.00, 0.92, -2.10),
+      new THREE.Vector3(0.55, 0.92, -2.10),
+      new THREE.Vector3(0.0, 0.92, -1.65),
+      new THREE.Vector3(0.0, 1.30, -0.95),
+      new THREE.Vector3(0.0, 1.30, -0.32),
+    ]);
+    const diluentPipe = new THREE.Mesh(new THREE.TubeGeometry(diluentPath, 56, 0.045, 14, false), mats.diluentSightPipe);
+    diluentPipe.renderOrder = 3;
+    diluentGroup.add(diluentPipe);
+
+    // Diluent skid base flange
+    const dilSkidFlange = createFlange(0.14, 0.05, 6, mats.steelDark);
+    dilSkidFlange.position.set(3.45, 0.24, -2.35);
+    diluentGroup.add(dilSkidFlange);
+
+    // Support stanchions for diluent header
+    for (const dx of [2.45, 1.05]) {
+      const dPost = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.03, 0.70, 10), mats.steelDark);
+      dPost.position.set(dx, 0.56, -2.10);
+      diluentGroup.add(dPost);
+    }
+
+    // Manómetro de Diluente
+    const gaugeDil = createPressureGauge('DILUENTE', 1000, 0.1);
+    gaugeDil.scale.setScalar(0.84);
+    gaugeDil.position.set(2.25, 0.95, -2.10);
+    diluentGroup.add(gaugeDil);
+
+    // Válvula de Purga de Diluente
+    const bleedDil = createBleedValve(mats.diluentLine);
+    bleedDil.scale.setScalar(0.85);
+    bleedDil.position.set(1.62, 0.89, -2.10);
+    diluentGroup.add(bleedDil);
+
+    // Válvula Check de Diluente
+    const checkDil = createCheckValve(mats.diluentLine, 0.65);
+    checkDil.rotation.y = Math.PI;
+    checkDil.position.set(0.95, 0.92, -2.10);
+    diluentGroup.add(checkDil);
+
+    // Choke / Válvula Dosificadora de Diluente near TE rear port
+    const dilChokeWheel = createHandwheel(0.12, mats.diluentLine);
+    dilChokeWheel.position.set(0.0, 1.56, -0.78);
+    diluentGroup.add(dilChokeWheel);
+    const dilChokeBonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.24, 12), mats.steelDark);
+    dilChokeBonnet.position.set(0.0, 1.42, -0.78);
+    diluentGroup.add(dilChokeBonnet);
+
+    // =========================================================================
+    // 8B. PROCESS FLOW ANIMATION SYSTEM (ZERO-GC INSTANCED STREAMS)
+    // =========================================================================
+    const processFlowGroup = new THREE.Group();
+    rootGroup.add(processFlowGroup);
+
+    const flowMats = {
+      crude: new THREE.MeshStandardMaterial({
+        color: 0x92400e,
+        emissive: 0x3b1806,
+        emissiveIntensity: 0.55,
+        roughness: 0.22,
+        metalness: 0.18,
+      }),
+      cavity: new THREE.MeshStandardMaterial({
+        color: 0xa16207,
+        emissive: 0x451a03,
+        emissiveIntensity: 0.62,
+        roughness: 0.20,
+        metalness: 0.22,
+      }),
+      prodMix: new THREE.MeshStandardMaterial({
+        color: 0xffffff, // tinted per-instance via setColorAt
+        emissive: 0x2b1204,
+        emissiveIntensity: 0.42,
+        roughness: 0.24,
+        metalness: 0.16,
+      }),
+      diluent: new THREE.MeshStandardMaterial({
+        color: 0xfbbf24,
+        emissive: 0xb45309,
+        emissiveIntensity: 0.50,
+        roughness: 0.22,
+        metalness: 0.12,
+      }),
+      gasBubble: new THREE.MeshStandardMaterial({
+        color: 0x7dd3fc,
+        emissive: 0x0284c7,
+        emissiveIntensity: 0.55,
+        roughness: 0.18,
+        metalness: 0.10,
+        transparent: true,
+        opacity: 0.82,
+      }),
+    };
+
+    const flowSphereGeo = new THREE.SphereGeometry(1, 10, 8);
+
+    // 1. Perforation inflow -> Gas anchor intake -> Dip tube suction (48 instances)
+    const PERF_COUNT = 48;
+    const perfFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.crude, PERF_COUNT);
+    perfFlowMesh.frustumCulled = false;
+    perfFlowMesh.renderOrder = 1;
+    processFlowGroup.add(perfFlowMesh);
+
+    const perfSeeds = [];
+    for (let i = 0; i < PERF_COUNT; i++) {
+      perfSeeds.push({
+        phase: i / PERF_COUNT,
+        lane: i % 8,
+        angle: 0.22 + ((i % 7) / 6) * (Math.PI - 0.44),
+        side: i % 2 === 0 ? -1 : 1,
+      });
+    }
+
+    // 2. Progressive cavity fluid pockets ascending through Stator/Rotor (24 instances)
+    const CAVITY_COUNT = 24;
+    const cavityFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.cavity, CAVITY_COUNT);
+    cavityFlowMesh.frustumCulled = false;
+    cavityFlowMesh.renderOrder = 1;
+    processFlowGroup.add(cavityFlowMesh);
+
+    // 3. Tubing ascent -> TE de producción -> Surface production line (64 instances)
+    const PROD_COUNT = 64;
+    const prodFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.prodMix, PROD_COUNT);
+    prodFlowMesh.frustumCulled = false;
+    prodFlowMesh.renderOrder = 1;
+    processFlowGroup.add(prodFlowMesh);
+
+    const prodCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.0, -5.82, -0.08),
+      new THREE.Vector3(0.09, -4.10, -0.06),
+      new THREE.Vector3(-0.08, -2.30, -0.08),
+      new THREE.Vector3(0.07, -0.50, -0.06),
+      new THREE.Vector3(0.0, 1.10, 0.0),
+      new THREE.Vector3(0.18, 1.30, 0.0),
+      new THREE.Vector3(1.50, 1.30, 0.0),
+      new THREE.Vector3(3.10, 1.30, 0.0),
+      new THREE.Vector3(4.52, 1.30, 0.0),
+      new THREE.Vector3(4.80, 1.18, 0.0),
+      new THREE.Vector3(4.85, 0.30, 0.0),
+    ]);
+
+    const prodSeeds = [];
+    const _colCrude = new THREE.Color(0x9a3412);
+    const _colDiluted = new THREE.Color(0xea9a1a);
+    const _colScratch = new THREE.Color();
+    for (let i = 0; i < PROD_COUNT; i++) {
+      prodSeeds.push({
+        phase: i / PROD_COUNT,
+        radialJitter: ((i % 5) - 2) * 0.016,
+        angleJitter: (i * 2.399) % (Math.PI * 2),
+      });
+      prodFlowMesh.setColorAt(i, _colCrude);
+    }
+    if (prodFlowMesh.instanceColor) prodFlowMesh.instanceColor.needsUpdate = true;
+
+    // 4. Diluent injection stream along diluentPath into TE de Producción (28 instances)
+    const DIL_COUNT = 28;
+    const dilFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.diluent, DIL_COUNT);
+    dilFlowMesh.frustumCulled = false;
+    dilFlowMesh.renderOrder = 1;
+    processFlowGroup.add(dilFlowMesh);
+
+    const diluentFlowCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(3.45, 0.24, -2.35),
+      new THREE.Vector3(3.45, 0.92, -2.35),
+      new THREE.Vector3(3.00, 0.92, -2.10),
+      new THREE.Vector3(0.55, 0.92, -2.10),
+      new THREE.Vector3(0.0, 0.92, -1.65),
+      new THREE.Vector3(0.0, 1.30, -0.95),
+      new THREE.Vector3(0.0, 1.30, -0.02),
+    ]);
+
+    // 5. Annulus gas separation bubbles (Gas anchor -> Annulus -> Línea de Gas del Anular) (40 instances)
+    const GAS_COUNT = 40;
+    const gasFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.gasBubble, GAS_COUNT);
+    gasFlowMesh.frustumCulled = false;
+    gasFlowMesh.renderOrder = 1;
+    processFlowGroup.add(gasFlowMesh);
+
+    const gasFullCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.24, -10.02, -0.18),
+      new THREE.Vector3(0.36, -8.20, -0.12),
+      new THREE.Vector3(0.35, -5.60, -0.14),
+      new THREE.Vector3(0.36, -2.80, -0.12),
+      new THREE.Vector3(0.34, 0.14, -0.04),
+      new THREE.Vector3(0.75, 0.16, 0.42),
+      new THREE.Vector3(0.95, 0.72, 0.56),
+      new THREE.Vector3(2.85, 0.72, 0.56),
+      new THREE.Vector3(3.65, 0.72, 0.56),
+      new THREE.Vector3(4.25, 1.05, 0.25),
+      new THREE.Vector3(4.25, 1.28, 0.0),
+    ]);
+
+    const gasSeeds = [];
+    for (let i = 0; i < GAS_COUNT; i++) {
+      gasSeeds.push({
+        phase: i / GAS_COUNT,
+        swirlOffset: (i * 1.618) % (Math.PI * 2),
+      });
+    }
+
+    // Pre-allocated scratch math objects (zero GC in render loop)
+    const _flowMat4 = new THREE.Matrix4();
+    const _flowPos = new THREE.Vector3();
+    const _flowTan = new THREE.Vector3();
+    const _flowQuat = new THREE.Quaternion();
+    const _flowScale = new THREE.Vector3();
+    const _upAxis = new THREE.Vector3(0, 1, 0);
+
+    // =========================================================================
+    // 9. PRE-WARM SHADERS & CAMERA PRESETS
+    // =========================================================================
+    if (!isSoftwareGl) {
+      renderer.compile(scene, camera);
+    }
+
+    const PRESETS = {
+      'panoramica': {
+        pos: [8.6, 3.2, 16.4],
+        target: [0.35, -3.1, 0.0],
+        section: 'flujo',
+      },
+      'corte-frontal': {
+        pos: [0.0, -3.6, 15.8],
+        target: [0.0, -4.1, 0.0],
+        section: 'flujo',
+      },
+      'manifold-descarga': {
+        pos: [4.2, 2.55, 5.4],
+        target: [2.25, 1.05, -0.4],
+        section: 'flujo',
+      },
+      'isometrica-superficie': {
+        pos: [6.4, 5.2, 7.6],
+        target: [0.2, 1.85, -0.3],
+        section: 'flujo',
+      },
+      'superficie-overview': {
+        pos: [5.4, 4.1, 7.8],
+        target: [0.4, 2.1, -0.2],
+        section: 'superficie',
+      },
+      'plataforma-celler': {
+        pos: [2.8, 1.45, 4.6],
+        target: [0.0, 0.35, 0.0],
+        section: 'superficie',
+      },
+      'motor-poleas': {
+        pos: [-2.8, 4.5, 4.4],
+        target: [-0.65, 3.35, 0.0],
+        section: 'superficie',
+      },
+      'cabezal-barra': {
+        pos: [2.3, 3.4, 3.8],
+        target: [0.0, 2.9, 0.0],
+        section: 'superficie',
+      },
+      'acometida-te': {
+        pos: [-3.1, 2.5, 4.9],
+        target: [-1.45, 1.75, -0.35],
+        section: 'superficie',
+      },
+      'lineas-valvulas': {
+        pos: [3.6, 2.25, 4.8],
+        target: [2.1, 1.15, -0.35],
+        section: 'superficie',
+      },
+      'subsuelo-overview': {
+        pos: [4.8, -4.4, 11.4],
+        target: [0.0, -5.8, 0.0],
+        section: 'subsuelo',
+      },
+      'bloque-corte': {
+        pos: [6.2, -3.5, 13.6],
+        target: [0.0, -5.6, 0.0],
+        section: 'subsuelo',
+      },
+      'sarta-cabillas': {
+        pos: [1.8, -2.4, 5.4],
+        target: [0.0, -2.9, 0.0],
+        section: 'subsuelo',
+      },
+      'bomba-bcp': {
+        pos: [1.05, -7.25, 3.65],
+        target: [0.0, -7.45, 0.0],
+        section: 'subsuelo',
+      },
+      'zona-canoneada': {
+        pos: [1.35, -9.65, 4.15],
+        target: [0.0, -9.95, 0.05],
+        section: 'subsuelo',
+      },
+    };
+
+    const STEP_INFO = {
+      '01': {
+        preset: 'panoramica',
+        html: '<strong>01 / Qué es:</strong> El Bombeo de Cavidad Progresiva (BCP) utiliza un rotor helicoidal metálico girando dentro de un estator de elastómero para elevar crudo viscoso de forma continua.',
+      },
+      '02': {
+        preset: 'bomba-bcp',
+        html: '<strong>02 / Cómo funciona:</strong> El motor eléctrico transmite torque mediante poleas y barra pulida hacia la sarta de cabillas, formando cavidades selladas progresivas que impulsan el fluido hacia superficie.',
+      },
+      '03': {
+        preset: 'lineas-valvulas',
+        html: '<strong>03 / Componentes:</strong> Integra cabezal de rotación, prensa de estopas, TE de producción, líneas de producción, gas anular y diluente con choke, válvulas check, purgas y manómetros.',
+      },
+      '04': {
+        preset: 'isometrica-superficie',
+        html: '<strong>04 / Operación:</strong> Ajusta la velocidad en el panel de telemetría (RPM) para observar la relación de transmisión en las poleas, el giro del rotor y la respuesta de caudal y presión.',
+      },
+    };
+
+    // Smooth camera transition state (damped & cancelled on user OrbitControls interaction)
+    let transitionActive = false;
+    const targetCamPos = new THREE.Vector3().copy(camera.position);
+    const targetCtrlTarget = new THREE.Vector3().copy(controls.target);
+
+    function goToPreset(presetKey) {
+      const p = PRESETS[presetKey];
+      if (!p) return;
+      targetCamPos.set(p.pos[0], p.pos[1], p.pos[2]);
+      targetCtrlTarget.set(p.target[0], p.target[1], p.target[2]);
+      transitionActive = true;
+    }
+
+    controls.addEventListener('start', () => {
+      transitionActive = false;
+    });
+
+    // =========================================================================
+    // 10. UI WIRING (SIDEBAR, RAIL, STEP BAR, TELEMETRY & RPM SLIDER)
+    // =========================================================================
+    const navCards = document.querySelectorAll('.nav-card');
+    const railNodes = document.querySelectorAll('.rail-node');
+    const navItemBtns = document.querySelectorAll('.nav-item-btn');
+    const stepBtns = document.querySelectorAll('.step-btn');
+    const stepCaption = document.getElementById('step-caption');
+    const stepCaptionText = document.getElementById('step-caption-text');
+    const btnCloseCaption = document.getElementById('btn-close-caption');
+    const btnResetView = document.getElementById('btn-reset-view');
+
+    function setActiveSection(sectionKey) {
+      navCards.forEach((c) => c.classList.toggle('active', c.dataset.section === sectionKey));
+      railNodes.forEach((n) => n.classList.toggle('active', n.dataset.rail === sectionKey));
+    }
+
+    function selectNavItem(btn) {
+      navItemBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const sectionKey = btn.dataset.sectionRef;
+      if (sectionKey) setActiveSection(sectionKey);
+      goToPreset(btn.dataset.preset);
+    }
+
+    navItemBtns.forEach((btn) => {
+      btn.addEventListener('click', () => selectNavItem(btn));
+    });
+
+    document.querySelectorAll('.nav-card-header').forEach((hdr) => {
+      hdr.addEventListener('click', () => {
+        const card = hdr.closest('.nav-card');
+        if (card) setActiveSection(card.dataset.section);
+        if (hdr.dataset.focus) goToPreset(hdr.dataset.focus);
+      });
+    });
+
+    railNodes.forEach((node) => {
+      node.addEventListener('click', () => {
+        const sec = node.dataset.rail;
+        setActiveSection(sec);
+        if (sec === 'superficie') goToPreset('superficie-overview');
+        else if (sec === 'subsuelo') goToPreset('subsuelo-overview');
+        else goToPreset('panoramica');
+      });
+    });
+
+    stepBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const stepId = btn.dataset.step;
+        stepBtns.forEach((b) => {
+          const isActive = b === btn;
+          b.classList.toggle('active', isActive);
+          b.setAttribute('aria-selected', String(isActive));
+        });
+        const info = STEP_INFO[stepId];
+        if (info) {
+          stepCaptionText.innerHTML = info.html;
+          stepCaption.style.display = 'flex';
+          goToPreset(info.preset);
+          const p = PRESETS[info.preset];
+          if (p) setActiveSection(p.section);
+        }
+      });
+    });
+
+    btnCloseCaption.addEventListener('click', () => {
+      stepCaption.style.display = 'none';
+    });
+
+    btnResetView.addEventListener('click', () => {
+      goToPreset('panoramica');
+      setActiveSection('flujo');
+      navItemBtns.forEach((b) => b.classList.toggle('active', b.dataset.preset === 'panoramica'));
+    });
+
+    // Telemetry & RPM Slider
+    const rpmSlider = document.getElementById('rpm-slider');
+    const rpmSliderBadge = document.getElementById('rpm-slider-badge');
+    const valBpd = document.getElementById('val-bpd');
+    const valPsi = document.getElementById('val-psi');
+    const valTemp = document.getElementById('val-temp');
+    const valRpm = document.getElementById('val-rpm');
+
+    let targetRpm = Number(rpmSlider.value);
+    let currentRpm = targetRpm;
+
+    function updateSliderVisual() {
+      const pct = (targetRpm / 350) * 100;
+      rpmSlider.style.background = `linear-gradient(90deg, #2563eb 0%, #3b82f6 ${pct}%, #1e293b ${pct}%)`;
+      rpmSliderBadge.textContent = `${targetRpm} RPM`;
+    }
+    updateSliderVisual();
+
+    rpmSlider.addEventListener('input', (e) => {
+      targetRpm = Number(e.target.value);
+      updateSliderVisual();
+    });
+
+    // =========================================================================
+    // 11. ANIMATION LOOP (60FPS HARDWARE / AFTERDRAW-PACED SOFTWARE WEBGL)
+    // =========================================================================
+    const clock = new THREE.Clock();
+    const PULLEY_RATIO = 0.54 / 0.22; // ~2.4545x motor speed relative to polished rod
+    let frameId = 0;
+    let lastTelemetryUpdate = 0;
+
+    function afterDraw(cb) {
+      const gl = renderer.getContext();
+      const sync = gl && gl.fenceSync ? gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0) : null;
+      if (!sync) {
+        frameId = window.setTimeout(cb, 80);
+        return;
+      }
+      gl.flush();
+      const poll = () => {
+        const state = gl.getSyncParameter(sync, gl.SYNC_STATUS);
+        if (state === gl.UNSIGNALED) {
+          frameId = window.setTimeout(poll, 5);
+        } else {
+          gl.deleteSync(sync);
+          frameId = window.setTimeout(cb, 80);
+        }
+      };
+      frameId = window.setTimeout(poll, 5);
+    }
+
+    let flowProgress = 0;
+    let gasProgress = 0;
+    let poolPhase = 0;
+    let pulsePhase = 0;
+
+    function updateProcessFlow(dt) {
+      const rpmRatio = currentRpm / 180;
+      flowProgress += dt * rpmRatio * 0.28;
+      gasProgress += dt * (0.08 + rpmRatio * 0.68) * 0.16;
+
+      // Subtle reservoir drawdown shimmer & warm lighting response to pumping rate
+      const activeFactor = THREE.MathUtils.clamp(currentRpm / 350, 0, 1);
+      poolPhase += dt * (1.2 + activeFactor * 3.0);
+      oilPool.position.y = -10.88 + Math.sin(poolPhase) * 0.008 * activeFactor;
+      meniscus.scale.setScalar(1 + Math.sin(poolPhase * 1.1) * 0.025 * activeFactor);
+      reservoirGlow.intensity = 4.8 + activeFactor * 1.8;
+
+      // 1. Crude inflow from Cañoneo -> Gas Anchor bottom -> Dip Tube up into Pump
+      for (let i = 0; i < PERF_COUNT; i++) {
+        const s = perfSeeds[i];
+        const t = (s.phase + flowProgress * 1.15) % 1;
+
+        if (t < 0.42) {
+          // Radial entry from rock perforation walls inward & downward toward gas anchor intake
+          const k = t / 0.42;
+          const r = THREE.MathUtils.lerp(1.06, 0.26, k);
+          const yStart = -10.42 + (s.lane % 5) * 0.22;
+          const y = THREE.MathUtils.lerp(yStart, -10.74, k * k);
+          _flowPos.set(Math.cos(s.angle) * r, y, -Math.sin(s.angle) * r);
+          _flowTan.set(-Math.cos(s.angle), -0.45 * k, Math.sin(s.angle)).normalize();
+          _flowScale.set(0.030, 0.052, 0.030);
+        } else {
+          // Drawn into Dip Tube bell & ascending cleanly through Stop Nipple into Pump Suction
+          const k = (t - 0.42) / 0.58;
+          const y = THREE.MathUtils.lerp(-10.72, -8.90, k);
+          const swirl = s.angle + k * 2.2;
+          const rad = 0.032 * (1 - k * 0.35);
+          _flowPos.set(Math.cos(swirl) * rad, y, -Math.sin(swirl) * rad);
+          _flowTan.set(0, 1, 0);
+          _flowScale.set(0.034, 0.058, 0.034);
+        }
+
+        _flowQuat.setFromUnitVectors(_upAxis, _flowTan);
+        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+        perfFlowMesh.setMatrixAt(i, _flowMat4);
+      }
+      perfFlowMesh.instanceMatrix.needsUpdate = true;
+
+      // 2. Progressive cavity fluid pockets climbing inside cutaway Stator/Elastomer
+      const rotorAngle = -rotatingRodAssembly.rotation.y;
+      for (let i = 0; i < CAVITY_COUNT; i++) {
+        const t = ((i / CAVITY_COUNT) + flowProgress * 0.95) % 1;
+        const y = -8.86 + t * 2.98;
+        // Follow the 2-lobe elastomer cavity opposite the turning rotor lobe
+        const cavityPhi = t * Math.PI * 2 * 2.25 + (i % 2) * Math.PI;
+        const cavityAngle = cavityPhi + rotorAngle * 0.5;
+        // Keep pockets visible in the cutaway front/back side arc
+        const rad = 0.118;
+        _flowPos.set(
+          Math.cos(cavityAngle) * rad,
+          y,
+          -Math.abs(Math.sin(cavityAngle)) * rad * 0.85
+        );
+        _flowTan.set(-Math.sin(cavityAngle) * 0.25, 1.0, -Math.cos(cavityAngle) * 0.20).normalize();
+        _flowQuat.setFromUnitVectors(_upAxis, _flowTan);
+        _flowScale.set(0.056, 0.088, 0.050);
+        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+        cavityFlowMesh.setMatrixAt(i, _flowMat4);
+      }
+      cavityFlowMesh.instanceMatrix.needsUpdate = true;
+
+      // 3. Tubing ascent -> TE de Producción -> Surface production line (with diluent color blend)
+      for (let i = 0; i < PROD_COUNT; i++) {
+        const s = prodSeeds[i];
+        const t = (s.phase + flowProgress * 0.55) % 1;
+        prodCurve.getPointAt(t, _flowPos);
+        prodCurve.getTangentAt(t, _flowTan);
+
+        if (t < 0.56) {
+          // Spiral gently in tubing annulus around rotating sucker rod
+          const swirlA = s.angleJitter + t * 18.0 + rotorAngle * 0.4;
+          const rTubing = 0.135 + s.radialJitter;
+          _flowPos.x = Math.cos(swirlA) * rTubing;
+          _flowPos.z = -Math.abs(Math.sin(swirlA)) * rTubing * 0.85 - 0.02;
+        } else {
+          // Slight radial scatter inside horizontal surface production sight-pipe
+          _flowPos.y += Math.sin(s.angleJitter + t * 12) * 0.024;
+          _flowPos.z += Math.cos(s.angleJitter) * 0.024;
+        }
+
+        _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
+        _flowScale.set(0.036, 0.068, 0.036);
+        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+        prodFlowMesh.setMatrixAt(i, _flowMat4);
+
+        // Blend crude oil color toward lighter diluted amber after passing TE de Producción (t >= 0.60)
+        const mixFactor = THREE.MathUtils.smoothstep(t, 0.58, 0.70);
+        _colScratch.copy(_colCrude).lerp(_colDiluted, mixFactor);
+        prodFlowMesh.setColorAt(i, _colScratch);
+      }
+      prodFlowMesh.instanceMatrix.needsUpdate = true;
+      if (prodFlowMesh.instanceColor) prodFlowMesh.instanceColor.needsUpdate = true;
+
+      // 4. Diluent injection stream entering TE de Producción
+      for (let i = 0; i < DIL_COUNT; i++) {
+        const t = ((i / DIL_COUNT) + flowProgress * 0.82) % 1;
+        diluentFlowCurve.getPointAt(t, _flowPos);
+        diluentFlowCurve.getTangentAt(t, _flowTan);
+        _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
+        _flowScale.set(0.024, 0.050, 0.024);
+        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+        dilFlowMesh.setMatrixAt(i, _flowMat4);
+      }
+      dilFlowMesh.instanceMatrix.needsUpdate = true;
+
+      // 5. Annulus gas separation bubbles: Gas Anchor vents -> Casing Annulus -> Línea de Gas del Anular
+      for (let i = 0; i < GAS_COUNT; i++) {
+        const s = gasSeeds[i];
+        const t = (s.phase + gasProgress) % 1;
+        gasFullCurve.getPointAt(t, _flowPos);
+        gasFullCurve.getTangentAt(t, _flowTan);
+
+        if (t < 0.42) {
+          // Keep bubbles riding visibly inside the cutaway casing-tubing annulus (Z <= -0.05)
+          const rAnn = 0.36;
+          const arcA = 0.25 + ((Math.sin(s.swirlOffset + t * 10) * 0.5 + 0.5) * (Math.PI - 0.50));
+          _flowPos.x = Math.cos(arcA) * rAnn;
+          _flowPos.z = -Math.sin(arcA) * rAnn;
+        }
+
+        _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
+        const bSize = t < 0.42 ? 0.028 : 0.024;
+        _flowScale.set(bSize, bSize * 1.25, bSize);
+        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+        gasFlowMesh.setMatrixAt(i, _flowMat4);
+      }
+      gasFlowMesh.instanceMatrix.needsUpdate = true;
+    }
+
+    function stepScene(dt, elapsed) {
+      // Smoothly damp RPM changes
+      currentRpm = THREE.MathUtils.damp(currentRpm, targetRpm, 6.0, dt);
+
+      // Angular velocity scaled for smooth visual readability (rad/s)
+      const visualOmega = (currentRpm / 60) * Math.PI * 0.42;
+
+      // Rotate driven pulley, polished rod + clamp, sucker rod string & helical rotor
+      drivenPulleyGroup.rotation.y -= visualOmega * dt;
+      surfaceSpinAssembly.rotation.y -= visualOmega * dt;
+      rotatingRodAssembly.rotation.y -= visualOmega * dt;
+
+      // Rotate motor drive pulley at true transmission ratio
+      drivePulleyGroup.rotation.y -= visualOmega * PULLEY_RATIO * dt;
+
+      // Scroll V-belt texture to show live belt travel
+      beltTex.offset.x -= (visualOmega * 0.24) * dt;
+
+      // Update synchronized 3D fluid, progressive cavity, diluent & annulus gas flows
+      updateProcessFlow(dt);
+
+      // Subtle manometer needle reaction to pressure & pump pulsation
+      const normLoad = currentRpm / 350;
+      pulsePhase += dt * (1.5 + normLoad * 4.5);
+      const pulse = Math.sin(pulsePhase) * 0.03 * normLoad;
+      for (const g of gaugeNeedles) {
+        g.pivot.rotation.z = g.baseAngle - normLoad * 1.45 + pulse;
+      }
+
+      // Smooth damped camera preset transitions
+      if (transitionActive) {
+        const dampLambda = isSoftwareGl ? 10.0 : 5.2;
+        camera.position.x = THREE.MathUtils.damp(camera.position.x, targetCamPos.x, dampLambda, dt);
+        camera.position.y = THREE.MathUtils.damp(camera.position.y, targetCamPos.y, dampLambda, dt);
+        camera.position.z = THREE.MathUtils.damp(camera.position.z, targetCamPos.z, dampLambda, dt);
+
+        controls.target.x = THREE.MathUtils.damp(controls.target.x, targetCtrlTarget.x, dampLambda, dt);
+        controls.target.y = THREE.MathUtils.damp(controls.target.y, targetCtrlTarget.y, dampLambda, dt);
+        controls.target.z = THREE.MathUtils.damp(controls.target.z, targetCtrlTarget.z, dampLambda, dt);
+
+        if (
+          camera.position.distanceToSquared(targetCamPos) < 0.001 &&
+          controls.target.distanceToSquared(targetCtrlTarget) < 0.001
+        ) {
+          camera.position.copy(targetCamPos);
+          controls.target.copy(targetCtrlTarget);
+          transitionActive = false;
+        }
+      }
+
+      controls.update();
+
+      // Update real-time telemetry readout at ~6 Hz for crisp readability
+      if (elapsed - lastTelemetryUpdate > 0.16) {
+        lastTelemetryUpdate = elapsed;
+        const jitter = (Math.sin(elapsed * 2.3) + Math.cos(elapsed * 3.7)) * 0.5;
+        const bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(currentRpm * 2.4 + jitter * 4));
+        const psi = Math.round(280 + currentRpm * 1.58 + jitter * 3);
+        const temp = (58.4 + (currentRpm / 350) * 19.6 + jitter * 0.15).toFixed(1);
+
+        valBpd.textContent = String(bpd);
+        valPsi.textContent = String(psi);
+        valTemp.textContent = temp;
+        valRpm.textContent = String(Math.round(currentRpm));
+      }
+    }
+
+    function tick() {
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const elapsed = clock.getElapsedTime();
+      stepScene(dt, elapsed);
+      renderer.render(scene, camera);
+
+      if (isSoftwareGl) afterDraw(tick);
+      else frameId = requestAnimationFrame(tick);
+    }
+
+    tick();
+
+    // =========================================================================
+    // 12. RESPONSIVE RESIZE & CLEANUP
+    // =========================================================================
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 2));
+    });
+
+    window.addEventListener('beforeunload', () => {
+      cancelAnimationFrame(frameId);
+      clearTimeout(frameId);
+      renderer.dispose();
+    });
+  </script>
+</body>
+</html>

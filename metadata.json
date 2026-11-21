@@ -1,0 +1,6 @@
+{
+  "name": "Simulador 3D Sistema BCP",
+  "description": "Aplicación web 3D interactiva de un sistema de Bombeo de Cavidad Progresiva (BCP) con bloque geológico en corte, equipos de superficie y telemetría en tiempo real.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
