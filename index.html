@@ -15,14 +15,14 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
-    "d3": "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm"
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+      "d3": "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm"
+    }
   }
-}
-</script>
+  </script>
 
   <style>
     :root {
@@ -201,6 +201,34 @@
       color: #cbd5e1;
     }
 
+    .btn-ghost[data-weather-mode="lluvia"] {
+      border-color: rgba(56, 189, 248, 0.54);
+      background: rgba(14, 42, 68, 0.72);
+      color: #e0f2fe;
+    }
+
+    .btn-ghost[data-weather-mode="lluvia"] svg {
+      color: #38bdf8;
+    }
+
+    .btn-ghost[data-weather-mode="polvo"] {
+      border-color: rgba(217, 159, 76, 0.56);
+      background: rgba(66, 44, 16, 0.72);
+      color: #fef3c7;
+    }
+
+    .btn-ghost[data-weather-mode="polvo"] svg {
+      color: #f5b963;
+    }
+
+    .btn-ghost.is-weather-standby {
+      opacity: 0.76;
+    }
+
+    .btn-ghost.is-weather-standby:hover {
+      opacity: 1;
+    }
+
     /* Compact Floating Reopen Button for Left Sidebar */
     .btn-open-sidebar {
       position: fixed;
@@ -253,7 +281,7 @@
       top: 48px;
       left: 12px;
       width: 210px;
-      max-height: calc(100vh - 64px);
+      max-height: calc(100vh - 96px);
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -531,7 +559,7 @@
       white-space: nowrap;
     }
 
-    /* Bottom Center Step Bar (Thin & Centered, Clear of Side Panels) */
+    /* Bottom Center Step Bar (Thin & Centered, Clear of Side Panels, Hidden by Default) */
     .bottom-center-wrap {
       position: fixed;
       left: 50%;
@@ -543,6 +571,66 @@
       align-items: center;
       gap: 6px;
       z-index: 20;
+      pointer-events: none;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1), transform 180ms cubic-bezier(0.16, 1, 0.3, 1), visibility 180ms linear;
+    }
+
+    .bottom-center-wrap.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(-50%, 10px);
+      pointer-events: none;
+    }
+
+    .bottom-center-wrap.is-hidden * {
+      pointer-events: none !important;
+    }
+
+    .btn-guide-toggle {
+      position: fixed;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      height: 28px;
+      padding: 0 11px;
+      border-radius: 6px;
+      background: var(--surface-panel);
+      backdrop-filter: var(--panel-blur);
+      -webkit-backdrop-filter: var(--panel-blur);
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      z-index: 20;
+      white-space: nowrap;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 160ms cubic-bezier(0.16, 1, 0.3, 1), transform 160ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease, border-color 150ms ease, color 150ms ease, visibility 160ms linear;
+    }
+
+    .btn-guide-toggle:hover {
+      background: var(--surface-panel-hover);
+      border-color: rgba(96, 165, 250, 0.42);
+      color: #f1f5f9;
+    }
+
+    .btn-guide-toggle:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 2px;
+    }
+
+    .btn-guide-toggle.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(-50%, 8px);
       pointer-events: none;
     }
 
@@ -602,6 +690,34 @@
       pointer-events: auto;
     }
 
+    .step-bar-hide {
+      width: 24px;
+      height: 28px;
+      margin-left: 2px;
+      padding: 0;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      background: transparent;
+      color: #94a3b8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 140ms ease, color 140ms ease;
+    }
+
+    .step-bar-hide:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+    }
+
+    .step-bar-hide:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 1px;
+    }
+
     .step-btn {
       height: 28px;
       padding: 0 11px;
@@ -635,12 +751,15 @@
       outline-offset: 2px;
     }
 
-    /* Bottom Right Compact & Minimizable Telemetry Panel */
+    /* Bottom Right Compact & Minimizable Telemetry Panel (Never Overlaps Depth Nav Dock) */
     .telemetry-panel {
       position: fixed;
       right: 12px;
       bottom: 12px;
       width: 256px;
+      max-height: calc(100vh - 294px);
+      display: flex;
+      flex-direction: column;
       background: var(--surface-panel);
       backdrop-filter: var(--panel-blur);
       -webkit-backdrop-filter: var(--panel-blur);
@@ -666,6 +785,7 @@
       padding-bottom: 6px;
       margin-bottom: 7px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
     }
 
     .telemetry-panel.minimized .telemetry-header {
@@ -709,6 +829,29 @@
 
     .telemetry-panel.minimized .telemetry-toggle-chevron {
       transform: rotate(180deg);
+    }
+
+    .telemetry-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: 2px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
+    }
+
+    .telemetry-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .telemetry-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .telemetry-body::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 999px;
     }
 
     .telemetry-panel.minimized .telemetry-body {
@@ -963,7 +1106,7 @@
       border: 1px solid var(--border-subtle);
       border-radius: 9px;
       padding: 7px 6px;
-      z-index: 20;
+      z-index: 21;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1079,10 +1222,25 @@
 
     @media (max-height: 760px) {
       .depth-slider-wrap {
-        height: 84px;
+        height: 76px;
       }
       .depth-slider {
-        width: 80px;
+        width: 72px;
+      }
+      .telemetry-panel {
+        max-height: calc(100vh - 248px);
+      }
+    }
+
+    @media (max-height: 620px) {
+      .depth-slider-wrap {
+        height: 58px;
+      }
+      .depth-slider {
+        width: 54px;
+      }
+      .telemetry-panel {
+        max-height: calc(100vh - 228px);
       }
     }
 
@@ -1609,6 +1767,666 @@
       color: var(--text-muted);
     }
 
+    /* Discreet Bottom-Left Credits / Autoría Dock */
+    .credits-dock {
+      position: fixed;
+      left: 12px;
+      bottom: 12px;
+      z-index: 22;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      pointer-events: auto;
+    }
+
+    .btn-credits {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: var(--surface-panel);
+      backdrop-filter: var(--panel-blur);
+      -webkit-backdrop-filter: var(--panel-blur);
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+      white-space: nowrap;
+    }
+
+    .btn-credits:hover,
+    .btn-credits[aria-expanded="true"] {
+      background: var(--surface-panel-hover);
+      border-color: rgba(96, 165, 250, 0.42);
+      color: #f1f5f9;
+    }
+
+    .btn-credits[aria-expanded="true"] svg {
+      color: #60a5fa;
+    }
+
+    .btn-credits:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 2px;
+    }
+
+    .credits-popover {
+      position: absolute;
+      left: 0;
+      bottom: calc(100% + 8px);
+      width: 262px;
+      padding: 11px 12px 12px;
+      border-radius: 9px;
+      background: var(--surface-panel-strong);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.20);
+      box-shadow: 0 14px 32px rgba(2, 6, 14, 0.52);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px) scale(0.98);
+      transform-origin: bottom left;
+      pointer-events: none;
+      transition: opacity 170ms cubic-bezier(0.16, 1, 0.3, 1), transform 170ms cubic-bezier(0.16, 1, 0.3, 1), visibility 170ms linear;
+    }
+
+    .credits-popover.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .credits-popover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+
+    .credits-popover-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #60a5fa;
+    }
+
+    .credits-close-btn {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+    }
+
+    .credits-close-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.14);
+      color: #f8fafc;
+    }
+
+    .credits-close-btn:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 1px;
+    }
+
+    .credits-popover-sub {
+      font-size: 10.5px;
+      color: #94a3b8;
+      line-height: 1.35;
+      margin-bottom: 9px;
+    }
+
+    .credits-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .credits-item {
+      padding: 8px 0 7px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #e2e8f0;
+      line-height: 1.35;
+      letter-spacing: 0.005em;
+    }
+
+    .credits-item:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    /* Independent Optional Fault Simulation Dock & Drawer (Hidden by Default) */
+    .faults-dock {
+      position: fixed;
+      left: 110px;
+      bottom: 12px;
+      z-index: 22;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      pointer-events: auto;
+    }
+
+    .btn-faults-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: var(--surface-panel);
+      backdrop-filter: var(--panel-blur);
+      -webkit-backdrop-filter: var(--panel-blur);
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+      white-space: nowrap;
+    }
+
+    .btn-faults-toggle:hover,
+    .btn-faults-toggle[aria-expanded="true"] {
+      background: var(--surface-panel-hover);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: #f1f5f9;
+    }
+
+    .btn-faults-toggle[aria-expanded="true"] svg {
+      color: #fbbf24;
+    }
+
+    .btn-faults-toggle.has-fault-warn {
+      border-color: rgba(245, 158, 11, 0.58);
+      background: rgba(69, 39, 9, 0.72);
+      color: #fef3c7;
+    }
+
+    .btn-faults-toggle.has-fault-crit {
+      border-color: rgba(239, 68, 68, 0.64);
+      background: rgba(69, 14, 18, 0.78);
+      color: #fee2e2;
+    }
+
+    .btn-faults-toggle:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 2px;
+    }
+
+    .fault-btn-dot {
+      display: none;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .btn-faults-toggle.has-fault-warn .fault-btn-dot {
+      display: inline-block;
+      background: #fbbf24;
+      box-shadow: 0 0 7px rgba(251, 191, 36, 0.85);
+      animation: faultPulseDot 1.3s ease-in-out infinite;
+    }
+
+    .btn-faults-toggle.has-fault-crit .fault-btn-dot {
+      display: inline-block;
+      background: #f87171;
+      box-shadow: 0 0 8px rgba(248, 113, 113, 0.9);
+      animation: faultPulseDot 0.95s ease-in-out infinite;
+    }
+
+    @keyframes faultPulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.82); }
+    }
+
+    .faults-panel {
+      position: absolute;
+      left: 0;
+      bottom: calc(100% + 8px);
+      width: 294px;
+      max-height: calc(100vh - 110px);
+      display: flex;
+      flex-direction: column;
+      padding: 11px 12px 12px;
+      border-radius: 9px;
+      background: var(--surface-panel-strong);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 16px 36px rgba(2, 6, 14, 0.56);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px) scale(0.98);
+      transform-origin: bottom left;
+      pointer-events: none;
+      transition: opacity 175ms cubic-bezier(0.16, 1, 0.3, 1), transform 175ms cubic-bezier(0.16, 1, 0.3, 1), visibility 175ms linear;
+    }
+
+    .faults-panel.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .faults-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+      flex-shrink: 0;
+    }
+
+    .faults-panel-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .faults-panel-title {
+      font-size: 9.8px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: #f8fafc;
+      white-space: nowrap;
+    }
+
+    .faults-status-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 600;
+      color: #34d399;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .faults-status-text.is-warn {
+      color: #fbbf24;
+    }
+
+    .faults-status-text.is-crit {
+      color: #f87171;
+    }
+
+    .faults-panel-body {
+      overflow-y: auto;
+      min-height: 0;
+      padding-right: 2px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.24) transparent;
+    }
+
+    .faults-panel-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .faults-panel-body::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.24);
+      border-radius: 999px;
+    }
+
+    .faults-panel-sub {
+      font-size: 10.2px;
+      color: #94a3b8;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    .fault-torque-meter {
+      padding: 7px 8px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .fault-torque-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .fault-torque-label {
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #94a3b8;
+    }
+
+    .fault-torque-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #e2e8f0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .fault-torque-val.is-warn {
+      color: #fbbf24;
+    }
+
+    .fault-torque-val.is-crit {
+      color: #f87171;
+    }
+
+    .fault-torque-track {
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.16);
+      overflow: hidden;
+    }
+
+    .fault-torque-fill {
+      width: 42%;
+      height: 100%;
+      border-radius: 999px;
+      background: #38bdf8;
+      transition: width 180ms ease, background-color 180ms ease;
+    }
+
+    .fault-torque-fill.is-warn {
+      background: #f59e0b;
+    }
+
+    .fault-torque-fill.is-crit {
+      background: #ef4444;
+    }
+
+    .fault-scenarios-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .fault-scenario-btn {
+      width: 100%;
+      text-align: left;
+      padding: 7px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.025);
+      color: #cbd5e1;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+
+    .fault-scenario-btn:hover {
+      background: rgba(255, 255, 255, 0.065);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+
+    .fault-scenario-btn:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 1px;
+    }
+
+    .fault-scenario-btn.active[data-severity="warn"] {
+      background: rgba(120, 53, 15, 0.36);
+      border-color: rgba(245, 158, 11, 0.62);
+      color: #fef3c7;
+    }
+
+    .fault-scenario-btn.active[data-severity="crit"] {
+      background: rgba(127, 29, 29, 0.42);
+      border-color: rgba(239, 68, 68, 0.68);
+      color: #fee2e2;
+    }
+
+    .fault-scenario-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .fault-scenario-name {
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.25;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fault-sev-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #64748b;
+    }
+
+    .fault-scenario-btn[data-severity="warn"] .fault-sev-dot {
+      background: #f59e0b;
+    }
+
+    .fault-scenario-btn[data-severity="crit"] .fault-sev-dot {
+      background: #ef4444;
+    }
+
+    .fault-scenario-desc {
+      font-size: 9.8px;
+      color: #94a3b8;
+      line-height: 1.32;
+      padding-left: 12px;
+    }
+
+    .fault-scenario-btn.active .fault-scenario-desc {
+      color: rgba(241, 245, 249, 0.82);
+    }
+
+    .fault-diagnosis-box {
+      display: none;
+      padding: 8px 9px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      border-left: 3px solid #f59e0b;
+      background: rgba(120, 53, 15, 0.24);
+      font-size: 10.3px;
+      line-height: 1.4;
+      color: #fef3c7;
+    }
+
+    .fault-diagnosis-box.visible {
+      display: block;
+    }
+
+    .fault-diagnosis-box.is-crit {
+      border-left-color: #ef4444;
+      background: rgba(127, 29, 29, 0.30);
+      color: #fee2e2;
+    }
+
+    .fault-diagnosis-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .fault-diagnosis-action {
+      margin-top: 4px;
+      font-size: 9.6px;
+      color: rgba(226, 232, 240, 0.82);
+    }
+
+    .btn-fault-reset {
+      width: 100%;
+      height: 29px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(255, 255, 255, 0.04);
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 10.8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+      flex-shrink: 0;
+    }
+
+    .btn-fault-reset:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: #f8fafc;
+    }
+
+    .btn-fault-reset.is-needed {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(52, 211, 153, 0.54);
+      color: #d1fae5;
+    }
+
+    .btn-fault-reset.is-needed:hover {
+      background: rgba(16, 185, 129, 0.30);
+      border-color: rgba(52, 211, 153, 0.82);
+      color: #ffffff;
+    }
+
+    .btn-fault-reset:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 2px;
+    }
+
+    /* Non-blocking Top-Center Active Fault Alert Banner (Hidden in Normal Operation) */
+    .fault-alert-banner {
+      position: fixed;
+      top: 48px;
+      left: 50%;
+      transform: translate(-50%, -8px);
+      max-width: min(460px, calc(100vw - 340px));
+      padding: 6px 10px;
+      border-radius: 7px;
+      background: rgba(28, 16, 8, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(245, 158, 11, 0.56);
+      box-shadow: 0 10px 26px rgba(2, 6, 14, 0.45);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      z-index: 23;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 175ms cubic-bezier(0.16, 1, 0.3, 1), transform 175ms cubic-bezier(0.16, 1, 0.3, 1), visibility 175ms linear;
+    }
+
+    .fault-alert-banner.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0);
+      pointer-events: auto;
+    }
+
+    .fault-alert-banner.is-crit {
+      background: rgba(34, 10, 12, 0.90);
+      border-color: rgba(239, 68, 68, 0.64);
+    }
+
+    .fault-alert-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #fbbf24;
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.85);
+      animation: faultPulseDot 1.15s ease-in-out infinite;
+    }
+
+    .fault-alert-banner.is-crit .fault-alert-dot {
+      background: #f87171;
+      box-shadow: 0 0 9px rgba(248, 113, 113, 0.9);
+    }
+
+    .fault-alert-copy {
+      min-width: 0;
+      flex: 1;
+      font-size: 10.8px;
+      line-height: 1.3;
+      color: #fef3c7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fault-alert-banner.is-crit .fault-alert-copy {
+      color: #fee2e2;
+    }
+
+    .fault-alert-copy strong {
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .fault-alert-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .fault-banner-btn {
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 130ms ease, border-color 130ms ease;
+    }
+
+    .fault-banner-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.34);
+    }
+
     @media (max-width: 1120px) {
       .bottom-center-wrap {
         max-width: calc(100vw - 524px);
@@ -1618,14 +2436,20 @@
         font-size: 10px;
         height: 26px;
       }
+      .credits-popover {
+        width: 244px;
+      }
+      .faults-panel {
+        width: 274px;
+      }
     }
   </style>
 </head>
 <body>
   <div id="viewport" aria-label="Visor 3D del Sistema de Bombeo de Cavidad Progresiva"></div>
 
-  <!-- Toggleable Geological Strata Labels Overlay (Junín 5) -->
-  <div id="geo-labels-layer" class="geo-labels-layer" aria-label="Etiquetas de capas geológicas del Bloque Junín 5"></div>
+  <!-- Toggleable Geological Strata Labels Overlay (Junín 5, Hidden by Default) -->
+  <div id="geo-labels-layer" class="geo-labels-layer hidden" aria-label="Etiquetas de capas geológicas del Bloque Junín 5"></div>
 
   <!-- Pinned 3D Component Leader Line Overlay -->
   <svg id="tooltip-leader-svg" aria-hidden="true">
@@ -1693,7 +2517,22 @@
         </svg>
         <span id="lighting-btn-label">Luz: Estudio</span>
       </button>
-      <button type="button" id="btn-geo-labels" class="btn-ghost geo-active" title="Mostrar u ocultar etiquetas de capas geológicas (Junín 5)" aria-pressed="true">
+      <button type="button" id="btn-weather-mode" class="btn-ghost is-weather-standby" data-weather-mode="despejado" title="Clima en modo Día: Despejado / Lluvia / Polvo de sabana" aria-label="Alternar clima en modo Día: Despejado, Lluvia o Polvo">
+        <svg id="icon-weather-despejado" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+        </svg>
+        <svg id="icon-weather-lluvia" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+          <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+          <path d="M8 19v2M12 17v4M16 19v2" />
+        </svg>
+        <svg id="icon-weather-polvo" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+          <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" />
+          <path d="M9.6 4.6A2 2 0 1 1 11 8H2" />
+          <path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
+        </svg>
+        <span id="weather-btn-label">Clima: Despejado</span>
+      </button>
+      <button type="button" id="btn-geo-labels" class="btn-ghost" title="Mostrar u ocultar etiquetas de capas geológicas (Junín 5)" aria-pressed="false">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <polygon points="12 2 2 7 12 12 22 7 12 2" />
           <polyline points="2 12 12 17 22 12" />
@@ -1947,9 +2786,132 @@
     </div>
   </aside>
 
-  <!-- Bottom Center Step Navigation -->
-  <div id="bottom-center-wrap" class="bottom-center-wrap">
-    <div id="step-caption" class="step-caption">
+  <!-- Discreet Bottom-Left Credits / Autoría Control -->
+  <div id="credits-dock" class="credits-dock">
+    <div id="credits-popover" class="credits-popover" role="dialog" aria-label="Créditos y autoría del simulador" aria-hidden="true">
+      <div class="credits-popover-header">
+        <span class="credits-popover-title">Autoría y Créditos</span>
+        <button type="button" id="btn-credits-close" class="credits-close-btn" aria-label="Cerrar créditos" title="Cerrar">×</button>
+      </div>
+      <div class="credits-popover-sub">Simulador 3D · Sistema BCP · Bloque Junín 5</div>
+      <ul class="credits-list">
+        <li class="credits-item">Ing. Procesos Químicos Diego González</li>
+        <li class="credits-item">Ing. Geólogo Mirlarys García</li>
+      </ul>
+    </div>
+    <button type="button" id="btn-credits-toggle" class="btn-credits" aria-expanded="false" aria-controls="credits-popover" title="Ver autoría y créditos del simulador">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+      </svg>
+      <span>Créditos</span>
+    </button>
+  </div>
+
+  <!-- Non-blocking Top-Center Alert Banner (Only Visible When an Operational Fault is Active) -->
+  <div id="fault-alert-banner" class="fault-alert-banner" role="status" aria-live="polite" aria-hidden="true">
+    <span class="fault-alert-dot" aria-hidden="true"></span>
+    <span id="fault-alert-copy" class="fault-alert-copy"></span>
+    <div class="fault-alert-actions">
+      <button type="button" id="btn-fault-banner-open" class="fault-banner-btn" title="Abrir panel de simulación de fallas">Detalle</button>
+      <button type="button" id="btn-fault-banner-reset" class="fault-banner-btn" title="Volver a operación normal">Restablecer</button>
+    </div>
+  </div>
+
+  <!-- Independent Optional Operational Fault Simulation Dock (Hidden & Inactive by Default) -->
+  <div id="faults-dock" class="faults-dock">
+    <section id="faults-panel" class="faults-panel" role="dialog" aria-label="Simulación de fallas operativas BCP" aria-hidden="true">
+      <div class="faults-panel-header">
+        <div class="faults-panel-title-wrap">
+          <span class="faults-panel-title">Simulación de Fallas</span>
+          <span id="faults-status-text" class="faults-status-text">Normal</span>
+        </div>
+        <button type="button" id="btn-faults-close" class="credits-close-btn" aria-label="Cerrar menú de fallas" title="Cerrar">×</button>
+      </div>
+
+      <div class="faults-panel-body">
+        <p class="faults-panel-sub">Activa un evento operativo bajo demanda para observar su impacto en el sistema BCP y la telemetría.</p>
+
+        <div class="fault-torque-meter" aria-label="Indicador de esfuerzo y torque en sarta">
+          <div class="fault-torque-row">
+            <span class="fault-torque-label">Torque / Esfuerzo</span>
+            <span id="fault-torque-val" class="fault-torque-val">44% · 660 lb·ft</span>
+          </div>
+          <div class="fault-torque-track">
+            <div id="fault-torque-fill" class="fault-torque-fill"></div>
+          </div>
+        </div>
+
+        <div class="fault-scenarios-list" role="group" aria-label="Escenarios de fallas operativas">
+          <button type="button" class="fault-scenario-btn" data-fault="corte-diluente" data-severity="warn" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Corte / pérdida de diluente</span>
+            </span>
+            <span class="fault-scenario-desc">Crudo extrapesado sin dilución · alta viscosidad y presión.</span>
+          </button>
+
+          <button type="button" class="fault-scenario-btn" data-fault="baja-sumergencia" data-severity="warn" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Baja sumergencia / arrastre de gas</span>
+            </span>
+            <span class="fault-scenario-desc">Llenado parcial en fondo · caudal inestable y gas lock.</span>
+          </button>
+
+          <button type="button" class="fault-scenario-btn" data-fault="parada-retroceso" data-severity="crit" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Parada / retroceso de sarta</span>
+            </span>
+            <span class="fault-scenario-desc">Corte de giro y falla de freno · efecto backspin hasta 0 RPM.</span>
+          </button>
+
+          <button type="button" class="fault-scenario-btn" data-fault="sobrecarga-torque" data-severity="crit" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Sobrecarga / alto torque</span>
+            </span>
+            <span class="fault-scenario-desc">Esfuerzo crítico por fricción viscosa o sobrerrevolución.</span>
+          </button>
+        </div>
+
+        <div id="fault-diagnosis-box" class="fault-diagnosis-box" role="status" aria-live="polite">
+          <div id="fault-diagnosis-title" class="fault-diagnosis-title">Diagnóstico Operativo</div>
+          <div id="fault-diagnosis-text"></div>
+          <div id="fault-diagnosis-action" class="fault-diagnosis-action"></div>
+        </div>
+      </div>
+
+      <button type="button" id="btn-fault-reset" class="btn-fault-reset" title="Restablecer operación normal del sistema BCP">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        <span>Operación Normal (Restablecer)</span>
+      </button>
+    </section>
+
+    <button type="button" id="btn-faults-toggle" class="btn-faults-toggle" aria-expanded="false" aria-controls="faults-panel" title="Mostrar u ocultar simulador opcional de fallas operativas BCP">
+      <span class="fault-btn-dot" aria-hidden="true"></span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+      <span id="faults-toggle-label">Fallas BCP</span>
+    </button>
+  </div>
+
+  <!-- Discreet Bottom-Center Toggle Button for Step Guide Bar -->
+  <button type="button" id="btn-guide-toggle" class="btn-guide-toggle" aria-expanded="false" aria-controls="bottom-center-wrap" title="Mostrar guía interactiva: Qué es / Cómo funciona / Componentes / Operación">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </svg>
+    <span>Guía BCP</span>
+  </button>
+
+  <!-- Bottom Center Step Navigation (Hidden by Default) -->
+  <div id="bottom-center-wrap" class="bottom-center-wrap is-hidden" aria-hidden="true">
+    <div id="step-caption" class="step-caption" style="display: none;">
       <div id="step-caption-text">
         <strong>01 / Qué es:</strong> El Bombeo de Cavidad Progresiva (BCP) utiliza un rotor helicoidal metálico girando dentro de un estator de elastómero para elevar crudo viscoso de forma continua.
       </div>
@@ -1965,6 +2927,11 @@
       <button type="button" class="step-btn" data-step="02" role="tab" aria-selected="false">02 / CÓMO FUNCIONA</button>
       <button type="button" class="step-btn" data-step="03" role="tab" aria-selected="false">03 / COMPONENTES</button>
       <button type="button" class="step-btn" data-step="04" role="tab" aria-selected="false">04 / OPERACIÓN</button>
+      <button type="button" id="btn-hide-guide" class="step-bar-hide" title="Ocultar barra guía" aria-label="Ocultar barra guía">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
     </div>
   </div>
 
@@ -4554,6 +5521,116 @@
     savannaShrubMesh.computeBoundingSphere();
     savannaGroup.add(savannaShrubMesh);
 
+    // 8.1b Dynamic Day-Mode Weather Effects (Subtle Rain & Orinoco Savanna Blowing Dust)
+    // Strictly rendered above ground (Y >= 0.14) and strictly outside the wellbore, macolla pad & front cutaway corridor
+    const weatherGroup = new THREE.Group();
+    weatherGroup.visible = false;
+    rootGroup.add(weatherGroup);
+
+    function isInsideWeatherExclusion(x, z) {
+      return x > -5.9 && x < 5.9 && z > -4.0 && z < 6.8;
+    }
+
+    const weatherRand = makeSeededRand(907);
+
+    function sampleOuterWeatherXZ(xMin, xMax, zMin, zMax) {
+      for (let attempt = 0; attempt < 28; attempt++) {
+        const x = xMin + weatherRand() * (xMax - xMin);
+        const z = zMin + weatherRand() * (zMax - zMin);
+        if (!isInsideWeatherExclusion(x, z)) return { x, z };
+      }
+      // Guaranteed fallback on outer savanna wings
+      const side = weatherRand() < 0.5 ? -1 : 1;
+      return {
+        x: side * (6.4 + weatherRand() * 6.8),
+        z: zMin + weatherRand() * (zMax - zMin),
+      };
+    }
+
+    // Subtle Tropical Rain Streaks (Single LineSegments draw call, zero per-frame allocations)
+    const RAIN_COUNT = 260;
+    const rainPositions = new Float32Array(RAIN_COUNT * 6);
+    const rainDrops = [];
+    for (let i = 0; i < RAIN_COUNT; i++) {
+      const pt = sampleOuterWeatherXZ(-13.8, 13.8, -10.2, 5.2);
+      const y = 0.2 + weatherRand() * 11.4;
+      const speed = 10.6 + weatherRand() * 3.2;
+      const len = 0.54 + weatherRand() * 0.28;
+      rainDrops.push({ x: pt.x, y, z: pt.z, speed, len });
+      const idx = i * 6;
+      rainPositions[idx] = pt.x;
+      rainPositions[idx + 1] = y;
+      rainPositions[idx + 2] = pt.z;
+      rainPositions[idx + 3] = pt.x - 0.08 * len;
+      rainPositions[idx + 4] = y - len;
+      rainPositions[idx + 5] = pt.z + 0.02 * len;
+    }
+    const rainGeo = new THREE.BufferGeometry();
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
+    const rainMat = new THREE.LineBasicMaterial({
+      color: 0xcbe4ff,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+    const rainLines = new THREE.LineSegments(rainGeo, rainMat);
+    rainLines.frustumCulled = false;
+    rainLines.visible = false;
+    weatherGroup.add(rainLines);
+
+    // Subtle Orinoco Savanna Blowing Dust (Single Points draw call with soft radial CanvasTexture)
+    function createDustSpriteTexture() {
+      const c = document.createElement('canvas');
+      c.width = 64;
+      c.height = 64;
+      const ctx = c.getContext('2d');
+      const g = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
+      g.addColorStop(0.0, 'rgba(232, 198, 148, 0.85)');
+      g.addColorStop(0.45, 'rgba(214, 174, 118, 0.36)');
+      g.addColorStop(1.0, 'rgba(196, 152, 98, 0.0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 64, 64);
+      const tex = new THREE.CanvasTexture(c);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    const DUST_COUNT = 190;
+    const dustPositions = new Float32Array(DUST_COUNT * 3);
+    const dustGrains = [];
+    for (let i = 0; i < DUST_COUNT; i++) {
+      const pt = sampleOuterWeatherXZ(-13.8, 13.8, -10.0, 5.0);
+      const y = 0.24 + weatherRand() * 3.5;
+      dustGrains.push({
+        x: pt.x,
+        y,
+        z: pt.z,
+        vx: 2.1 + weatherRand() * 1.7,
+        vz: (weatherRand() - 0.5) * 0.45,
+        phase: weatherRand() * Math.PI * 2,
+        amp: 0.14 + weatherRand() * 0.24,
+      });
+      const idx = i * 3;
+      dustPositions[idx] = pt.x;
+      dustPositions[idx + 1] = y;
+      dustPositions[idx + 2] = pt.z;
+    }
+    const dustGeo = new THREE.BufferGeometry();
+    dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+    const dustMat = new THREE.PointsMaterial({
+      color: 0xd9b382,
+      map: createDustSpriteTexture(),
+      size: 0.56,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+    const dustPoints = new THREE.Points(dustGeo, dustMat);
+    dustPoints.frustumCulled = false;
+    dustPoints.visible = false;
+    weatherGroup.add(dustPoints);
+
     // 8.2 Celler (Contrapozo U-shaped concrete pit with steel grating rim)
     const cellarGroup = new THREE.Group();
     surfaceGroup.add(cellarGroup);
@@ -5791,6 +6868,8 @@
     const btnToggleTelemetry = document.getElementById('btn-toggle-telemetry');
     const telemetryMiniRpm = document.getElementById('telemetry-mini-rpm');
     const bottomCenterWrapEl = document.getElementById('bottom-center-wrap');
+    const btnGuideToggle = document.getElementById('btn-guide-toggle');
+    const btnHideGuide = document.getElementById('btn-hide-guide');
 
     const navCards = document.querySelectorAll('.nav-card');
     const railNodes = document.querySelectorAll('.rail-node');
@@ -5810,12 +6889,55 @@
     btnCollapseSidebar.addEventListener('click', () => setSidebarHidden(true));
     btnOpenSidebar.addEventListener('click', () => setSidebarHidden(false));
 
+    let guideBarVisible = false;
+
+    function setGuideVisible(visible) {
+      guideBarVisible = Boolean(visible);
+      if (bottomCenterWrapEl) {
+        bottomCenterWrapEl.classList.toggle('is-hidden', !guideBarVisible);
+        bottomCenterWrapEl.setAttribute('aria-hidden', String(!guideBarVisible));
+      }
+      if (btnGuideToggle) {
+        btnGuideToggle.classList.toggle('is-hidden', guideBarVisible);
+        btnGuideToggle.setAttribute('aria-expanded', String(guideBarVisible));
+      }
+      if (stepCaption) {
+        stepCaption.style.display = guideBarVisible ? 'flex' : 'none';
+      }
+    }
+
+    if (btnGuideToggle) {
+      btnGuideToggle.addEventListener('click', () => setGuideVisible(true));
+    }
+    if (btnHideGuide) {
+      btnHideGuide.addEventListener('click', () => setGuideVisible(false));
+    }
+
+    // Guarantee "DATOS EN TIEMPO REAL" never overlaps the top-right vertical depth control ("PROF.")
+    function syncRightDockClearance() {
+      if (!depthNavDockEl || !telemetryPanelEl) return;
+      const depthRect = depthNavDockEl.getBoundingClientRect();
+      const gapBelowDepth = 12;
+      const bottomInset = 12;
+      const safeTop = Math.ceil(depthRect.bottom) + gapBelowDepth;
+      const availH = Math.max(96, window.innerHeight - safeTop - bottomInset);
+      telemetryPanelEl.style.maxHeight = `${availH}px`;
+    }
+
+    syncRightDockClearance();
+    requestAnimationFrame(syncRightDockClearance);
+    if (typeof ResizeObserver !== 'undefined' && depthNavDockEl) {
+      const rightDockObserver = new ResizeObserver(() => syncRightDockClearance());
+      rightDockObserver.observe(depthNavDockEl);
+    }
+
     btnToggleTelemetry.addEventListener('click', () => {
       const nextMin = !telemetryPanelEl.classList.contains('minimized');
       telemetryPanelEl.classList.toggle('minimized', nextMin);
       btnToggleTelemetry.setAttribute('aria-expanded', String(!nextMin));
       btnToggleTelemetry.title = nextMin ? 'Expandir panel de telemetría' : 'Minimizar panel de telemetría';
       btnToggleTelemetry.setAttribute('aria-label', btnToggleTelemetry.title);
+      syncRightDockClearance();
     });
 
     function setActiveSection(sectionKey, expandIfCollapsed = false) {
@@ -5959,6 +7081,221 @@
     rpmSlider.addEventListener('input', (e) => {
       targetRpm = Number(e.target.value);
       updateSliderVisual();
+    });
+
+    // =========================================================================
+    // 10A-2. INDEPENDENT OPERATIONAL FAULT SIMULATION MODULE (OFF BY DEFAULT)
+    // =========================================================================
+    const faultsDockEl = document.getElementById('faults-dock');
+    const faultsPanelEl = document.getElementById('faults-panel');
+    const btnFaultsToggle = document.getElementById('btn-faults-toggle');
+    const faultsToggleLabel = document.getElementById('faults-toggle-label');
+    const btnFaultsClose = document.getElementById('btn-faults-close');
+    const faultsStatusText = document.getElementById('faults-status-text');
+    const faultScenarioBtns = document.querySelectorAll('.fault-scenario-btn');
+    const btnFaultReset = document.getElementById('btn-fault-reset');
+    const faultDiagnosisBox = document.getElementById('fault-diagnosis-box');
+    const faultDiagnosisTitle = document.getElementById('fault-diagnosis-title');
+    const faultDiagnosisText = document.getElementById('fault-diagnosis-text');
+    const faultDiagnosisAction = document.getElementById('fault-diagnosis-action');
+    const faultTorqueVal = document.getElementById('fault-torque-val');
+    const faultTorqueFill = document.getElementById('fault-torque-fill');
+
+    const faultAlertBannerEl = document.getElementById('fault-alert-banner');
+    const faultAlertCopyEl = document.getElementById('fault-alert-copy');
+    const btnFaultBannerOpen = document.getElementById('btn-fault-banner-open');
+    const btnFaultBannerReset = document.getElementById('btn-fault-banner-reset');
+
+    const FAULT_SPECS = {
+      'corte-diluente': {
+        severity: 'warn',
+        shortLabel: 'Corte de Diluente',
+        statusText: 'Alerta · Diluente',
+        bannerPrefix: 'Corte de diluente:',
+        bannerSummary: 'crudo extrapesado sin dilución · alta viscosidad y presión.',
+        diagnosis: 'Interrupción en la inyección de diluente hacia la TE de producción. La viscosidad del crudo extrapesado (~9° API) eleva bruscamente la pérdida por fricción y la carga sobre el rotor.',
+        action: 'Acción: Verificar bomba de diluente, válvula dosificadora y presión de descarga.',
+      },
+      'baja-sumergencia': {
+        severity: 'warn',
+        shortLabel: 'Baja Sumergencia / Gas',
+        statusText: 'Alerta · Gas Lock',
+        bannerPrefix: 'Baja sumergencia / arrastre de gas:',
+        bannerSummary: 'fluctuaciones severas de caudal y llenado parcial.',
+        diagnosis: 'Descenso del nivel dinámico con ingreso de gas libre a la succión BCP. Genera bacheo intermitente en caudal/presión y eleva la temperatura del elastómero por lubricación deficiente.',
+        action: 'Acción: Reducir RPM temporalmente, revisar ancla de gas y presión en el espacio anular.',
+      },
+      'parada-retroceso': {
+        severity: 'crit',
+        shortLabel: 'Parada / Backspin',
+        statusText: 'Falla · Retroceso',
+        bannerPrefix: 'Parada y retroceso de sarta (Backspin):',
+        bannerSummary: 'freno anti-retroceso inoperativo · desaceleración a 0 RPM.',
+        diagnosis: 'Corte de giro en superficie con falla del freno anti-retroceso. La energía elástica de las cabillas y la columna hidrostática invierten el giro de la sarta antes de bloquearse en 0 RPM.',
+        action: 'Acción: Aislar variador VFD, inspeccionar freno del cabezal y válvula check de descarga.',
+      },
+      'sobrecarga-torque': {
+        severity: 'crit',
+        shortLabel: 'Sobrecarga / Torque',
+        statusText: 'Crítico · Torque',
+        bannerPrefix: 'Sobrecarga por alto torque:',
+        bannerSummary: 'esfuerzo crítico en cabillas y variador VFD.',
+        diagnosis: 'Torque resistente próximo al límite mecánico por alta fricción viscosa y sobrerrevolución. Se detecta vibración en cabezal y riesgo de desconexión por sobrecorriente o torsión de sarta.',
+        action: 'Acción: Disminuir RPM en el VFD, confirmar inyección de diluente y evaluar arrastre de sólidos.',
+      },
+    };
+
+    let activeFault = 'normal';
+    let faultElapsed = 0;
+    let faultStartRpm = 180;
+    let savedNormalSnapshot = null;
+
+    const _vfdLedGreen = new THREE.Color(0x22c55e);
+    const _vfdLedAmber = new THREE.Color(0xf59e0b);
+    const _vfdLedRed = new THREE.Color(0xef4444);
+
+    function setFaultsPanelOpen(open) {
+      if (!faultsPanelEl || !btnFaultsToggle) return;
+      const next = Boolean(open);
+      faultsPanelEl.classList.toggle('open', next);
+      faultsPanelEl.setAttribute('aria-hidden', String(!next));
+      btnFaultsToggle.setAttribute('aria-expanded', String(next));
+    }
+
+    function syncFaultUI() {
+      const spec = FAULT_SPECS[activeFault] || null;
+      const isFault = Boolean(spec);
+      const isCrit = isFault && spec.severity === 'crit';
+
+      if (faultsStatusText) {
+        faultsStatusText.textContent = isFault ? spec.statusText : 'Normal';
+        faultsStatusText.classList.toggle('is-warn', isFault && !isCrit);
+        faultsStatusText.classList.toggle('is-crit', isCrit);
+      }
+
+      if (btnFaultsToggle) {
+        btnFaultsToggle.classList.toggle('has-fault-warn', isFault && !isCrit);
+        btnFaultsToggle.classList.toggle('has-fault-crit', isCrit);
+      }
+      if (faultsToggleLabel) {
+        faultsToggleLabel.textContent = isFault ? `Falla: ${spec.shortLabel}` : 'Fallas BCP';
+      }
+
+      faultScenarioBtns.forEach((btn) => {
+        const isMatch = btn.dataset.fault === activeFault;
+        btn.classList.toggle('active', isMatch);
+        btn.setAttribute('aria-pressed', String(isMatch));
+      });
+
+      if (faultDiagnosisBox) {
+        faultDiagnosisBox.classList.toggle('visible', isFault);
+        faultDiagnosisBox.classList.toggle('is-crit', isCrit);
+        if (isFault) {
+          faultDiagnosisTitle.textContent = `Diagnóstico · ${spec.shortLabel}`;
+          faultDiagnosisText.textContent = spec.diagnosis;
+          faultDiagnosisAction.textContent = spec.action;
+        }
+      }
+
+      if (btnFaultReset) {
+        btnFaultReset.classList.toggle('is-needed', isFault);
+      }
+
+      if (faultAlertBannerEl) {
+        faultAlertBannerEl.classList.toggle('visible', isFault);
+        faultAlertBannerEl.classList.toggle('is-crit', isCrit);
+        faultAlertBannerEl.setAttribute('aria-hidden', String(!isFault));
+        if (isFault && faultAlertCopyEl) {
+          faultAlertCopyEl.innerHTML = `<strong>${spec.bannerPrefix}</strong> ${spec.bannerSummary}`;
+        }
+      }
+    }
+
+    function setActiveFault(faultKey) {
+      const nextKey = FAULT_SPECS[faultKey] ? faultKey : 'normal';
+
+      if (nextKey === 'normal') {
+        activeFault = 'normal';
+        faultElapsed = 0;
+        if (savedNormalSnapshot) {
+          targetRpm = savedNormalSnapshot.targetRpm;
+          rpmSlider.value = String(targetRpm);
+          updateSliderVisual();
+          setFluidMode(savedNormalSnapshot.fluidMode);
+          savedNormalSnapshot = null;
+        }
+        driveHeadGroup.position.set(0, 0, 0);
+        mats.vfdLedRun.color.copy(_vfdLedGreen);
+        mats.vfdLedRun.emissive.copy(_vfdLedGreen);
+        syncFaultUI();
+        if (typeof lastTelemetryUpdate === 'number') lastTelemetryUpdate = -1;
+        return;
+      }
+
+      // Snapshot clean pre-fault operating state the first time a fault is triggered
+      if (activeFault === 'normal') {
+        savedNormalSnapshot = {
+          targetRpm,
+          fluidMode,
+        };
+      }
+
+      activeFault = nextKey;
+      faultElapsed = 0;
+      faultStartRpm = Math.max(40, Math.abs(currentRpm));
+
+      if (nextKey === 'corte-diluente') {
+        setFluidMode('extrapesado');
+      } else if (nextKey === 'sobrecarga-torque') {
+        if (targetRpm < 265) {
+          targetRpm = 285;
+          rpmSlider.value = String(targetRpm);
+          updateSliderVisual();
+        }
+      }
+
+      syncFaultUI();
+      if (typeof lastTelemetryUpdate === 'number') lastTelemetryUpdate = -1;
+    }
+
+    if (btnFaultsToggle) {
+      btnFaultsToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = faultsPanelEl.classList.contains('open');
+        setFaultsPanelOpen(!isOpen);
+      });
+    }
+
+    if (btnFaultsClose) {
+      btnFaultsClose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setFaultsPanelOpen(false);
+      });
+    }
+
+    faultScenarioBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.fault;
+        if (activeFault === key) setActiveFault('normal');
+        else setActiveFault(key);
+      });
+    });
+
+    if (btnFaultReset) {
+      btnFaultReset.addEventListener('click', () => setActiveFault('normal'));
+    }
+    if (btnFaultBannerReset) {
+      btnFaultBannerReset.addEventListener('click', () => setActiveFault('normal'));
+    }
+    if (btnFaultBannerOpen) {
+      btnFaultBannerOpen.addEventListener('click', () => setFaultsPanelOpen(true));
+    }
+
+    document.addEventListener('pointerdown', (e) => {
+      if (!faultsPanelEl || !faultsPanelEl.classList.contains('open')) return;
+      if (faultsDockEl && !faultsDockEl.contains(e.target) && (!faultAlertBannerEl || !faultAlertBannerEl.contains(e.target))) {
+        setFaultsPanelOpen(false);
+      }
     });
 
     // =========================================================================
@@ -6521,7 +7858,11 @@
       else pushRect(btnOpenSidebar);
       pushRect(depthNavDockEl);
       pushRect(telemetryPanelEl);
-      pushRect(bottomCenterWrapEl);
+      if (guideBarVisible) pushRect(bottomCenterWrapEl);
+      else pushRect(btnGuideToggle);
+      pushRect(creditsDockEl);
+      pushRect(faultsDockEl);
+      if (activeFault !== 'normal') pushRect(faultAlertBannerEl);
       return rects;
     }
 
@@ -6558,8 +7899,10 @@
       }
       const tr = telemetryPanelEl.getBoundingClientRect();
       rawCandidates.push({ left: tr.left - tipW - 12, top: anchorY - tipH * 0.5 });
-      const br = bottomCenterWrapEl.getBoundingClientRect();
-      rawCandidates.push({ left: anchorX - tipW * 0.5, top: br.top - tipH - 12 });
+      if (guideBarVisible && bottomCenterWrapEl) {
+        const br = bottomCenterWrapEl.getBoundingClientRect();
+        rawCandidates.push({ left: anchorX - tipW * 0.5, top: br.top - tipH - 12 });
+      }
 
       let bestLeft = pad;
       let bestTop = topSafe;
@@ -6715,8 +8058,14 @@
     });
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && pinnedInspectId) {
-        hideTooltip(true);
+      if (e.key === 'Escape') {
+        if (pinnedInspectId) hideTooltip(true);
+        if (creditsPopoverEl && creditsPopoverEl.classList.contains('open')) {
+          setCreditsOpen(false);
+        }
+        if (faultsPanelEl && faultsPanelEl.classList.contains('open')) {
+          setFaultsPanelOpen(false);
+        }
       }
       const tag = e.target && e.target.tagName;
       const isTextControl =
@@ -6754,7 +8103,7 @@
     // =========================================================================
     const geoLabelsLayerEl = document.getElementById('geo-labels-layer');
     const btnGeoLabels = document.getElementById('btn-geo-labels');
-    let geoLabelsVisible = true;
+    let geoLabelsVisible = false;
     let hoveredGeoLabelId = null;
     const _geoProjVec = new THREE.Vector3();
 
@@ -6849,12 +8198,14 @@
       btnGeoLabels.setAttribute('aria-pressed', String(visible));
     }
 
+    setGeoLabelsVisible(false);
+
     btnGeoLabels.addEventListener('click', () => {
       setGeoLabelsVisible(!geoLabelsVisible);
     });
 
     // =========================================================================
-    // 10B-3. LIGHTING MODES (ESTUDIO / DÍA / NOCHE) WITH SMOOTH TRANSITIONS
+    // 10B-3. LIGHTING MODES (ESTUDIO / DÍA / NOCHE) & DÍA WEATHER EFFECTS
     // =========================================================================
     const btnLightingMode = document.getElementById('btn-lighting-mode');
     const lightingBtnLabel = document.getElementById('lighting-btn-label');
@@ -6862,8 +8213,67 @@
     const iconLightDia = document.getElementById('icon-light-dia');
     const iconLightNoche = document.getElementById('icon-light-noche');
 
+    const btnWeatherMode = document.getElementById('btn-weather-mode');
+    const weatherBtnLabel = document.getElementById('weather-btn-label');
+    const iconWeatherDespejado = document.getElementById('icon-weather-despejado');
+    const iconWeatherLluvia = document.getElementById('icon-weather-lluvia');
+    const iconWeatherPolvo = document.getElementById('icon-weather-polvo');
+
+    // Discreet Credits / Autoría Popover Controls
+    const creditsDockEl = document.getElementById('credits-dock');
+    const creditsPopoverEl = document.getElementById('credits-popover');
+    const btnCreditsToggle = document.getElementById('btn-credits-toggle');
+    const btnCreditsClose = document.getElementById('btn-credits-close');
+
+    function setCreditsOpen(open) {
+      if (!creditsPopoverEl || !btnCreditsToggle) return;
+      creditsPopoverEl.classList.toggle('open', open);
+      creditsPopoverEl.setAttribute('aria-hidden', String(!open));
+      btnCreditsToggle.setAttribute('aria-expanded', String(open));
+    }
+
+    if (btnCreditsToggle) {
+      btnCreditsToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = creditsPopoverEl.classList.contains('open');
+        setCreditsOpen(!isOpen);
+      });
+    }
+
+    if (btnCreditsClose) {
+      btnCreditsClose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setCreditsOpen(false);
+      });
+    }
+
+    document.addEventListener('pointerdown', (e) => {
+      if (!creditsPopoverEl || !creditsPopoverEl.classList.contains('open')) return;
+      if (creditsDockEl && !creditsDockEl.contains(e.target)) {
+        setCreditsOpen(false);
+      }
+    });
+
     const LIGHTING_ORDER = ['estudio', 'dia', 'noche'];
     let currentLightMode = 'estudio';
+
+    const WEATHER_ORDER = ['despejado', 'lluvia', 'polvo'];
+    const WEATHER_LABELS = {
+      despejado: 'Clima: Despejado',
+      lluvia: 'Clima: Lluvia',
+      polvo: 'Clima: Polvo',
+    };
+    let currentWeatherMode = 'despejado';
+    let weatherRainBlend = 0;
+    let weatherDustBlend = 0;
+
+    const _weatherSkyTop = new THREE.Color();
+    const _weatherSkyHorizon = new THREE.Color();
+    const _weatherFogColor = new THREE.Color();
+    const _rainSkyTopTint = new THREE.Color(0x4b637c);
+    const _rainHorizonTint = new THREE.Color(0x9fb2c4);
+    const _dustSkyTopTint = new THREE.Color(0x6382a2);
+    const _dustHorizonTint = new THREE.Color(0xd2bfa2);
 
     const LIGHTING_MODES = {
       estudio: {
@@ -6957,6 +8367,27 @@
 
     let currentSavannaBlend = 0;
 
+    function syncWeatherButtonUI() {
+      if (!btnWeatherMode) return;
+      const isDia = currentLightMode === 'dia';
+      const displayMode = isDia ? currentWeatherMode : 'despejado';
+      btnWeatherMode.dataset.weatherMode = displayMode;
+      btnWeatherMode.classList.toggle('is-weather-standby', !isDia);
+      weatherBtnLabel.textContent = isDia ? WEATHER_LABELS[currentWeatherMode] : 'Clima: Día';
+      iconWeatherDespejado.style.display = displayMode === 'despejado' ? '' : 'none';
+      iconWeatherLluvia.style.display = displayMode === 'lluvia' ? '' : 'none';
+      iconWeatherPolvo.style.display = displayMode === 'polvo' ? '' : 'none';
+      btnWeatherMode.title = isDia
+        ? 'Alternar clima en modo Día: Despejado / Lluvia / Polvo de sabana'
+        : 'Activar modo Día y efectos climáticos (Lluvia / Polvo de sabana)';
+    }
+
+    function setWeatherMode(mode) {
+      if (!WEATHER_LABELS[mode]) return;
+      currentWeatherMode = mode;
+      syncWeatherButtonUI();
+    }
+
     function setLightingMode(mode) {
       if (!LIGHTING_MODES[mode]) return;
       currentLightMode = mode;
@@ -6966,6 +8397,7 @@
       iconLightEstudio.style.display = mode === 'estudio' ? '' : 'none';
       iconLightDia.style.display = mode === 'dia' ? '' : 'none';
       iconLightNoche.style.display = mode === 'noche' ? '' : 'none';
+      syncWeatherButtonUI();
     }
 
     btnLightingMode.addEventListener('click', () => {
@@ -6973,16 +8405,148 @@
       setLightingMode(LIGHTING_ORDER[nextIdx]);
     });
 
+    if (btnWeatherMode) {
+      btnWeatherMode.addEventListener('click', () => {
+        if (currentLightMode !== 'dia') {
+          setLightingMode('dia');
+          setWeatherMode(currentWeatherMode === 'despejado' ? 'lluvia' : currentWeatherMode);
+          return;
+        }
+        const nextIdx = (WEATHER_ORDER.indexOf(currentWeatherMode) + 1) % WEATHER_ORDER.length;
+        setWeatherMode(WEATHER_ORDER[nextIdx]);
+      });
+    }
+
+    syncWeatherButtonUI();
+
+    function updateWeatherEffects(dt, elapsed) {
+      const isDia = currentLightMode === 'dia';
+      const targetRain = isDia && currentWeatherMode === 'lluvia' ? 1.0 : 0.0;
+      const targetDust = isDia && currentWeatherMode === 'polvo' ? 1.0 : 0.0;
+      const wBlend = 1 - Math.exp(-3.8 * dt);
+
+      weatherRainBlend = THREE.MathUtils.lerp(weatherRainBlend, targetRain, wBlend);
+      weatherDustBlend = THREE.MathUtils.lerp(weatherDustBlend, targetDust, wBlend);
+
+      const rainActive = weatherRainBlend > 0.008;
+      const dustActive = weatherDustBlend > 0.008;
+      weatherGroup.visible = rainActive || dustActive;
+
+      rainLines.visible = rainActive;
+      if (rainActive) {
+        rainMat.opacity = weatherRainBlend * 0.34;
+        const posAttr = rainGeo.attributes.position;
+        const arr = posAttr.array;
+        const windX = -1.45;
+        const windZ = 0.32;
+
+        for (let i = 0; i < RAIN_COUNT; i++) {
+          const d = rainDrops[i];
+          d.x += windX * dt;
+          d.y -= d.speed * dt;
+          d.z += windZ * dt;
+
+          if (
+            d.y < 0.16 ||
+            d.x < -14.2 ||
+            d.x > 14.2 ||
+            d.z < -10.6 ||
+            d.z > 5.4 ||
+            isInsideWeatherExclusion(d.x, d.z)
+          ) {
+            const pt = sampleOuterWeatherXZ(-13.8, 13.8, -10.2, 5.2);
+            d.x = pt.x;
+            d.z = pt.z;
+            d.y = 8.8 + weatherRand() * 3.0;
+          }
+
+          const idx = i * 6;
+          const tailX = d.x - (windX / d.speed) * d.len;
+          const tailY = d.y + d.len;
+          const tailZ = d.z - (windZ / d.speed) * d.len;
+          arr[idx] = d.x;
+          arr[idx + 1] = d.y;
+          arr[idx + 2] = d.z;
+          arr[idx + 3] = tailX;
+          arr[idx + 4] = tailY;
+          arr[idx + 5] = tailZ;
+        }
+        posAttr.needsUpdate = true;
+      }
+
+      dustPoints.visible = dustActive;
+      if (dustActive) {
+        dustMat.opacity = weatherDustBlend * 0.34;
+        const posAttr = dustGeo.attributes.position;
+        const arr = posAttr.array;
+
+        for (let i = 0; i < DUST_COUNT; i++) {
+          const g = dustGrains[i];
+          const gust = 1.0 + 0.22 * Math.sin(elapsed * 0.75 + g.phase);
+          g.x += g.vx * gust * dt;
+          g.z += g.vz * dt;
+          g.y += Math.sin(elapsed * 1.4 + g.phase) * g.amp * dt;
+
+          if (g.y < 0.22) g.y = 0.22;
+          if (g.y > 4.0) g.y = 3.9;
+
+          if (
+            g.x > 14.0 ||
+            g.x < -14.0 ||
+            g.z < -10.2 ||
+            g.z > 5.2 ||
+            isInsideWeatherExclusion(g.x, g.z)
+          ) {
+            const spawnBack = weatherRand() < 0.42;
+            const pt = spawnBack
+              ? sampleOuterWeatherXZ(-13.8, 13.4, -10.0, -4.3)
+              : sampleOuterWeatherXZ(-13.8, -6.3, -9.8, 4.8);
+            g.x = pt.x;
+            g.z = pt.z;
+            g.y = 0.24 + weatherRand() * 3.3;
+          }
+
+          const idx = i * 3;
+          arr[idx] = g.x;
+          arr[idx + 1] = g.y;
+          arr[idx + 2] = g.z;
+        }
+        posAttr.needsUpdate = true;
+      }
+    }
+
     function updateLightingTransitions(dt, elapsed) {
       const target = LIGHTING_MODES[currentLightMode];
       const blend = 1 - Math.exp(-4.2 * dt);
 
-      skyUniforms.uTopColor.value.lerp(target.skyTop, blend);
-      skyUniforms.uHorizonColor.value.lerp(target.skyHorizon, blend);
+      // Update weather particles & smooth weather blend first so sky/fog subtly respond
+      updateWeatherEffects(dt, elapsed);
+
+      _weatherSkyTop.copy(target.skyTop);
+      _weatherSkyHorizon.copy(target.skyHorizon);
+      _weatherFogColor.copy(target.fogColor);
+
+      if (weatherRainBlend > 0.001) {
+        _weatherSkyTop.lerp(_rainSkyTopTint, weatherRainBlend * 0.42);
+        _weatherSkyHorizon.lerp(_rainHorizonTint, weatherRainBlend * 0.45);
+        _weatherFogColor.lerp(_rainHorizonTint, weatherRainBlend * 0.45);
+      }
+      if (weatherDustBlend > 0.001) {
+        _weatherSkyTop.lerp(_dustSkyTopTint, weatherDustBlend * 0.24);
+        _weatherSkyHorizon.lerp(_dustHorizonTint, weatherDustBlend * 0.42);
+        _weatherFogColor.lerp(_dustHorizonTint, weatherDustBlend * 0.42);
+      }
+
+      const targetCloudAmount = target.cloudAmount + weatherRainBlend * 0.16;
+      const targetFogDensity = target.fogDensity + weatherRainBlend * 0.0018 + weatherDustBlend * 0.0015;
+      const targetKeyIntensity = target.keyIntensity * (1.0 - weatherRainBlend * 0.18 - weatherDustBlend * 0.06);
+
+      skyUniforms.uTopColor.value.lerp(_weatherSkyTop, blend);
+      skyUniforms.uHorizonColor.value.lerp(_weatherSkyHorizon, blend);
       skyUniforms.uBottomColor.value.lerp(target.skyBottom, blend);
-      skyUniforms.uCloudAmount.value = THREE.MathUtils.lerp(skyUniforms.uCloudAmount.value, target.cloudAmount, blend);
+      skyUniforms.uCloudAmount.value = THREE.MathUtils.lerp(skyUniforms.uCloudAmount.value, targetCloudAmount, blend);
       skyUniforms.uTime.value = elapsed;
-      scene.background.lerp(target.skyHorizon, blend);
+      scene.background.lerp(_weatherSkyHorizon, blend);
 
       currentSavannaBlend = THREE.MathUtils.lerp(currentSavannaBlend, target.savannaAmount, blend);
       const showSavanna = currentSavannaBlend > 0.02;
@@ -6991,8 +8555,8 @@
         savannaGroup.scale.y = Math.max(0.01, currentSavannaBlend);
       }
 
-      scene.fog.color.lerp(target.fogColor, blend);
-      scene.fog.density = THREE.MathUtils.lerp(scene.fog.density, target.fogDensity, blend);
+      scene.fog.color.lerp(_weatherFogColor, blend);
+      scene.fog.density = THREE.MathUtils.lerp(scene.fog.density, targetFogDensity, blend);
       renderer.toneMappingExposure = THREE.MathUtils.lerp(renderer.toneMappingExposure, target.exposure, blend);
 
       hemiLight.color.lerp(target.hemiSky, blend);
@@ -7000,7 +8564,7 @@
       hemiLight.intensity = THREE.MathUtils.lerp(hemiLight.intensity, target.hemiIntensity, blend);
 
       keyLight.color.lerp(target.keyColor, blend);
-      keyLight.intensity = THREE.MathUtils.lerp(keyLight.intensity, target.keyIntensity, blend);
+      keyLight.intensity = THREE.MathUtils.lerp(keyLight.intensity, targetKeyIntensity, blend);
       keyLight.position.lerp(target.keyPos, blend);
 
       rimLight.color.lerp(target.rimColor, blend);
@@ -7878,32 +9442,50 @@
     let poolPhase = 0;
     let pulsePhase = 0;
 
-    function updateProcessFlow(dt) {
-      dilutionBlend = THREE.MathUtils.damp(dilutionBlend, targetDilution, 4.5, dt);
-      if (Math.abs(dilutionBlend - targetDilution) < 0.002) dilutionBlend = targetDilution;
+    function updateProcessFlow(dt, elapsed = 0) {
+      const effectiveTargetDilution = activeFault === 'corte-diluente' ? 0 : targetDilution;
+      dilutionBlend = THREE.MathUtils.damp(dilutionBlend, effectiveTargetDilution, 4.5, dt);
+      if (Math.abs(dilutionBlend - effectiveTargetDilution) < 0.002) dilutionBlend = effectiveTargetDilution;
 
       const rpmRatio = currentRpm / 180;
-      const viscositySpeedFactor = 0.52 + 0.72 * dilutionBlend; // 0.52x sluggish without dilution vs 1.24x agile with diluent
-      flowProgress += dt * rpmRatio * 0.28 * viscositySpeedFactor;
-      if (dilutionBlend > 0.02) {
-        dilProgress += dt * rpmRatio * 0.28;
+      const isGasLock = activeFault === 'baja-sumergencia';
+      const isDilLoss = activeFault === 'corte-diluente';
+      const isBackspin = activeFault === 'parada-retroceso';
+
+      let viscositySpeedFactor = 0.52 + 0.72 * dilutionBlend; // 0.52x sluggish without dilution vs 1.24x agile with diluent
+      if (isDilLoss) viscositySpeedFactor *= 0.78;
+
+      let slugMod = 1.0;
+      if (isGasLock) {
+        const wave = Math.sin(elapsed * 3.1) * 0.5 + Math.sin(elapsed * 7.4) * 0.35 + Math.cos(elapsed * 1.6) * 0.25;
+        slugMod = THREE.MathUtils.clamp(0.46 + wave * 0.42, 0.12, 0.92);
       }
-      gasProgress += dt * (0.08 + rpmRatio * 0.68) * 0.16;
+
+      // Allow subtle downward fluid slip during reverse backspin; keep flowProgress positive-wrapped
+      flowProgress += dt * rpmRatio * 0.28 * viscositySpeedFactor * slugMod;
+      if (flowProgress < 0) flowProgress = ((flowProgress % 1) + 1) % 1;
+
+      if (dilutionBlend > 0.02 && !isBackspin) {
+        dilProgress += dt * Math.max(0, rpmRatio) * 0.28;
+      }
+      const gasBoost = isGasLock ? 2.45 : 1.0;
+      gasProgress += dt * (0.08 + Math.abs(rpmRatio) * 0.68) * 0.16 * gasBoost;
 
       // Subtle emissivity shift so #0d0b0a stays pure deep black in extra-heavy mode and #4a2c18 reads richly when diluted
       flowMats.prodMix.emissiveIntensity = 0.03 + 0.14 * dilutionBlend;
 
-      // Subtle reservoir drawdown shimmer & warm lighting response to pumping rate
-      const activeFactor = THREE.MathUtils.clamp(currentRpm / 350, 0, 1);
+      // Subtle reservoir drawdown shimmer & lower fluid level during low submergence / gas entrainment
+      const activeFactor = THREE.MathUtils.clamp(Math.abs(currentRpm) / 350, 0, 1);
       poolPhase += dt * (1.2 + activeFactor * 3.0);
-      oilPool.position.y = -10.88 + Math.sin(poolPhase) * 0.008 * activeFactor;
-      meniscus.scale.setScalar(1 + Math.sin(poolPhase * 1.1) * 0.025 * activeFactor);
+      const targetPoolY = isGasLock ? -11.05 : -10.88;
+      oilPool.position.y = THREE.MathUtils.damp(oilPool.position.y, targetPoolY + Math.sin(poolPhase) * 0.008 * activeFactor, 3.2, dt);
+      meniscus.scale.setScalar(1 + Math.sin(poolPhase * 1.1) * (isGasLock ? 0.048 : 0.025) * Math.max(0.25, activeFactor));
       reservoirGlow.intensity = 4.8 + activeFactor * 1.8;
 
       // 1. Crude inflow from Cañoneo -> Gas Anchor bottom -> Dip Tube up into Pump
       for (let i = 0; i < PERF_COUNT; i++) {
         const s = perfSeeds[i];
-        const t = (s.phase + flowProgress * 1.15) % 1;
+        const t = (((s.phase + flowProgress * 1.15) % 1) + 1) % 1;
 
         if (t < 0.42) {
           // Radial entry from rock perforation walls inward & downward toward gas anchor intake
@@ -7934,7 +9516,7 @@
       // 2. Progressive cavity fluid pockets climbing inside cutaway Stator/Elastomer
       const rotorAngle = -rotatingRodAssembly.rotation.y;
       for (let i = 0; i < CAVITY_COUNT; i++) {
-        const t = ((i / CAVITY_COUNT) + flowProgress * 0.95) % 1;
+        const t = ((((i / CAVITY_COUNT) + flowProgress * 0.95) % 1) + 1) % 1;
         const y = -8.86 + t * 2.98;
         // Follow the 2-lobe elastomer cavity opposite the turning rotor lobe
         const cavityPhi = t * Math.PI * 2 * 2.25 + (i % 2) * Math.PI;
@@ -7948,7 +9530,8 @@
         );
         _flowTan.set(-Math.sin(cavityAngle) * 0.25, 1.0, -Math.cos(cavityAngle) * 0.20).normalize();
         _flowQuat.setFromUnitVectors(_upAxis, _flowTan);
-        _flowScale.set(0.056, 0.088, 0.050);
+        const cavityFillScale = isGasLock ? (0.58 + 0.42 * slugMod) : 1.0;
+        _flowScale.set(0.056 * cavityFillScale, 0.088 * cavityFillScale, 0.050 * cavityFillScale);
         _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
         cavityFlowMesh.setMatrixAt(i, _flowMat4);
       }
@@ -7957,7 +9540,7 @@
       // 3. Tubing ascent -> TE de Producción -> Surface production line (dark #0d0b0a without dilution; transitions to #4a2c18 after TE when diluted)
       for (let i = 0; i < PROD_COUNT; i++) {
         const s = prodSeeds[i];
-        const t = (s.phase + flowProgress * 0.55) % 1;
+        const t = (((s.phase + flowProgress * 0.55) % 1) + 1) % 1;
         prodCurve.getPointAt(t, _flowPos);
         prodCurve.getTangentAt(t, _flowTan);
 
@@ -7975,7 +9558,8 @@
 
         _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
         const dropletThickness = 1 + (1 - dilutionBlend) * 0.14;
-        _flowScale.set(0.036 * dropletThickness, 0.068, 0.036 * dropletThickness);
+        const gasGap = isGasLock ? (0.62 + 0.38 * Math.sin(s.phase * 18 + elapsed * 4.5)) : 1.0;
+        _flowScale.set(0.036 * dropletThickness * gasGap, 0.068 * gasGap, 0.036 * dropletThickness * gasGap);
         _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
         prodFlowMesh.setMatrixAt(i, _flowMat4);
 
@@ -7987,7 +9571,7 @@
       prodFlowMesh.instanceMatrix.needsUpdate = true;
       if (prodFlowMesh.instanceColor) prodFlowMesh.instanceColor.needsUpdate = true;
 
-      // 4. Diluent injection stream entering TE de Producción (stops & hides in Crudo Extrapesado mode)
+      // 4. Diluent injection stream entering TE de Producción (stops & hides in Crudo Extrapesado mode or Corte de Diluente fault)
       const dilActive = dilutionBlend > 0.02;
       dilFlowMesh.visible = dilActive;
       flowMats.diluent.opacity = 0.94 * dilutionBlend;
@@ -8006,6 +9590,7 @@
       }
 
       // 5. Annulus gas separation bubbles: Gas Anchor vents -> Casing Annulus -> Línea de Gas del Anular
+      const gasBubbleMult = isGasLock ? 1.48 : 1.0;
       for (let i = 0; i < GAS_COUNT; i++) {
         const s = gasSeeds[i];
         const t = (s.phase + gasProgress) % 1;
@@ -8021,7 +9606,7 @@
         }
 
         _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
-        const bSize = t < 0.42 ? 0.028 : 0.024;
+        const bSize = (t < 0.42 ? 0.028 : 0.024) * gasBubbleMult;
         _flowScale.set(bSize, bSize * 1.25, bSize);
         _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
         gasFlowMesh.setMatrixAt(i, _flowMat4);
@@ -8030,10 +9615,32 @@
     }
 
     function stepScene(dt, elapsed) {
-      // Smoothly damp RPM changes
-      currentRpm = THREE.MathUtils.damp(currentRpm, targetRpm, 6.0, dt);
+      if (activeFault !== 'normal') {
+        faultElapsed += dt;
+      }
 
-      // Angular velocity scaled for smooth visual readability (rad/s)
+      // Determine effective target RPM according to active operational fault (normal uses user slider directly)
+      let effectiveTargetRpm = targetRpm;
+      if (activeFault === 'parada-retroceso') {
+        // Phase 1 (0..1.35s): rapid deceleration -> Phase 2 (1.35..6.0s): reverse backspin -> Phase 3: locked stall at 0 RPM
+        if (faultElapsed < 1.35) {
+          effectiveTargetRpm = 0;
+        } else if (faultElapsed < 6.0) {
+          const backT = (faultElapsed - 1.35) / 4.65;
+          const backEnv = Math.sin(backT * Math.PI) * Math.exp(-backT * 0.9);
+          effectiveTargetRpm = -Math.min(62, faultStartRpm * 0.36) * backEnv;
+        } else {
+          effectiveTargetRpm = 0;
+        }
+      }
+
+      // Smoothly damp RPM changes
+      currentRpm = THREE.MathUtils.damp(currentRpm, effectiveTargetRpm, activeFault === 'parada-retroceso' ? 4.2 : 6.0, dt);
+      if (activeFault === 'parada-retroceso' && faultElapsed >= 6.0 && Math.abs(currentRpm) < 0.25) {
+        currentRpm = 0;
+      }
+
+      // Angular velocity scaled for smooth visual readability (rad/s; negative during backspin reverses shaft/rotor/belt)
       const visualOmega = (currentRpm / 60) * Math.PI * 0.42;
 
       // Rotate driven pulley, polished rod + clamp, sucker rod string & helical rotor
@@ -8047,13 +9654,29 @@
       // Scroll V-belt texture to show live belt travel
       beltTex.offset.x -= (visualOmega * 0.24) * dt;
 
-      // Update synchronized 3D fluid, progressive cavity, diluent & annulus gas flows
-      updateProcessFlow(dt);
+      // Subtle mechanical vibration on drive head during high-torque overload
+      if (activeFault === 'sobrecarga-torque') {
+        const vibAmp = 0.011 * THREE.MathUtils.clamp(Math.abs(currentRpm) / 220, 0.35, 1.15);
+        driveHeadGroup.position.x = Math.sin(elapsed * 46.0) * vibAmp;
+        driveHeadGroup.position.z = Math.cos(elapsed * 53.0) * vibAmp * 0.75;
+      } else if (driveHeadGroup.position.x !== 0 || driveHeadGroup.position.z !== 0) {
+        driveHeadGroup.position.x = THREE.MathUtils.damp(driveHeadGroup.position.x, 0, 12, dt);
+        driveHeadGroup.position.z = THREE.MathUtils.damp(driveHeadGroup.position.z, 0, 12, dt);
+      }
 
-      // Subtle manometer needle reaction to pressure & pump pulsation (reacts also to higher friction head without dilution)
-      const normLoad = THREE.MathUtils.clamp((currentRpm / 350) + (1 - dilutionBlend) * 0.18, 0, 1.12);
+      // Update synchronized 3D fluid, progressive cavity, diluent & annulus gas flows
+      updateProcessFlow(dt, elapsed);
+
+      // Subtle manometer needle reaction to pressure & pump pulsation (reacts also to active fault load/flutter)
+      let normLoad = THREE.MathUtils.clamp((Math.max(0, currentRpm) / 350) + (1 - dilutionBlend) * 0.18, 0, 1.12);
+      if (activeFault === 'corte-diluente') normLoad = THREE.MathUtils.clamp(normLoad + 0.22, 0, 1.24);
+      else if (activeFault === 'sobrecarga-torque') normLoad = THREE.MathUtils.clamp(normLoad + 0.28, 0, 1.28);
+      else if (activeFault === 'baja-sumergencia') normLoad = THREE.MathUtils.clamp(normLoad * 0.68 + Math.sin(elapsed * 6.2) * 0.14, 0.12, 1.0);
+      else if (activeFault === 'parada-retroceso') normLoad = 0.16;
+
       pulsePhase += dt * (1.5 + normLoad * 4.5);
-      const pulse = Math.sin(pulsePhase) * 0.03 * normLoad;
+      const pulseMag = activeFault === 'baja-sumergencia' ? 0.095 : (activeFault === 'sobrecarga-torque' ? 0.055 : 0.03);
+      const pulse = Math.sin(pulsePhase * (activeFault === 'sobrecarga-torque' ? 3.2 : 1.0)) * pulseMag * normLoad;
       for (const g of gaugeNeedles) {
         g.pivot.rotation.z = g.baseAngle - normLoad * 1.45 + pulse;
       }
@@ -8092,41 +9715,102 @@
       // Smoothly interpolate Studio / Day / Night scene lighting & atmosphere
       updateLightingTransitions(dt, elapsed);
 
+      // Reflect active operational fault status on VFD cabinet LED cleanly without altering lighting modes
+      if (activeFault === 'normal') {
+        mats.vfdLedRun.color.copy(_vfdLedGreen);
+        mats.vfdLedRun.emissive.copy(_vfdLedGreen);
+      } else {
+        const isCritFault = FAULT_SPECS[activeFault] && FAULT_SPECS[activeFault].severity === 'crit';
+        const ledCol = isCritFault ? _vfdLedRed : _vfdLedAmber;
+        mats.vfdLedRun.color.copy(ledCol);
+        mats.vfdLedRun.emissive.copy(ledCol);
+        const blink = 0.55 + 0.45 * Math.sin(elapsed * (isCritFault ? 8.5 : 4.5));
+        mats.vfdLedRun.emissiveIntensity = Math.max(0.45, mats.vfdLedRun.emissiveIntensity * (0.7 + blink * 1.1));
+      }
+
       // Keep pinned 3D component tooltip, leader line & discreet hover indicator synced while orbiting/zooming
       updateHoverDotPosition();
       updatePinnedTooltipPosition();
       updateGeoLabels();
 
-      // Synchronize ambient machine hum, fluid flow & mechanical clicks with currentRpm
-      audioEngine.update(dt, currentRpm);
+      // Synchronize ambient machine hum, fluid flow & mechanical clicks with absolute shaft speed
+      audioEngine.update(dt, Math.abs(currentRpm));
 
       // Update real-time telemetry readout at ~6 Hz for crisp readability
       if (lastTelemetryUpdate < 0 || elapsed - lastTelemetryUpdate > 0.16) {
         lastTelemetryUpdate = elapsed;
         const jitter = (Math.sin(elapsed * 2.3) + Math.cos(elapsed * 3.7)) * 0.5;
         const heavyFactor = 1 - dilutionBlend;
+        const absRpm = Math.abs(currentRpm);
 
-        // Volumetric efficiency slightly improves with diluent; friction pressure & viscosity drop dramatically
+        // Nominal baseline calculations
         const volEffSlope = THREE.MathUtils.lerp(2.22, 2.48, dilutionBlend);
-        const bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(currentRpm * volEffSlope + jitter * 4));
+        let bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(currentRpm * volEffSlope + jitter * 4));
 
-        const psiDiluted = 280 + currentRpm * 1.48;
-        const psiHeavyDelta = 95 + currentRpm * 0.54;
-        const psi = Math.round(psiDiluted + heavyFactor * psiHeavyDelta + jitter * 3);
+        const psiDiluted = 280 + absRpm * 1.48;
+        const psiHeavyDelta = 95 + absRpm * 0.54;
+        let psi = Math.round(psiDiluted + heavyFactor * psiHeavyDelta + jitter * 3);
 
-        const viscDiluted = 260 - (currentRpm / 350) * 55;
-        const viscHeavy = 3650 - (currentRpm / 350) * 530;
-        const visc = Math.round(THREE.MathUtils.lerp(viscHeavy, viscDiluted, dilutionBlend) + jitter * (2 + heavyFactor * 16));
+        const viscDiluted = 260 - (absRpm / 350) * 55;
+        const viscHeavy = 3650 - (absRpm / 350) * 530;
+        let visc = Math.round(THREE.MathUtils.lerp(viscHeavy, viscDiluted, dilutionBlend) + jitter * (2 + heavyFactor * 16));
 
-        const temp = (58.4 + (currentRpm / 350) * 18.2 + heavyFactor * 4.6 + jitter * 0.15).toFixed(1);
+        let tempNum = 58.4 + (absRpm / 350) * 18.2 + heavyFactor * 4.6 + jitter * 0.15;
+        let torquePct = Math.round(THREE.MathUtils.clamp(16 + (absRpm / 350) * 44 + heavyFactor * 22 + jitter * 1.5, 0, 108));
+
+        // Coherent telemetry modulation for each optional operational fault
+        if (activeFault === 'corte-diluente') {
+          bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(bpd * 0.72 + jitter * 6));
+          psi = Math.round(psi + 215 + absRpm * 0.24 + jitter * 8);
+          visc = Math.round(Math.max(visc, 4580) + 280 + jitter * 65);
+          tempNum += 7.4;
+          torquePct = Math.round(THREE.MathUtils.clamp(torquePct + 24 + jitter * 2, 68, 94));
+        } else if (activeFault === 'baja-sumergencia') {
+          const gasWave = Math.sin(elapsed * 2.8) * 0.5 + Math.cos(elapsed * 6.1) * 0.35 + Math.sin(elapsed * 1.3) * 0.25;
+          const effMult = THREE.MathUtils.clamp(0.46 + gasWave * 0.26, 0.18, 0.74);
+          bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(bpd * effMult));
+          psi = Math.max(175, Math.round(psi - 108 + gasWave * 54));
+          tempNum += 9.4 + Math.abs(gasWave) * 1.6;
+          torquePct = Math.round(THREE.MathUtils.clamp(torquePct * (0.68 + gasWave * 0.22), 24, 78));
+        } else if (activeFault === 'parada-retroceso') {
+          bpd = 0;
+          const bleed = THREE.MathUtils.clamp(Math.exp(-faultElapsed * 0.55), 0, 1);
+          psi = Math.round(198 + bleed * 210 + jitter * 2);
+          tempNum = Math.max(48.0, tempNum - 4.2 * (1 - bleed));
+          torquePct = currentRpm < -2 ? Math.round(THREE.MathUtils.clamp(Math.abs(currentRpm) * 1.15, 14, 72)) : 0;
+        } else if (activeFault === 'sobrecarga-torque') {
+          bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(bpd * 0.88 + jitter * 5));
+          psi = Math.round(psi + 235 + absRpm * 0.28 + jitter * 11);
+          visc = Math.round(visc + 920 + jitter * 40);
+          tempNum += 12.6;
+          torquePct = Math.round(THREE.MathUtils.clamp(94 + (absRpm / 350) * 10 + jitter * 3, 92, 106));
+        }
 
         const roundedRpm = Math.round(currentRpm);
+        const temp = tempNum.toFixed(1);
+        const torqueLbFt = Math.round(torquePct * 15.0);
+
         valBpd.textContent = String(bpd);
         valPsi.textContent = String(psi);
         if (valVisc) valVisc.textContent = visc.toLocaleString('en-US');
         valTemp.textContent = temp;
-        valRpm.textContent = String(roundedRpm);
-        if (telemetryMiniRpm) telemetryMiniRpm.textContent = `${roundedRpm} RPM`;
+        valRpm.textContent = roundedRpm < 0 ? `${roundedRpm} (Rev)` : String(roundedRpm);
+        if (telemetryMiniRpm) {
+          telemetryMiniRpm.textContent = roundedRpm < 0 ? `${roundedRpm} RPM` : `${roundedRpm} RPM`;
+        }
+
+        // Update live Torque / Esfuerzo meter inside independent Fault Simulation menu
+        if (faultTorqueVal && faultTorqueFill) {
+          const isOverCrit = torquePct >= 90 || activeFault === 'sobrecarga-torque';
+          const isOverWarn = !isOverCrit && (torquePct >= 75 || activeFault === 'corte-diluente');
+          faultTorqueVal.textContent = `${torquePct}% · ${torqueLbFt.toLocaleString('en-US')} lb·ft`;
+          faultTorqueVal.classList.toggle('is-warn', isOverWarn);
+          faultTorqueVal.classList.toggle('is-crit', isOverCrit);
+          faultTorqueFill.style.width = `${Math.min(100, Math.max(0, torquePct))}%`;
+          faultTorqueFill.classList.toggle('is-warn', isOverWarn);
+          faultTorqueFill.classList.toggle('is-crit', isOverCrit);
+        }
+
         telemetryTrendChart.recordSample(bpd, psi, roundedRpm);
       }
     }
@@ -8151,6 +9835,7 @@
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 2));
+      syncRightDockClearance();
     });
 
     window.addEventListener('beforeunload', () => {
