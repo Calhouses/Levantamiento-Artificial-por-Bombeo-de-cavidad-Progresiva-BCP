@@ -1015,11 +1015,166 @@
       color: #fcd34d;
     }
 
+    .telemetry-value.eff-good {
+      color: #34d399;
+    }
+
+    .telemetry-value.bpd-theo {
+      color: #94a3b8;
+    }
+
+    .telemetry-value.is-warn {
+      color: #fbbf24;
+    }
+
+    .telemetry-value.is-crit {
+      color: #f87171;
+    }
+
     .telemetry-unit {
       font-size: 9.5px;
       font-weight: 500;
       color: #64748b;
       margin-left: 2px;
+    }
+
+    .diluent-slider-block {
+      margin-top: 6px;
+      padding-top: 5px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .flow-eff-card {
+      padding: 5px 7px 6px;
+      margin-bottom: 3px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.54);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .flow-eff-meta {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2px 8px;
+      align-items: baseline;
+      padding-top: 2px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .flow-eff-sublabel {
+      font-size: 9.8px;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+
+    .flow-eff-subval {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .flow-eff-track {
+      width: 100%;
+      height: 3px;
+      margin-top: 2px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.16);
+      overflow: hidden;
+    }
+
+    .flow-eff-fill {
+      width: 90%;
+      height: 100%;
+      border-radius: 999px;
+      background: #34d399;
+      transition: width 160ms ease, background-color 160ms ease;
+    }
+
+    .flow-eff-fill.is-warn {
+      background: #f59e0b;
+    }
+
+    .flow-eff-fill.is-crit {
+      background: #ef4444;
+    }
+
+    .telemetry-slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 4px 0 3px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .telemetry-inline-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 3.5px;
+      border-radius: 999px;
+      background: #1e293b;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .telemetry-inline-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #38bdf8;
+      border: 1.8px solid #e2e8f0;
+      cursor: pointer;
+      transition: transform 120ms ease, background-color 120ms ease;
+    }
+
+    .telemetry-inline-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.14);
+    }
+
+    .telemetry-inline-slider::-moz-range-thumb {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #38bdf8;
+      border: 1.8px solid #e2e8f0;
+      cursor: pointer;
+    }
+
+    .telemetry-inline-slider.is-warn::-webkit-slider-thumb {
+      background: #f59e0b;
+    }
+
+    .telemetry-inline-slider.is-warn::-moz-range-thumb {
+      background: #f59e0b;
+    }
+
+    .telemetry-inline-slider.is-crit::-webkit-slider-thumb {
+      background: #ef4444;
+    }
+
+    .telemetry-inline-slider.is-crit::-moz-range-thumb {
+      background: #ef4444;
+    }
+
+    .telemetry-inline-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.3px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
     }
 
     .rpm-control {
@@ -1308,6 +1463,11 @@
       box-shadow: 0 0 6px rgba(245, 158, 11, 0.7);
     }
 
+    .chart-series-btn[data-series="rpm"] .swatch {
+      background: #34d399;
+      box-shadow: 0 0 6px rgba(52, 211, 153, 0.7);
+    }
+
     .chart-series-btn.is-muted {
       opacity: 0.42;
       border-color: rgba(148, 163, 184, 0.12);
@@ -1376,7 +1536,7 @@
     }
 
     .chart-probe-bar .probe-rpm {
-      color: #93c5fd;
+      color: #34d399;
       font-weight: 600;
     }
 
@@ -1684,12 +1844,29 @@
       white-space: nowrap;
       pointer-events: auto;
       cursor: pointer;
+      transform-origin: 50% 22%;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-      transition: opacity 130ms ease, border-color 130ms ease, background-color 130ms ease;
+      transition: opacity 130ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 220ms ease;
+    }
+
+    #geo-labels-layer.wind-gusts .geo-label {
+      will-change: transform;
+      border-color: rgba(245, 158, 11, 0.46);
+      box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    #geo-labels-layer.wind-dust .geo-label {
+      border-color: rgba(217, 165, 92, 0.58);
+      background: rgba(22, 18, 15, 0.8);
+      box-shadow: 3px 5px 16px rgba(120, 82, 36, 0.28), 0 4px 14px rgba(0, 0, 0, 0.46);
     }
 
     .geo-label:hover,
-    .geo-label.active {
+    .geo-label.active,
+    #geo-labels-layer.wind-gusts .geo-label:hover,
+    #geo-labels-layer.wind-gusts .geo-label.active,
+    #geo-labels-layer.wind-dust .geo-label:hover,
+    #geo-labels-layer.wind-dust .geo-label.active {
       border-color: rgba(251, 191, 36, 0.85);
       background: rgba(24, 30, 44, 0.92);
     }
@@ -2007,7 +2184,7 @@
       position: absolute;
       left: 0;
       bottom: calc(100% + 8px);
-      width: 294px;
+      width: 308px;
       max-height: calc(100vh - 110px);
       display: flex;
       flex-direction: column;
@@ -2209,11 +2386,133 @@
       color: #fee2e2;
     }
 
+    .fault-scenario-btn.is-inspected {
+      box-shadow: inset 2px 0 0 #f8fafc;
+    }
+
     .fault-scenario-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 6px;
+    }
+
+    .fault-scenario-state {
+      display: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #f8fafc;
+      flex-shrink: 0;
+    }
+
+    .fault-scenario-btn.active .fault-scenario-state {
+      display: inline-block;
+    }
+
+    .fault-active-summary {
+      display: none;
+      padding: 7px 8px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.62);
+      border: 1px solid rgba(245, 158, 11, 0.34);
+    }
+
+    .fault-active-summary.visible {
+      display: block;
+    }
+
+    .fault-active-summary.is-crit {
+      border-color: rgba(239, 68, 68, 0.42);
+    }
+
+    .fault-active-summary-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .fault-active-summary-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #f8fafc;
+    }
+
+    .fault-active-summary-hint {
+      font-size: 8.6px;
+      color: #94a3b8;
+    }
+
+    .fault-active-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .fault-active-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 158, 11, 0.38);
+      background: rgba(120, 53, 15, 0.28);
+      color: #fde68a;
+      font-family: inherit;
+      font-size: 9.2px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 130ms ease, border-color 130ms ease, color 130ms ease;
+    }
+
+    .fault-active-tab:hover {
+      background: rgba(120, 53, 15, 0.48);
+      color: #ffffff;
+    }
+
+    .fault-active-tab.is-crit {
+      border-color: rgba(239, 68, 68, 0.44);
+      background: rgba(127, 29, 29, 0.32);
+      color: #fecaca;
+    }
+
+    .fault-active-tab.is-crit:hover {
+      background: rgba(127, 29, 29, 0.54);
+      color: #ffffff;
+    }
+
+    .fault-active-tab.selected {
+      border-color: #f8fafc;
+      background: rgba(245, 158, 11, 0.34);
+      color: #ffffff;
+    }
+
+    .fault-active-tab.is-crit.selected {
+      border-color: #f8fafc;
+      background: rgba(239, 68, 68, 0.42);
+      color: #ffffff;
+    }
+
+    .fault-active-tab-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #f59e0b;
+      flex-shrink: 0;
+    }
+
+    .fault-active-tab.is-crit .fault-active-tab-dot {
+      background: #ef4444;
     }
 
     .fault-scenario-name {
@@ -2274,18 +2573,62 @@
       color: #fee2e2;
     }
 
+    .fault-diagnosis-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
     .fault-diagnosis-title {
       font-size: 9.5px;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      margin-bottom: 3px;
+    }
+
+    .fault-diagnosis-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.6px;
+      font-weight: 600;
+      color: rgba(248, 250, 252, 0.78);
+      white-space: nowrap;
+    }
+
+    .fault-diag-heading {
+      font-size: 8.8px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: rgba(248, 250, 252, 0.92);
+      margin-top: 5px;
+      margin-bottom: 2px;
+    }
+
+    .fault-diag-heading:first-of-type {
+      margin-top: 0;
     }
 
     .fault-diagnosis-action {
-      margin-top: 4px;
+      margin-top: 5px;
       font-size: 9.6px;
-      color: rgba(226, 232, 240, 0.82);
+      color: rgba(226, 232, 240, 0.88);
+    }
+
+    .fault-diag-steps {
+      margin: 2px 0 0;
+      padding-left: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 9.6px;
+      line-height: 1.36;
+      color: rgba(226, 232, 240, 0.90);
+    }
+
+    .fault-diag-steps li {
+      padding-left: 1px;
     }
 
     .btn-fault-reset {
@@ -2831,7 +3174,7 @@
       </div>
 
       <div class="faults-panel-body">
-        <p class="faults-panel-sub">Activa un evento operativo bajo demanda para observar su impacto en el sistema BCP y la telemetría.</p>
+        <p class="faults-panel-sub">Activa uno o varios eventos operativos simultáneos (o ajusta los controles en telemetría) para inspeccionar su impacto y procedimiento.</p>
 
         <div class="fault-torque-meter" aria-label="Indicador de esfuerzo y torque en sarta">
           <div class="fault-torque-row">
@@ -2843,24 +3186,70 @@
           </div>
         </div>
 
+        <div id="fault-active-summary" class="fault-active-summary" aria-label="Resumen de fallas activas">
+          <div class="fault-active-summary-head">
+            <span id="fault-active-summary-title" class="fault-active-summary-title">Fallas activas</span>
+            <span id="fault-active-summary-hint" class="fault-active-summary-hint">Click para inspeccionar</span>
+          </div>
+          <div id="fault-active-tabs" class="fault-active-tabs" role="tablist" aria-label="Selector de diagnóstico de fallas activas"></div>
+        </div>
+
+        <div id="fault-diagnosis-box" class="fault-diagnosis-box" role="status" aria-live="polite">
+          <div class="fault-diagnosis-head">
+            <div id="fault-diagnosis-title" class="fault-diagnosis-title">Diagnóstico Operativo</div>
+            <span id="fault-diagnosis-counter" class="fault-diagnosis-counter"></span>
+          </div>
+          <div class="fault-diag-heading">Qué ocurre</div>
+          <div id="fault-diagnosis-text"></div>
+          <div class="fault-diag-heading">Procedimiento de solución</div>
+          <ol id="fault-diagnosis-steps" class="fault-diag-steps"></ol>
+        </div>
+
         <div class="fault-scenarios-list" role="group" aria-label="Escenarios de fallas operativas">
           <button type="button" class="fault-scenario-btn" data-fault="corte-diluente" data-severity="warn" aria-pressed="false">
             <span class="fault-scenario-head">
-              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Corte / pérdida de diluente</span>
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Corte / pérdida de diluente (&lt; 5%)</span>
+              <span class="fault-scenario-state">Activa</span>
             </span>
-            <span class="fault-scenario-desc">Crudo extrapesado sin dilución · alta viscosidad y presión.</span>
+            <span class="fault-scenario-desc">Sin dilución o dilución crítica · alta viscosidad, torque y restricción.</span>
+          </button>
+
+          <button type="button" class="fault-scenario-btn" data-fault="exceso-diluente" data-severity="warn" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Exceso de diluente (&gt; 28%)</span>
+              <span class="fault-scenario-state">Activa</span>
+            </span>
+            <span class="fault-scenario-desc">Viscosidad muy baja · mayor resbalamiento interno y sobrevolumen.</span>
           </button>
 
           <button type="button" class="fault-scenario-btn" data-fault="baja-sumergencia" data-severity="warn" aria-pressed="false">
             <span class="fault-scenario-head">
-              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Baja sumergencia / arrastre de gas</span>
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Baja sumergencia / arrastre de gas (&lt; 120 ft)</span>
+              <span class="fault-scenario-state">Activa</span>
             </span>
-            <span class="fault-scenario-desc">Llenado parcial en fondo · caudal inestable y gas lock.</span>
+            <span class="fault-scenario-desc">Nivel bajo o sobrebombeo · llenado parcial y caudal inestable.</span>
+          </button>
+
+          <button type="button" class="fault-scenario-btn" data-fault="baja-presion" data-severity="warn" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Baja presión en sistema (≤ 350 PSI)</span>
+              <span class="fault-scenario-state">Activa</span>
+            </span>
+            <span class="fault-scenario-desc">Caída de presión, pérdida de carga o llenado deficiente BCP.</span>
+          </button>
+
+          <button type="button" class="fault-scenario-btn" data-fault="baja-temperatura" data-severity="warn" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Baja temperatura / alta viscosidad (≤ 55 °C)</span>
+              <span class="fault-scenario-state">Activa</span>
+            </span>
+            <span class="fault-scenario-desc">Crudo más viscoso · mayor resistencia y esfuerzo torsional.</span>
           </button>
 
           <button type="button" class="fault-scenario-btn" data-fault="parada-retroceso" data-severity="crit" aria-pressed="false">
             <span class="fault-scenario-head">
               <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Parada / baja velocidad / retroceso</span>
+              <span class="fault-scenario-state">Activa</span>
             </span>
             <span class="fault-scenario-desc">&lt; 60 RPM o detención · resbalamiento interno / backspin a 0 RPM.</span>
           </button>
@@ -2868,15 +3257,26 @@
           <button type="button" class="fault-scenario-btn" data-fault="sobrecarga-torque" data-severity="crit" aria-pressed="false">
             <span class="fault-scenario-head">
               <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Sobrecarga / sobrevelocidad (&gt; 260 RPM)</span>
+              <span class="fault-scenario-state">Activa</span>
             </span>
             <span class="fault-scenario-desc">Alto torque, calentamiento del elastómero y esfuerzo en sarta.</span>
           </button>
-        </div>
 
-        <div id="fault-diagnosis-box" class="fault-diagnosis-box" role="status" aria-live="polite">
-          <div id="fault-diagnosis-title" class="fault-diagnosis-title">Diagnóstico Operativo</div>
-          <div id="fault-diagnosis-text"></div>
-          <div id="fault-diagnosis-action" class="fault-diagnosis-action"></div>
+          <button type="button" class="fault-scenario-btn" data-fault="alta-presion" data-severity="crit" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Alta presión / sobrepresión (&gt; 860 PSI)</span>
+              <span class="fault-scenario-state">Activa</span>
+            </span>
+            <span class="fault-scenario-desc">Elevado ΔP rotor–estator, carga en sarta y resbalamiento interno.</span>
+          </button>
+
+          <button type="button" class="fault-scenario-btn" data-fault="dano-elastomero" data-severity="crit" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Daño / degradación del elastómero (&gt; 98 °C)</span>
+              <span class="fault-scenario-state">Activa</span>
+            </span>
+            <span class="fault-scenario-desc">Ablandamiento, hinchamiento, pérdida de interferencia y caída de BPD.</span>
+          </button>
         </div>
       </div>
 
@@ -2972,50 +3372,111 @@
     </div>
 
     <div class="telemetry-body">
-      <div class="fluid-mode-wrap" role="group" aria-label="Selector de tipo de fluido">
+      <div class="fluid-mode-wrap" role="group" aria-label="Selector de tipo de fluido y dosificación de diluente">
         <div class="fluid-mode-header">
           <span class="fluid-mode-label">Tipo de Fluido</span>
-          <span id="fluid-mode-tag" class="fluid-mode-tag">Con diluente</span>
+          <span id="fluid-mode-tag" class="fluid-mode-tag">Con diluente (18%)</span>
         </div>
         <div class="fluid-segmented">
-          <button type="button" id="btn-fluid-extrapesado" class="fluid-btn" data-fluid="extrapesado" aria-pressed="false" title="Crudo Extrapesado (Sin dilución)">
+          <button type="button" id="btn-fluid-extrapesado" class="fluid-btn" data-fluid="extrapesado" aria-pressed="false" title="Crudo Extrapesado (Sin dilución · 0%)">
             <span class="fluid-btn-name"><span class="fluid-btn-dot heavy"></span>Extrapesado</span>
             <span class="fluid-btn-sub">Sin dilución</span>
           </button>
-          <button type="button" id="btn-fluid-diluido" class="fluid-btn active" data-fluid="diluido" aria-pressed="true" title="Crudo Diluido (Con inyección de diluente)">
+          <button type="button" id="btn-fluid-diluido" class="fluid-btn active" data-fluid="diluido" aria-pressed="true" title="Crudo Diluido (Con inyección de diluente · ~18%)">
             <span class="fluid-btn-name"><span class="fluid-btn-dot diluted"></span>Diluido</span>
             <span class="fluid-btn-sub">Con diluente</span>
           </button>
         </div>
+        <div class="diluent-slider-block">
+          <div class="telemetry-row">
+            <label for="diluent-slider" class="telemetry-label">% de Diluente</label>
+            <span id="val-diluent-wrap" class="telemetry-value"><span id="val-diluent">18</span><span class="telemetry-unit">%</span></span>
+          </div>
+          <input id="diluent-slider" class="telemetry-inline-slider" type="range" min="0" max="35" step="1" value="18" aria-label="Porcentaje de diluente inyectado" title="Ajustar % de diluente (corte/pérdida: < 5% · normal: 10–25% · exceso: > 28%)" />
+          <div class="telemetry-inline-ticks" title="Corte: < 5% · Óptimo: 10–25% · Exceso: > 28%">
+            <span>0%</span>
+            <span>5%</span>
+            <span>18%</span>
+            <span>28%</span>
+            <span>35%</span>
+          </div>
+        </div>
       </div>
 
       <div class="telemetry-grid">
-        <div class="telemetry-row">
-          <span class="telemetry-label">Caudal (BPD)</span>
-          <span class="telemetry-value"><span id="val-bpd">446</span><span class="telemetry-unit">BPD</span></span>
+        <div class="flow-eff-card" aria-label="Caudal real frente a caudal teórico y eficiencia volumétrica">
+          <div class="telemetry-row">
+            <span class="telemetry-label">Caudal Real (BPD)</span>
+            <span id="val-bpd-wrap" class="telemetry-value"><span id="val-bpd">446</span><span class="telemetry-unit">BPD</span></span>
+          </div>
+          <div class="flow-eff-meta">
+            <span class="flow-eff-sublabel">Caudal Teórico (BPD)</span>
+            <span class="flow-eff-subval telemetry-value bpd-theo"><span id="val-bpd-theo">495</span><span class="telemetry-unit">BPD</span></span>
+            <span class="flow-eff-sublabel">Eficiencia Volumétrica</span>
+            <span id="val-eff-wrap" class="flow-eff-subval telemetry-value eff-good"><span id="val-eff">90</span><span class="telemetry-unit">%</span></span>
+          </div>
+          <div class="flow-eff-track" title="Relación porcentual: 100% × Caudal Real / Caudal Teórico">
+            <div id="eff-bar-fill" class="flow-eff-fill"></div>
+          </div>
         </div>
-        <div class="telemetry-row">
-          <span class="telemetry-label">Presión (PSI)</span>
-          <span class="telemetry-value"><span id="val-psi">546</span><span class="telemetry-unit">PSI</span></span>
+
+        <div class="telemetry-slider-row">
+          <div class="telemetry-row">
+            <label for="psi-slider" class="telemetry-label">Presión (PSI)</label>
+            <span id="val-psi-wrap" class="telemetry-value"><span id="val-psi">545</span><span class="telemetry-unit">PSI</span></span>
+          </div>
+          <input id="psi-slider" class="telemetry-inline-slider" type="range" min="300" max="1200" step="5" value="545" aria-label="Control de presión de descarga en PSI" title="Ajustar presión de descarga (baja: ≤ 350 · normal: 355–860 · sobrepresión: > 860 PSI)" />
+          <div class="telemetry-inline-ticks" title="Baja presión: ≤ 350 PSI · Normal: 355–860 PSI · Sobrepresión: > 860 PSI">
+            <span>300</span>
+            <span>350</span>
+            <span>860</span>
+            <span>1200 PSI</span>
+          </div>
         </div>
+
+        <div class="telemetry-slider-row">
+          <div class="telemetry-row">
+            <label for="subm-slider" class="telemetry-label">Sumergencia (ft)</label>
+            <span id="val-subm-wrap" class="telemetry-value"><span id="val-subm">320</span><span class="telemetry-unit">ft</span></span>
+          </div>
+          <input id="subm-slider" class="telemetry-inline-slider" type="range" min="50" max="600" step="5" value="320" aria-label="Control de sumergencia o nivel de fluido sobre la bomba en pies" title="Ajustar sumergencia / nivel de fluido (baja sumergencia: < 120 ft · normal: ≥ 120 ft)" />
+          <div class="telemetry-inline-ticks" title="Baja sumergencia / arrastre de gas: < 120 ft · Normal: ~320 ft">
+            <span>50</span>
+            <span>120</span>
+            <span>320</span>
+            <span>600 ft</span>
+          </div>
+        </div>
+
         <div class="telemetry-row">
           <span class="telemetry-label">Viscosidad (cP)</span>
           <span id="val-visc-wrap" class="telemetry-value visc-low"><span id="val-visc">232</span><span class="telemetry-unit">cP</span></span>
         </div>
-        <div class="telemetry-row">
-          <span class="telemetry-label">Temperatura (°C)</span>
-          <span class="telemetry-value"><span id="val-temp">68.5</span><span class="telemetry-unit">°C</span></span>
+
+        <div class="telemetry-slider-row">
+          <div class="telemetry-row">
+            <label for="temp-slider" class="telemetry-label">Temperatura (°C)</label>
+            <span id="val-temp-wrap" class="telemetry-value"><span id="val-temp">68.0</span><span class="telemetry-unit">°C</span></span>
+          </div>
+          <input id="temp-slider" class="telemetry-inline-slider" type="range" min="50" max="130" step="1" value="68" aria-label="Control de temperatura operativa en grados Celsius" title="Ajustar temperatura operativa (fría/viscosa: ≤ 55 °C · normal: 56–98 °C · daño elastómero: > 98 °C)" />
+          <div class="telemetry-inline-ticks" title="Baja temp / alta viscosidad: ≤ 55 °C · Límite seguro elastómero: ≤ 98 °C">
+            <span>50</span>
+            <span>55</span>
+            <span>98</span>
+            <span>130 °C</span>
+          </div>
         </div>
+
         <div class="telemetry-row">
           <span class="telemetry-label">Velocidad (RPM)</span>
           <span class="telemetry-value"><span id="val-rpm">180</span><span class="telemetry-unit">RPM</span></span>
         </div>
       </div>
 
-      <!-- Interactive D3.js 10-Minute Historical Trend Area Chart -->
-      <div class="telemetry-chart-section" aria-label="Tendencia histórica de caudal BPD y presión PSI en los últimos 10 minutos">
+      <!-- Interactive D3.js Instant-Reactive Live Trend Chart (BPD, PSI & RPM) -->
+      <div class="telemetry-chart-section" aria-label="Tendencia en tiempo real de caudal BPD, presión PSI y velocidad RPM">
         <div class="chart-header">
-          <span class="chart-title">Tendencia 10 min</span>
+          <span class="chart-title">En vivo (30s)</span>
           <div class="chart-controls">
             <button type="button" id="btn-toggle-bpd" class="chart-series-btn" data-series="bpd" aria-pressed="true" title="Mostrar u ocultar serie BPD">
               <span class="swatch"></span><span>BPD</span>
@@ -3023,11 +3484,14 @@
             <button type="button" id="btn-toggle-psi" class="chart-series-btn" data-series="psi" aria-pressed="true" title="Mostrar u ocultar serie PSI">
               <span class="swatch"></span><span>PSI</span>
             </button>
-            <button type="button" id="btn-chart-reset-zoom" class="chart-reset-btn" title="Restablecer ventana de 10 minutos">10m</button>
+            <button type="button" id="btn-toggle-rpm" class="chart-series-btn" data-series="rpm" aria-pressed="true" title="Mostrar u ocultar serie RPM">
+              <span class="swatch"></span><span>RPM</span>
+            </button>
+            <button type="button" id="btn-chart-reset-zoom" class="chart-reset-btn" title="Restablecer ventana en vivo de 30 segundos">30s</button>
           </div>
         </div>
         <div id="chart-probe-bar" class="chart-probe-bar">
-          <span>Correlación RPM → BPD / PSI · Hover / Zoom</span>
+          <span>En vivo · BPD / PSI / RPM · Hover / Zoom</span>
         </div>
         <div id="telemetry-chart-wrap" class="chart-svg-wrap">
           <svg id="telemetry-trend-svg" class="chart-svg" viewBox="0 0 234 108" preserveAspectRatio="none"></svg>
@@ -5313,6 +5777,252 @@
     padGroup.add(createFloodlightPole(-5.25, -3.30, 4.95, -0.25, 2.35, -0.1));
     padGroup.add(createFloodlightPole(5.25, 3.15, 4.80, 1.45, 1.15, -0.15));
 
+    // 8.1A Industrial Safety Windsock (Manga de Viento) on clear back-right corner of concrete pad
+    function createWindsockTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512;
+      c.height = 256;
+      const ctx = c.getContext('2d');
+
+      // 5 alternating high-visibility aviation orange / crisp white stripes along cone length (V axis)
+      const stripes = [
+        { color: '#f95308', y0: 0.00, y1: 0.21 },
+        { color: '#f4f6f8', y0: 0.21, y1: 0.40 },
+        { color: '#f95308', y0: 0.40, y1: 0.61 },
+        { color: '#f4f6f8', y0: 0.61, y1: 0.80 },
+        { color: '#f95308', y0: 0.80, y1: 1.00 },
+      ];
+      for (const s of stripes) {
+        ctx.fillStyle = s.color;
+        ctx.fillRect(0, Math.floor(s.y0 * 256), 512, Math.ceil((s.y1 - s.y0) * 256) + 1);
+      }
+
+      // Subtle ripstop nylon weave & seam stitching between bands
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.10)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 512; x += 8) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 256);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.28)';
+      ctx.lineWidth = 2;
+      for (const s of stripes) {
+        const y = Math.floor(s.y0 * 256);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(512, y);
+        ctx.stroke();
+      }
+
+      // Reinforced dark-orange mouth hem & tail cuff
+      ctx.fillStyle = 'rgba(124, 45, 18, 0.32)';
+      ctx.fillRect(0, 0, 512, 8);
+      ctx.fillRect(0, 248, 512, 8);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      return tex;
+    }
+
+    const windsockGroup = new THREE.Group();
+    windsockGroup.position.set(4.85, 0.22, -2.95); // Flush on concrete padRight, clear of pipes, poles & wellhead
+    surfaceGroup.add(windsockGroup);
+
+    // 1. Concrete pedestal + steel base flange + 4 anchor bolts
+    const wsPedestal = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.08, 0.42), mats.concrete);
+    wsPedestal.position.y = 0.04;
+    wsPedestal.receiveShadow = true;
+    wsPedestal.castShadow = true;
+    windsockGroup.add(wsPedestal);
+
+    const wsBaseFlange = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.036, 0.26), mats.steelDark);
+    wsBaseFlange.position.y = 0.098;
+    wsBaseFlange.castShadow = true;
+    windsockGroup.add(wsBaseFlange);
+
+    const wsBoltGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.035, 6);
+    for (const [bx, bz] of [[-0.09, -0.09], [0.09, -0.09], [-0.09, 0.09], [0.09, 0.09]]) {
+      const bolt = new THREE.Mesh(wsBoltGeo, mats.chromePolished);
+      bolt.position.set(bx, 0.122, bz);
+      windsockGroup.add(bolt);
+    }
+
+    // 2. Safety-yellow lower guard sleeve + tapered galvanized vertical mast
+    const wsMastHeight = 4.15;
+    const wsGuardCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.064, 0.068, 0.78, 14), mats.safetyYellow);
+    wsGuardCollar.position.y = 0.50;
+    wsGuardCollar.castShadow = true;
+    windsockGroup.add(wsGuardCollar);
+
+    const wsMast = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.056, wsMastHeight, 14), mats.galvanizedPipe);
+    wsMast.position.y = 0.11 + wsMastHeight * 0.5;
+    wsMast.castShadow = true;
+    windsockGroup.add(wsMast);
+
+    // 3. Top obstruction finial cap (industrial red warning beacon)
+    const wsCapCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.042, 0.07, 12), mats.steelDark);
+    wsCapCollar.position.y = 0.11 + wsMastHeight + 0.03;
+    windsockGroup.add(wsCapCollar);
+
+    const wsBeaconMat = new THREE.MeshStandardMaterial({
+      color: 0xdc2626,
+      emissive: 0x991b1b,
+      emissiveIntensity: 0.45,
+      roughness: 0.28,
+      metalness: 0.12,
+    });
+    const wsBeacon = new THREE.Mesh(new THREE.SphereGeometry(0.044, 12, 10), wsBeaconMat);
+    wsBeacon.position.y = 0.11 + wsMastHeight + 0.085;
+    windsockGroup.add(wsBeacon);
+
+    // 4. Rotating swivel weathervane head (rotates smoothly into downwind direction)
+    const windsockSwivel = new THREE.Group();
+    windsockSwivel.position.y = 0.11 + wsMastHeight - 0.18;
+    windsockGroup.add(windsockSwivel);
+
+    const wsBearing = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.15, 14), mats.chromePolished);
+    windsockSwivel.add(wsBearing);
+
+    const wsStandoffArm = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.28, 10), mats.chromePolished);
+    wsStandoffArm.rotation.z = Math.PI / 2;
+    wsStandoffArm.position.x = 0.14;
+    windsockSwivel.add(wsStandoffArm);
+
+    // Mouth hoop ring centered at local X = 0.28 (cone attaches cleanly at X = 0.28 and streams toward +X)
+    const wsMouthRadius = 0.205;
+    const wsTailRadius = 0.085;
+    const wsConeLength = 1.56;
+    const wsMouthX = 0.28;
+
+    const wsHoop = new THREE.Mesh(new THREE.TorusGeometry(wsMouthRadius, 0.013, 10, 24), mats.chromePolished);
+    wsHoop.rotation.y = Math.PI / 2;
+    wsHoop.position.x = wsMouthX;
+    windsockSwivel.add(wsHoop);
+
+    // 4 radial tension wire stays connecting swivel collar to mouth hoop
+    for (let s = 0; s < 4; s++) {
+      const ang = (s / 4) * Math.PI * 2 + Math.PI * 0.25;
+      const stayCurve = new THREE.LineCurve3(
+        new THREE.Vector3(0.04, 0, 0),
+        new THREE.Vector3(wsMouthX, Math.cos(ang) * wsMouthRadius, Math.sin(ang) * wsMouthRadius)
+      );
+      const stayMesh = new THREE.Mesh(new THREE.TubeGeometry(stayCurve, 2, 0.006, 6, false), mats.chromePolished);
+      windsockSwivel.add(stayMesh);
+    }
+
+    // 5. High-visibility tapered fabric cone (oriented along local +X, deformed smoothly per-frame with zero GC)
+    const wsConeGeo = new THREE.CylinderGeometry(wsTailRadius, wsMouthRadius, wsConeLength, 20, 24, true);
+    // Rotate so bottom (mouth, y = -L/2) sits at x = 0 and top (tail, y = +L/2) extends to x = +wsConeLength
+    wsConeGeo.rotateZ(-Math.PI / 2);
+    wsConeGeo.translate(wsConeLength * 0.5, 0, 0);
+
+    const wsPosAttr = wsConeGeo.attributes.position;
+    const wsBasePositions = new Float32Array(wsPosAttr.array.length);
+    wsBasePositions.set(wsPosAttr.array);
+
+    const wsFabricMat = new THREE.MeshStandardMaterial({
+      map: createWindsockTexture(),
+      roughness: 0.82,
+      metalness: 0.02,
+      side: THREE.DoubleSide,
+    });
+    const wsConeMesh = new THREE.Mesh(wsConeGeo, wsFabricMat);
+    wsConeMesh.position.x = wsMouthX;
+    wsConeMesh.castShadow = true;
+    wsConeMesh.receiveShadow = true;
+    windsockSwivel.add(wsConeMesh);
+
+    let wsCurrentYaw = -0.32;
+    let wsCurrentStrength = 0.38;
+    let wsGustIntensity = 0; // Normalized [0..1] when windsock detects gusty wind or dust conditions
+    let wsWindDirX = Math.cos(wsCurrentYaw);
+
+    function updateWindsock(dt, elapsed) {
+      // Derive wind direction & strength coherently from active weather (Despejado / Lluvia / Polvo)
+      const rainWeight = weatherRainBlend;
+      const dustWeight = weatherDustBlend;
+      const calmWeight = Math.max(0, 1.0 - rainWeight - dustWeight);
+
+      // Gentle savanna trade breeze in normal/clear conditions, squall downwind in rain (-1.45, +0.32), brisk +X gusts in dust
+      const calmYaw = -0.32 + Math.sin(elapsed * 0.34) * 0.16 + Math.cos(elapsed * 0.19) * 0.09;
+      const rainYaw = Math.atan2(-0.32, -1.45) + Math.sin(elapsed * 1.15) * 0.11;
+      const dustYaw = 0.04 + Math.sin(elapsed * 0.85) * 0.14;
+
+      // Blend vector direction cleanly (no angle wrap discontinuities)
+      const dirX = Math.cos(calmYaw) * calmWeight + Math.cos(rainYaw) * rainWeight + Math.cos(dustYaw) * dustWeight;
+      const dirZ = -Math.sin(calmYaw) * calmWeight - Math.sin(rainYaw) * rainWeight - Math.sin(dustYaw) * dustWeight;
+      const targetYaw = Math.atan2(-dirZ, dirX);
+
+      // Shortest-arc damped yaw rotation on swivel
+      const yawDiff = ((targetYaw - wsCurrentYaw + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+      wsCurrentYaw += yawDiff * (1 - Math.exp(-3.2 * dt));
+      windsockSwivel.rotation.y = wsCurrentYaw;
+
+      // Target wind intensity: gentle breeze (~0.38) vs brisk rain (~0.82) vs gusty savanna dust (~0.94)
+      const calmGust = 0.34 + 0.09 * Math.sin(elapsed * 0.9) + 0.05 * Math.cos(elapsed * 1.7);
+      const rainGust = 0.78 + 0.14 * Math.sin(elapsed * 2.1) + 0.08 * Math.cos(elapsed * 3.7);
+      const dustGust = 0.88 + 0.12 * Math.sin(elapsed * 0.75) + 0.09 * Math.sin(elapsed * 2.6);
+      const targetStrength = THREE.MathUtils.clamp(
+        calmGust * calmWeight + rainGust * rainWeight + dustGust * dustWeight,
+        0.22,
+        1.05
+      );
+      wsCurrentStrength = THREE.MathUtils.damp(wsCurrentStrength, targetStrength, 3.6, dt);
+
+      // Expose smoothed gust/dust intensity & lateral direction for atmospheric UI coherence (#geo-labels-layer)
+      const gustFromStrength = THREE.MathUtils.clamp((wsCurrentStrength - 0.56) / 0.44, 0, 1);
+      const gustFromDust = THREE.MathUtils.clamp(dustWeight * 1.05, 0, 1);
+      wsGustIntensity = THREE.MathUtils.damp(wsGustIntensity, Math.max(gustFromStrength, gustFromDust), 4.0, dt);
+      wsWindDirX = Math.cos(wsCurrentYaw);
+
+      // Deform fabric vertices along cone axis u ∈ [0, 1] with zero allocations
+      const posArr = wsPosAttr.array;
+      const droopMax = THREE.MathUtils.lerp(0.76, 0.07, THREE.MathUtils.clamp((wsCurrentStrength - 0.22) / 0.75, 0, 1));
+      const waveSpeed = 3.2 + wsCurrentStrength * 8.2;
+      const waveAmpZ = 0.025 + wsCurrentStrength * 0.095;
+      const waveAmpY = 0.018 + wsCurrentStrength * 0.055;
+      const inflate = 0.84 + wsCurrentStrength * 0.19;
+
+      for (let i = 0; i < posArr.length; i += 3) {
+        const bx = wsBasePositions[i];
+        const by = wsBasePositions[i + 1];
+        const bz = wsBasePositions[i + 2];
+
+        const u = bx / wsConeLength; // 0 at rigid mouth hoop, 1 at open tail
+        const uPin = u * u;
+        const radialScale = THREE.MathUtils.lerp(1.0, inflate, u);
+
+        // Gravity droop pulls tail downward gently in calm breeze and lifts nearly horizontal in strong wind
+        const droopY = -droopMax * Math.pow(u, 1.48);
+        // Subtle arc foreshortening when drooping so fabric length stays physically consistent
+        const pullX = -0.34 * droopMax * droopMax * uPin;
+
+        // Traveling cloth ripples from mouth toward tail
+        const phase1 = u * 7.8 - elapsed * waveSpeed;
+        const phase2 = u * 13.5 - elapsed * (waveSpeed * 1.42) + by * 2.4;
+        const flutterZ = (Math.sin(phase1) * 0.72 + Math.sin(phase2) * 0.28) * waveAmpZ * u;
+        const flutterY = (Math.cos(phase1 * 0.9) * 0.65 + Math.sin(phase2) * 0.35) * waveAmpY * u;
+
+        // Slight oval vertical flattening when limp in light wind
+        const sagFlatY = THREE.MathUtils.lerp(1.0, 0.78 + 0.22 * wsCurrentStrength, u);
+
+        posArr[i] = bx + pullX;
+        posArr[i + 1] = by * radialScale * sagFlatY + droopY + flutterY;
+        posArr[i + 2] = bz * radialScale + flutterZ;
+      }
+      wsPosAttr.needsUpdate = true;
+      wsConeGeo.computeVertexNormals();
+
+      // Subtle aviation obstruction beacon glow in Night mode
+      const nightGlow = currentLightMode === 'noche' ? (1.45 + 0.65 * Math.sin(elapsed * 2.8)) : 0.32;
+      wsBeaconMat.emissiveIntensity = THREE.MathUtils.damp(wsBeaconMat.emissiveIntensity, nightGlow, 4.0, dt);
+    }
+
     // 8.1B Orinoco Savanna Context (Day Mode Only — sits on expanded wings away from well, pad & cutaway)
     const savannaGroup = new THREE.Group();
     savannaGroup.visible = false;
@@ -7021,29 +7731,221 @@
       navItemBtns.forEach((b) => b.classList.toggle('active', b.dataset.preset === 'panoramica'));
     });
 
-    // Telemetry, Fluid Mode & RPM Slider
+    // Telemetry, Fluid Mode & Movable Controls (% Diluent, RPM, Pressure PSI, Submergence ft, Temperature °C)
     const rpmSlider = document.getElementById('rpm-slider');
     const rpmSliderBadge = document.getElementById('rpm-slider-badge');
+    const diluentSlider = document.getElementById('diluent-slider');
+    const psiSlider = document.getElementById('psi-slider');
+    const submSlider = document.getElementById('subm-slider');
+    const tempSlider = document.getElementById('temp-slider');
+    const valBpdWrap = document.getElementById('val-bpd-wrap');
     const valBpd = document.getElementById('val-bpd');
+    const valBpdTheo = document.getElementById('val-bpd-theo');
+    const valEffWrap = document.getElementById('val-eff-wrap');
+    const valEff = document.getElementById('val-eff');
+    const effBarFill = document.getElementById('eff-bar-fill');
+    const valDiluentWrap = document.getElementById('val-diluent-wrap');
+    const valDiluent = document.getElementById('val-diluent');
+    const valPsiWrap = document.getElementById('val-psi-wrap');
     const valPsi = document.getElementById('val-psi');
+    const valSubmWrap = document.getElementById('val-subm-wrap');
+    const valSubm = document.getElementById('val-subm');
     const valViscWrap = document.getElementById('val-visc-wrap');
     const valVisc = document.getElementById('val-visc');
+    const valTempWrap = document.getElementById('val-temp-wrap');
     const valTemp = document.getElementById('val-temp');
     const valRpm = document.getElementById('val-rpm');
     const btnFluidExtrapesado = document.getElementById('btn-fluid-extrapesado');
     const btnFluidDiluido = document.getElementById('btn-fluid-diluido');
     const fluidModeTag = document.getElementById('fluid-mode-tag');
 
+    // Nominal BCP pump geometric displacement (BPD per RPM: 2.75 × 180 RPM = 495 BPD theoretical)
+    const PUMP_DISP_BPD_PER_RPM = 2.75;
+
+    const DILUENT_MIN = 0;
+    const DILUENT_MAX = 35;
+    const DILUENT_LOW_FAULT = 5;       // < 5% (0..4%) triggers corte / pérdida de diluente
+    const DILUENT_WARN_LOW = 9;        // 5..9% low-caution band
+    const DILUENT_DEFAULT_NORMAL = 18; // ~18% nominal Orinoco Belt dilution
+    const DILUENT_WARN_HIGH = 26;      // 26..28% high-caution band
+    const DILUENT_HIGH_FAULT = 28;     // > 28% (29..35%) triggers exceso de diluente
+    const DILUENT_FAULT_EXCESS = 32;   // manual fault setpoint
+
+    const RPM_MIN_NORMAL = 60;
+    const RPM_MAX_NORMAL = 260;
+    const RPM_DEFAULT_NORMAL = 180;
+    const RPM_FAULT_OVERSPEED = 320;
+    const RPM_FAULT_STOP = 0;
+
+    const PSI_MIN = 300;
+    const PSI_MAX = 1200;
+    const PSI_MIN_NORMAL = 350;
+    const PSI_WARN_LOW = 390;
+    const PSI_DEFAULT_NORMAL = 545;
+    const PSI_WARN_HIGH = 780;
+    const PSI_MAX_NORMAL = 860;
+    const PSI_FAULT_HIGH = 1040;
+    const PSI_FAULT_LOW = 300;
+
+    const SUBM_MIN = 50;
+    const SUBM_MAX = 600;
+    const SUBM_MIN_NORMAL = 120;
+    const SUBM_WARN_LOW = 160;
+    const SUBM_DEFAULT_NORMAL = 320;
+    const SUBM_FAULT_LOW = 85;
+
+    const TEMP_MIN = 50;
+    const TEMP_MAX = 130;
+    const TEMP_MIN_NORMAL = 55;
+    const TEMP_WARN_LOW = 58;
+    const TEMP_DEFAULT_NORMAL = 68;
+    const TEMP_WARN_HIGH = 88;
+    const TEMP_MAX_NORMAL = 98;
+    const TEMP_FAULT_HIGH = 114;
+    const TEMP_FAULT_LOW = 50;
+
+    // Combined thermal-mechanical stress envelope (accelerated elastomer degradation)
+    const COMBO_TEMP_MIN = 88;
+    const COMBO_PSI_MIN = 760;
+    const COMBO_RPM_MIN = 235;
+
     let targetRpm = Number(rpmSlider.value);
     let currentRpm = targetRpm;
-    let fluidMode = 'diluido';
-    let targetDilution = 1;
-    let dilutionBlend = 1;
+    let targetDiluentPct = Number(diluentSlider ? diluentSlider.value : DILUENT_DEFAULT_NORMAL);
+    let currentDiluentPct = targetDiluentPct;
+    let targetPsi = Number(psiSlider ? psiSlider.value : PSI_DEFAULT_NORMAL);
+    let currentPsi = targetPsi;
+    let targetSubmergence = Number(submSlider ? submSlider.value : SUBM_DEFAULT_NORMAL);
+    let currentSubmergence = targetSubmergence;
+    let effectiveSubmergence = targetSubmergence;
+    let targetTemp = Number(tempSlider ? tempSlider.value : TEMP_DEFAULT_NORMAL);
+    let currentTemp = targetTemp;
+    let fluidMode = targetDiluentPct === 0 ? 'extrapesado' : 'diluido';
+    let targetDilution = THREE.MathUtils.clamp(targetDiluentPct / DILUENT_DEFAULT_NORMAL, 0, 1);
+    let dilutionBlend = targetDilution;
 
-    function setFluidMode(mode) {
-      fluidMode = mode === 'extrapesado' ? 'extrapesado' : 'diluido';
-      targetDilution = fluidMode === 'diluido' ? 1 : 0;
+    // Dynamic submergence drops when pumping aggressively above reservoir inflow (high RPM + low pressure)
+    function computeEffectiveSubmergence(staticSubm, rpmVal, psiVal) {
+      const absRpm = Math.max(0, rpmVal);
+      const overPump = THREE.MathUtils.clamp((absRpm - 200) / 80, 0, 1.35);
+      const lowPress = THREE.MathUtils.clamp((440 - psiVal) / 110, 0, 1.15);
+      const highRpmDrawdown = absRpm > 260 ? (absRpm - 260) * 0.55 : 0;
+      const drawdownFt = overPump * lowPress * 290 + highRpmDrawdown;
+      return THREE.MathUtils.clamp(staticSubm - drawdownFt, SUBM_MIN, SUBM_MAX);
+    }
 
+    function updateDiluentSliderVisual() {
+      if (!diluentSlider) return;
+      const pct = THREE.MathUtils.clamp(((targetDiluentPct - DILUENT_MIN) / (DILUENT_MAX - DILUENT_MIN)) * 100, 0, 100);
+      let fillStart = '#d97706';
+      let fillEnd = '#fbbf24';
+      const isLowFault = targetDiluentPct < DILUENT_LOW_FAULT;
+      const isExcessFault = targetDiluentPct > DILUENT_HIGH_FAULT;
+      const isWarn = isLowFault || isExcessFault || targetDiluentPct <= DILUENT_WARN_LOW || targetDiluentPct >= DILUENT_WARN_HIGH;
+      if (isLowFault || isExcessFault) {
+        fillStart = '#ea580c';
+        fillEnd = '#f59e0b';
+      } else if (!isWarn) {
+        fillStart = '#b45309';
+        fillEnd = '#f59e0b';
+      }
+      diluentSlider.style.background = `linear-gradient(90deg, ${fillStart} 0%, ${fillEnd} ${pct}%, #1e293b ${pct}%)`;
+      diluentSlider.classList.toggle('is-warn', isLowFault || isExcessFault);
+      diluentSlider.classList.toggle('is-crit', false);
+      if (valDiluent) valDiluent.textContent = String(Math.round(targetDiluentPct));
+      if (valDiluentWrap) {
+        valDiluentWrap.classList.toggle('is-warn', isLowFault || isExcessFault);
+        valDiluentWrap.classList.toggle('is-crit', false);
+      }
+      if (fluidModeTag) {
+        if (targetDiluentPct === 0) {
+          fluidModeTag.textContent = 'Sin dilución (0%)';
+          fluidModeTag.classList.add('is-heavy');
+        } else if (targetDiluentPct < DILUENT_LOW_FAULT) {
+          fluidModeTag.textContent = `Dilución crítica (${targetDiluentPct}%)`;
+          fluidModeTag.classList.add('is-heavy');
+        } else if (targetDiluentPct > DILUENT_HIGH_FAULT) {
+          fluidModeTag.textContent = `Exceso diluente (${targetDiluentPct}%)`;
+          fluidModeTag.classList.remove('is-heavy');
+        } else {
+          fluidModeTag.textContent = `Con diluente (${targetDiluentPct}%)`;
+          fluidModeTag.classList.remove('is-heavy');
+        }
+      }
+    }
+
+    function updatePsiSliderVisual() {
+      if (!psiSlider) return;
+      const pct = THREE.MathUtils.clamp(((targetPsi - PSI_MIN) / (PSI_MAX - PSI_MIN)) * 100, 0, 100);
+      let fillStart = '#0284c7';
+      let fillEnd = '#38bdf8';
+      const isCrit = targetPsi > PSI_MAX_NORMAL;
+      const isWarn = !isCrit && (targetPsi >= PSI_WARN_HIGH || targetPsi <= PSI_WARN_LOW);
+      if (isCrit) {
+        fillStart = '#dc2626';
+        fillEnd = '#ef4444';
+      } else if (isWarn) {
+        fillStart = '#d97706';
+        fillEnd = '#f59e0b';
+      }
+      psiSlider.style.background = `linear-gradient(90deg, ${fillStart} 0%, ${fillEnd} ${pct}%, #1e293b ${pct}%)`;
+      psiSlider.classList.toggle('is-warn', isWarn);
+      psiSlider.classList.toggle('is-crit', isCrit);
+      if (valPsiWrap) {
+        valPsiWrap.classList.toggle('is-warn', isWarn);
+        valPsiWrap.classList.toggle('is-crit', isCrit);
+      }
+    }
+
+    function updateSubmergenceSliderVisual() {
+      if (!submSlider) return;
+      const dynSubm = computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi);
+      const pct = THREE.MathUtils.clamp(((targetSubmergence - SUBM_MIN) / (SUBM_MAX - SUBM_MIN)) * 100, 0, 100);
+      let fillStart = '#0284c7';
+      let fillEnd = '#38bdf8';
+      const isCrit = dynSubm < 75;
+      const isWarn = !isCrit && (targetSubmergence < SUBM_WARN_LOW || dynSubm < SUBM_MIN_NORMAL);
+      if (isCrit) {
+        fillStart = '#d97706';
+        fillEnd = '#f59e0b';
+      } else if (isWarn) {
+        fillStart = '#d97706';
+        fillEnd = '#f59e0b';
+      }
+      submSlider.style.background = `linear-gradient(90deg, ${fillStart} 0%, ${fillEnd} ${pct}%, #1e293b ${pct}%)`;
+      submSlider.classList.toggle('is-warn', isWarn || isCrit);
+      submSlider.classList.toggle('is-crit', false);
+      if (valSubmWrap) {
+        valSubmWrap.classList.toggle('is-warn', isWarn || isCrit);
+        valSubmWrap.classList.toggle('is-crit', false);
+      }
+    }
+
+    function updateTempSliderVisual() {
+      if (!tempSlider) return;
+      const pct = THREE.MathUtils.clamp(((targetTemp - TEMP_MIN) / (TEMP_MAX - TEMP_MIN)) * 100, 0, 100);
+      let fillStart = '#0d9488';
+      let fillEnd = '#2dd4bf';
+      const isComboStress = targetTemp >= COMBO_TEMP_MIN && targetPsi >= COMBO_PSI_MIN && targetRpm >= COMBO_RPM_MIN;
+      const isCrit = targetTemp > TEMP_MAX_NORMAL || isComboStress;
+      const isWarn = !isCrit && (targetTemp >= TEMP_WARN_HIGH || targetTemp <= TEMP_WARN_LOW);
+      if (isCrit) {
+        fillStart = '#dc2626';
+        fillEnd = '#ef4444';
+      } else if (isWarn) {
+        fillStart = '#d97706';
+        fillEnd = '#f59e0b';
+      }
+      tempSlider.style.background = `linear-gradient(90deg, ${fillStart} 0%, ${fillEnd} ${pct}%, #1e293b ${pct}%)`;
+      tempSlider.classList.toggle('is-warn', isWarn);
+      tempSlider.classList.toggle('is-crit', isCrit);
+      if (valTempWrap) {
+        valTempWrap.classList.toggle('is-warn', isWarn);
+        valTempWrap.classList.toggle('is-crit', isCrit);
+      }
+    }
+
+    function syncFluidModeButtons() {
       const isDiluted = fluidMode === 'diluido';
       if (btnFluidDiluido) {
         btnFluidDiluido.classList.toggle('active', isDiluted);
@@ -7053,29 +7955,104 @@
         btnFluidExtrapesado.classList.toggle('active', !isDiluted);
         btnFluidExtrapesado.setAttribute('aria-pressed', String(!isDiluted));
       }
-      if (fluidModeTag) {
-        fluidModeTag.textContent = isDiluted ? 'Con diluente' : 'Sin dilución';
-        fluidModeTag.classList.toggle('is-heavy', !isDiluted);
+    }
+
+    function setDiluentSliderValue(nextPct, options = {}) {
+      targetDiluentPct = THREE.MathUtils.clamp(Math.round(nextPct), DILUENT_MIN, DILUENT_MAX);
+      if (diluentSlider) diluentSlider.value = String(targetDiluentPct);
+      targetDilution = THREE.MathUtils.clamp(targetDiluentPct / DILUENT_DEFAULT_NORMAL, 0, 1);
+      fluidMode = targetDiluentPct === 0 ? 'extrapesado' : 'diluido';
+      syncFluidModeButtons();
+      updateDiluentSliderVisual();
+      if (options.snapCurrent) {
+        currentDiluentPct = targetDiluentPct;
+        dilutionBlend = targetDilution;
       }
+    }
+
+    function setPsiSliderValue(nextPsi) {
+      targetPsi = THREE.MathUtils.clamp(Math.round(nextPsi / 5) * 5, PSI_MIN, PSI_MAX);
+      if (psiSlider) psiSlider.value = String(targetPsi);
+      updatePsiSliderVisual();
+      updateSubmergenceSliderVisual();
+      updateTempSliderVisual();
+    }
+
+    function setSubmergenceSliderValue(nextSubm) {
+      targetSubmergence = THREE.MathUtils.clamp(Math.round(nextSubm / 5) * 5, SUBM_MIN, SUBM_MAX);
+      if (submSlider) submSlider.value = String(targetSubmergence);
+      updateSubmergenceSliderVisual();
+    }
+
+    function setTempSliderValue(nextTemp) {
+      targetTemp = THREE.MathUtils.clamp(Math.round(nextTemp), TEMP_MIN, TEMP_MAX);
+      if (tempSlider) tempSlider.value = String(targetTemp);
+      updateTempSliderVisual();
+    }
+
+    function setFluidMode(mode, options = {}) {
+      const prevMode = fluidMode;
+      fluidMode = mode === 'extrapesado' ? 'extrapesado' : 'diluido';
+      const isDiluted = fluidMode === 'diluido';
+
+      // Synchronize % de diluente slider with fluid mode button selection
+      if (options.syncDiluent !== false) {
+        if (!isDiluted) {
+          targetDiluentPct = 0;
+        } else if (targetDiluentPct < DILUENT_LOW_FAULT || targetDiluentPct > DILUENT_HIGH_FAULT) {
+          targetDiluentPct = DILUENT_DEFAULT_NORMAL;
+        }
+        if (diluentSlider) diluentSlider.value = String(targetDiluentPct);
+      }
+
+      targetDilution = THREE.MathUtils.clamp(targetDiluentPct / DILUENT_DEFAULT_NORMAL, 0, 1);
+      syncFluidModeButtons();
+      updateDiluentSliderVisual();
+
       if (valViscWrap) {
-        valViscWrap.classList.toggle('visc-low', isDiluted);
-        valViscWrap.classList.toggle('visc-high', !isDiluted);
+        valViscWrap.classList.toggle('visc-low', targetDiluentPct >= DILUENT_LOW_FAULT);
+        valViscWrap.classList.toggle('visc-high', targetDiluentPct < DILUENT_LOW_FAULT);
       }
-      lastTelemetryUpdate = -1;
+
+      // Reflect realistic viscous friction pressure & heating shift only when those sliders are inside their normal zone
+      if (options.adjustSliders !== false && prevMode !== fluidMode && typeof hasFault === 'function') {
+        const psiInNormalBand = targetPsi > PSI_MIN_NORMAL && targetPsi <= PSI_MAX_NORMAL;
+        if (psiInNormalBand && !hasFault('parada-retroceso')) {
+          const nextPsi = isDiluted
+            ? Math.max(430, targetPsi - 170)
+            : Math.min(835, targetPsi + 170);
+          setPsiSliderValue(nextPsi);
+        }
+        const tempInNormalBand = targetTemp > TEMP_MIN_NORMAL && targetTemp <= TEMP_MAX_NORMAL;
+        if (tempInNormalBand && !hasFault('parada-retroceso')) {
+          const nextTemp = isDiluted
+            ? Math.max(60, targetTemp - 5)
+            : Math.min(92, targetTemp + 5);
+          setTempSliderValue(nextTemp);
+        }
+      }
+
+      // Bidirectional sync with diluent faults when changed by user in "Datos en tiempo real"
+      if (options.fromUser && typeof evaluateControlFaults === 'function') {
+        evaluateControlFaults('fluid', { prevFluidMode: prevMode });
+      }
+      if (typeof triggerInstantTelemetry === 'function') {
+        if (options.fromUser) {
+          currentDiluentPct = THREE.MathUtils.lerp(currentDiluentPct, targetDiluentPct, 0.72);
+          dilutionBlend = THREE.MathUtils.lerp(dilutionBlend, targetDilution, 0.72);
+        }
+        triggerInstantTelemetry();
+      } else {
+        lastTelemetryUpdate = -1;
+      }
     }
 
     if (btnFluidExtrapesado) {
-      btnFluidExtrapesado.addEventListener('click', () => setFluidMode('extrapesado'));
+      btnFluidExtrapesado.addEventListener('click', () => setFluidMode('extrapesado', { fromUser: true }));
     }
     if (btnFluidDiluido) {
-      btnFluidDiluido.addEventListener('click', () => setFluidMode('diluido'));
+      btnFluidDiluido.addEventListener('click', () => setFluidMode('diluido', { fromUser: true }));
     }
-
-    const RPM_MIN_NORMAL = 60;
-    const RPM_MAX_NORMAL = 260;
-    const RPM_DEFAULT_NORMAL = 180;
-    const RPM_FAULT_OVERSPEED = 320;
-    const RPM_FAULT_STOP = 0;
 
     function updateSliderVisual() {
       const pct = (targetRpm / 350) * 100;
@@ -7101,9 +8078,13 @@
       if (telemetryMiniRpm) telemetryMiniRpm.textContent = `${targetRpm} RPM`;
     }
     updateSliderVisual();
+    updateDiluentSliderVisual();
+    updatePsiSliderVisual();
+    updateSubmergenceSliderVisual();
+    updateTempSliderVisual();
 
     // =========================================================================
-    // 10A-2. INDEPENDENT OPERATIONAL FAULT SIMULATION MODULE (OFF BY DEFAULT)
+    // 10A-2. INDEPENDENT MULTI-FAULT OPERATIONAL SIMULATION MODULE (OFF BY DEFAULT)
     // =========================================================================
     const faultsDockEl = document.getElementById('faults-dock');
     const faultsPanelEl = document.getElementById('faults-panel');
@@ -7113,10 +8094,15 @@
     const faultsStatusText = document.getElementById('faults-status-text');
     const faultScenarioBtns = document.querySelectorAll('.fault-scenario-btn');
     const btnFaultReset = document.getElementById('btn-fault-reset');
+    const faultActiveSummaryEl = document.getElementById('fault-active-summary');
+    const faultActiveSummaryTitle = document.getElementById('fault-active-summary-title');
+    const faultActiveSummaryHint = document.getElementById('fault-active-summary-hint');
+    const faultActiveTabsEl = document.getElementById('fault-active-tabs');
     const faultDiagnosisBox = document.getElementById('fault-diagnosis-box');
     const faultDiagnosisTitle = document.getElementById('fault-diagnosis-title');
+    const faultDiagnosisCounter = document.getElementById('fault-diagnosis-counter');
     const faultDiagnosisText = document.getElementById('fault-diagnosis-text');
-    const faultDiagnosisAction = document.getElementById('fault-diagnosis-action');
+    const faultDiagnosisSteps = document.getElementById('fault-diagnosis-steps');
     const faultTorqueVal = document.getElementById('fault-torque-val');
     const faultTorqueFill = document.getElementById('fault-torque-fill');
 
@@ -7125,24 +8111,109 @@
     const btnFaultBannerOpen = document.getElementById('btn-fault-banner-open');
     const btnFaultBannerReset = document.getElementById('btn-fault-banner-reset');
 
+    const FAULT_DISPLAY_ORDER = [
+      'dano-elastomero',
+      'alta-presion',
+      'sobrecarga-torque',
+      'parada-retroceso',
+      'baja-sumergencia',
+      'corte-diluente',
+      'exceso-diluente',
+      'baja-presion',
+      'baja-temperatura',
+    ];
+
     const FAULT_SPECS = {
       'corte-diluente': {
         severity: 'warn',
         shortLabel: 'Corte de Diluente',
-        statusText: 'Alerta · Diluente',
-        bannerPrefix: 'Corte de diluente:',
-        bannerSummary: 'crudo extrapesado sin dilución · alta viscosidad y presión.',
-        diagnosis: 'Interrupción en la inyección de diluente hacia la TE de producción. La viscosidad del crudo extrapesado (~9° API) eleva bruscamente la pérdida por fricción y la carga sobre el rotor.',
-        action: 'Acción: Verificar bomba de diluente, válvula dosificadora y presión de descarga.',
+        statusText: 'Alerta · Sin Diluente',
+        bannerPrefix: 'Corte / pérdida de diluente (0%):',
+        bannerSummary: 'crudo extrapesado sin dilución · alta viscosidad, esfuerzo torsional y pérdida de eficiencia.',
+        diagnosis: 'Interrupción total de la inyección de diluente (0%). La viscosidad del crudo extrapesado (~9° API) se dispara de forma no lineal, elevando la pérdida por fricción, el torque en la sarta y restringiendo el llenado eficiente de las cavidades BCP.',
+        steps: [
+          'Inspeccionar la bomba dosificadora de diluente, filtros en línea y nivel del tanque de nafta/diluente.',
+          'Verificar la apertura de la válvula dosificadora y purgar posibles bolsas de gas en la línea de inyección.',
+          'Reducir temporalmente las RPM en el VFD hasta restablecer la dosificación óptima (10–25% de diluente) y estabilizar torque y presión.',
+        ],
+      },
+      'corte-diluente-bajo': {
+        severity: 'warn',
+        shortLabel: 'Dilución Insuficiente',
+        statusText: 'Alerta · Diluente < 5%',
+        bannerPrefix: 'Pérdida parcial de diluente (< 5%):',
+        bannerSummary: 'dosificación insuficiente · viscosidad elevada, alto torque y restricción de flujo.',
+        diagnosis: 'El porcentaje de diluente cayó por debajo del umbral operativo mínimo (< 5%). La mezcla mantiene viscosidad muy elevada, incrementando el torque resistente en la sarta de cabillas y reduciendo la eficiencia volumétrica por restricción en la succión.',
+        steps: [
+          'Incrementar progresivamente la tasa en la bomba dosificadora hasta recuperar el rango normal (15–22% de diluente).',
+          'Revisar presión de suministro de diluente, filtros parcialmente obstruidos y posición de la válvula reguladora.',
+          'Monitorear el descenso de viscosidad (cP) y torque antes de elevar nuevamente las RPM en el VFD.',
+        ],
+      },
+      'exceso-diluente': {
+        severity: 'warn',
+        shortLabel: 'Exceso de Diluente',
+        statusText: 'Alerta · Exceso Diluente',
+        bannerPrefix: 'Exceso de diluente (> 28%):',
+        bannerSummary: 'viscosidad muy baja · mayor resbalamiento interno (slippage) y sobrevolumen manejado.',
+        diagnosis: 'La dosificación de diluente supera el límite operativo recomendado (> 28%), reduciendo excesivamente la viscosidad de la mezcla. Esto aumenta el resbalamiento interno (slippage) entre rotor y estator —bajando la Eficiencia Volumétrica (%)—, incrementa el volumen total manejado y eleva el riesgo de hinchamiento químico del elastómero.',
+        steps: [
+          'Reducir gradualmente la inyección de diluente en la bomba dosificadora o válvula de control hasta retornar al rango óptimo (15–22%).',
+          'Verificar el caudalímetro de diluente y recalibrar la relación diluente/crudo (D/C) según la viscosidad objetivo en cabezal.',
+          'Observar la recuperación de la Eficiencia Volumétrica (%) y vigilar signos de hinchamiento (swelling) del elastómero por exposición a aromáticos.',
+        ],
       },
       'baja-sumergencia': {
         severity: 'warn',
         shortLabel: 'Baja Sumergencia / Gas',
-        statusText: 'Alerta · Gas Lock',
-        bannerPrefix: 'Baja sumergencia / arrastre de gas:',
-        bannerSummary: 'fluctuaciones severas de caudal y llenado parcial.',
-        diagnosis: 'Descenso del nivel dinámico con ingreso de gas libre a la succión BCP. Genera bacheo intermitente en caudal/presión y eleva la temperatura del elastómero por lubricación deficiente.',
-        action: 'Acción: Reducir RPM temporalmente, revisar ancla de gas y presión en el espacio anular.',
+        statusText: 'Alerta · Baja Sumergencia',
+        bannerPrefix: 'Baja sumergencia / arrastre de gas (< 120 ft):',
+        bannerSummary: 'nivel dinámico bajo · fluctuaciones severas de caudal y llenado parcial.',
+        diagnosis: 'El nivel dinámico de fluido cayó por debajo de 120 ft sobre la succión BCP, permitiendo el ingreso de gas libre. Genera bacheo intermitente en caudal/presión y calentamiento del elastómero por lubricación deficiente.',
+        steps: [
+          'Disminuir las RPM en el VFD para permitir la recuperación del nivel dinámico de fluido sobre la bomba.',
+          'Ventear o regular la contrapresión del espacio anular (casing) para facilitar la separación del gas en el ancla.',
+          'Confirmar sumergencia con medición acústica (echometer) antes de incrementar nuevamente la velocidad.',
+        ],
+      },
+      'baja-sumergencia-sobrebombeo': {
+        severity: 'warn',
+        shortLabel: 'Sobrebombeo / Baja Sumergencia',
+        statusText: 'Alerta · Sobrebombeo',
+        bannerPrefix: 'Sobrebombeo / riesgo de baja sumergencia:',
+        bannerSummary: 'altas RPM con baja presión de aporte · abatimiento del nivel dinámico y arrastre de gas.',
+        diagnosis: 'La velocidad de bombeo supera la capacidad de reposición del yacimiento bajo baja presión de sistema, abatiendo el nivel dinámico por debajo de 120 ft. Esto reduce la eficiencia volumétrica e induce arrastre de gas en la succión.',
+        steps: [
+          'Reducir gradualmente las RPM en el VFD hasta igualar el caudal de extracción con el aporte real del yacimiento.',
+          'Monitorear la recuperación del nivel de fluido (sumergencia > 120 ft) y la estabilización de la presión en cabezal.',
+          'Verificar el venteo del anular y el ancla de gas para evitar operación en seco del elastómero.',
+        ],
+      },
+      'baja-presion': {
+        severity: 'warn',
+        shortLabel: 'Baja Presión',
+        statusText: 'Alerta · Baja Presión',
+        bannerPrefix: 'Baja presión en sistema (≤ 350 PSI):',
+        bannerSummary: 'caída de presión de descarga · posible llenado deficiente, pérdida de carga o baja sumergencia.',
+        diagnosis: 'La presión del sistema cayó por debajo del rango operativo normal (≤ 350 PSI). Esto sugiere llenado deficiente en cavidades, pérdida de carga o fuga en línea de superficie, baja sumergencia/aporte del yacimiento o desgaste interno rotor–estator.',
+        steps: [
+          'Verificar la apertura del choke, válvulas de desvío (bypass), válvula check y descartar fugas en la línea de flujo en superficie.',
+          'Comprobar la sumergencia (nivel dinámico de fluido) y la presión del anular para descartar llenado parcial o gas lock.',
+          'Realizar prueba de eficiencia volumétrica y revisar calibración del manómetro de cabezal o posible desgaste del elastómero.',
+        ],
+      },
+      'baja-temperatura': {
+        severity: 'warn',
+        shortLabel: 'Baja Temp. / Alta Viscosidad',
+        statusText: 'Alerta · Alta Viscosidad',
+        bannerPrefix: 'Baja temperatura / alta viscosidad (≤ 55 °C):',
+        bannerSummary: 'aumento de viscosidad del crudo pesado/extrapesado · mayor resistencia y esfuerzo torsional.',
+        diagnosis: 'Al operar en temperatura mínima (≤ 55 °C), la viscosidad del crudo pesado/extrapesado se incrementa notablemente, elevando la resistencia viscosa, la carga torsional sobre la sarta de cabillas y la pérdida de carga en la tubería.',
+        steps: [
+          'Controlar y moderar las RPM en el VFD para evitar picos de torque excesivos y proteger la sarta de cabillas.',
+          'Evaluar e incrementar la dosificación de diluente (o verificar el calentamiento/traza térmica en línea) para reducir la viscosidad.',
+          'Vigilar en continuo el torque, la presión de descarga y el caudal (BPD) hasta estabilizar la fluidez del sistema.',
+        ],
       },
       'parada-retroceso': {
         severity: 'crit',
@@ -7150,8 +8221,12 @@
         statusText: 'Falla · Parada / Retroceso',
         bannerPrefix: 'Parada y retroceso de sarta (Backspin):',
         bannerSummary: 'detención en 0 RPM · caída total de caudal y retroceso de sarta.',
-        diagnosis: 'Corte de giro en superficie o falla del freno anti-retroceso. La energía elástica de las cabillas y la columna hidrostática invierten el giro de la sarta antes de detenerse en 0 RPM.',
-        action: 'Acción: Restablecer velocidad al rango normal (60–260 RPM) e inspeccionar freno y válvula check.',
+        diagnosis: 'Corte de giro en superficie o falla del freno anti-retroceso. La energía elástica acumulada en las cabillas y la columna hidrostática invierten el giro de la sarta antes de detenerse en 0 RPM.',
+        steps: [
+          'Mantener despejada el área del cabezal hasta verificar que la sarta se haya detenido por completo (0 RPM).',
+          'Inspeccionar el sistema de freno hidráulico/mecánico anti-backspin, correas y válvula check en línea de descarga.',
+          'Despresurizar controladamente si es necesario y arrancar en rampa suave desde el VFD al rango normal (60–260 RPM).',
+        ],
       },
       'baja-velocidad': {
         severity: 'warn',
@@ -7160,7 +8235,11 @@
         bannerPrefix: 'Baja velocidad (< 60 RPM):',
         bannerSummary: 'resbalamiento interno en elastómero · caída crítica de caudal y eficiencia.',
         diagnosis: 'Operación por debajo del umbral mínimo recomendado (60 RPM). El resbalamiento interno entre lóbulos del estator y rotor desploma la eficiencia volumétrica y dificulta el levantamiento del crudo.',
-        action: 'Acción: Incrementar la velocidad al rango normal (60–260 RPM) o pulsar Operación Normal.',
+        steps: [
+          'Revisar la consigna de frecuencia en el VFD y descartar limitaciones de corriente o disparos parciales.',
+          'Incrementar progresivamente la velocidad hacia la ventana operativa normal (60–260 RPM) vigilando el caudal.',
+          'Comprobar que la presión de descarga y el aporte del yacimiento acompañen la recuperación de eficiencia.',
+        ],
       },
       'sobrecarga-torque': {
         severity: 'crit',
@@ -7169,19 +8248,109 @@
         bannerPrefix: 'Sobrecarga / sobrevelocidad (> 260 RPM):',
         bannerSummary: 'alto torque, calentamiento del elastómero y esfuerzo crítico en sarta.',
         diagnosis: 'Velocidad y torque resistente por encima del rango operativo seguro (60–260 RPM). El exceso de RPM y fricción viscosa sobrecalienta el elastómero y exige al límite la sarta de cabillas y el VFD.',
-        action: 'Acción: Reducir las RPM al rango normal (60–260 RPM) o pulsar Operación Normal.',
+        steps: [
+          'Reducir inmediatamente las RPM en el VFD a la banda normal (60–260 RPM) para aliviar el par torsional.',
+          'Verificar la inyección de diluente y descartar acumulación de sólidos/arena o rozamiento mecánico en fondo.',
+          'Ajustar el límite de protección de torque en el variador (VFD) para prevenir rotura o desenrosque de cabillas.',
+        ],
+      },
+      'alta-presion': {
+        severity: 'crit',
+        shortLabel: 'Alta Presión / Sobrepresión',
+        statusText: 'Crítico · Sobrepresión',
+        bannerPrefix: 'Alta presión en sistema (> 860 PSI):',
+        bannerSummary: 'mayor ΔP en etapas rotor–estator, sobrecarga de torque y riesgo de resbalamiento interno.',
+        diagnosis: 'La presión de descarga supera el límite seguro de operación (860 PSI), incrementando el diferencial de presión (ΔP) por etapa rotor–estator. Esto dispara el torque y esfuerzo axial en la sarta, induce resbalamiento interno (caída de BPD) y acelera la fatiga del elastómero.',
+        steps: [
+          'Inspeccionar válvulas de descarga, choke/manifold y línea de flujo en superficie por bloqueos, válvulas semicerradas o tapones de crudo viscoso.',
+          'Reducir gradualmente las RPM en el VFD y asegurar inyección continua de diluente para disminuir las pérdidas por fricción.',
+          'Verificar la presión de cabezal (THP) y la válvula de alivio/seguridad (PSV) hasta retornar por debajo de 860 PSI.',
+        ],
+      },
+      'dano-elastomero': {
+        severity: 'crit',
+        shortLabel: 'Degradación del Elastómero',
+        statusText: 'Crítico · Elastómero',
+        bannerPrefix: 'Daño / degradación del elastómero (> 98 °C):',
+        bannerSummary: 'ablandamiento, hinchamiento y pérdida de interferencia rotor–estator con caída de eficiencia.',
+        diagnosis: 'La temperatura excede el límite térmico del elastómero del estator (> 98 °C), provocando ablandamiento, hinchamiento (swelling), pérdida de interferencia rotor–estator y desgarro/desgaste del caucho. El caudal cae por resbalamiento interno mientras el hinchamiento genera torque anómalo.',
+        steps: [
+          'Bajar de inmediato las RPM en el VFD para reducir el calentamiento por fricción e histéresis; si el torque o la temperatura no ceden, ejecutar parada controlada.',
+          'Confirmar sumergencia/lubricación adecuada del fluido y revisar compatibilidad química del diluente/aromáticos con el elastómero (NBR/HNBR).',
+          'Realizar prueba de eficiencia volumétrica y programar servicio (pull-out) para reemplazar el estator por un elastómero de mayor grado térmico (HNBR/FKM) y reajustar holgura.',
+        ],
+      },
+      'dano-elastomero-combinado': {
+        severity: 'crit',
+        shortLabel: 'Estrés Severo Elastómero',
+        statusText: 'Crítico · Elastómero (T+P+RPM)',
+        bannerPrefix: 'Degradación acelerada del elastómero (Alta T + Alta P + Altas RPM):',
+        bannerSummary: 'histéresis térmica y fatiga mecánica combinada en estator · pérdida severa de eficiencia.',
+        diagnosis: 'La combinación simultánea de temperatura elevada (≥ 88 °C), alto diferencial de presión (≥ 760 PSI) y altas RPM (≥ 235 RPM) dispara el calentamiento interno por histéresis del elastómero, causando hinchamiento, fatiga acelerada y desprendimiento de caucho (chunking).',
+        steps: [
+          'Reducir primero las RPM en el VFD y aliviar la contrapresión en el manifold/choke para bajar el ΔP por etapa.',
+          'Restablecer refrigeración y lubricación en fondo verificando nivel dinámico y dosificación controlada de diluente compatible.',
+          'Monitorear recuperación de eficiencia volumétrica; si persiste alto resbalamiento, planificar cambio de estator a compuesto de alta temperatura.',
+        ],
       },
     };
 
-    let activeFault = 'normal';
+    const activeFaults = new Set();
+    let inspectedFault = null;
     let faultElapsed = 0;
     let faultStartRpm = 180;
-    let savedNormalSnapshot = null;
     let lowSpeedSubmode = 'backspin'; // 'backspin' (0 RPM / manual stop) vs 'slip' (1..59 RPM via slider)
+    let elastomerStressSubmode = 'thermal'; // 'thermal' (> 98 °C) vs 'combined' (T + P + RPM)
+    let submergenceSubmode = 'direct'; // 'direct' (< 120 ft slider) vs 'overpump' (high RPM + low PSI drawdown)
+    let diluentLossSubmode = 'cut'; // 'cut' (0%) vs 'low' (1..4%)
 
     const _vfdLedGreen = new THREE.Color(0x22c55e);
     const _vfdLedAmber = new THREE.Color(0xf59e0b);
     const _vfdLedRed = new THREE.Color(0xef4444);
+    const _elastomerHealthyCol = new THREE.Color(0x8b46b8);
+    const _elastomerHeatCol = new THREE.Color(0xb93822);
+    const _elastomerHealthyEm = new THREE.Color(0x1a0b28);
+    const _elastomerHeatEm = new THREE.Color(0x9a2414);
+
+    function hasFault(key) {
+      return activeFaults.has(key);
+    }
+
+    function hasAnyFault() {
+      return activeFaults.size > 0;
+    }
+
+    function getFaultSpec(key) {
+      if (!key) return null;
+      if (key === 'corte-diluente' && diluentLossSubmode === 'low') {
+        return FAULT_SPECS['corte-diluente-bajo'];
+      }
+      if (key === 'parada-retroceso' && lowSpeedSubmode === 'slip') {
+        return FAULT_SPECS['baja-velocidad'];
+      }
+      if (key === 'dano-elastomero' && elastomerStressSubmode === 'combined') {
+        return FAULT_SPECS['dano-elastomero-combinado'];
+      }
+      if (key === 'baja-sumergencia' && submergenceSubmode === 'overpump') {
+        return FAULT_SPECS['baja-sumergencia-sobrebombeo'];
+      }
+      return FAULT_SPECS[key] || null;
+    }
+
+    function getOrderedActiveFaults() {
+      return FAULT_DISPLAY_ORDER.filter((key) => activeFaults.has(key)).sort((a, b) => {
+        const sa = getFaultSpec(a)?.severity === 'crit' ? 0 : 1;
+        const sb = getFaultSpec(b)?.severity === 'crit' ? 0 : 1;
+        return sa - sb;
+      });
+    }
+
+    function hasAnyCriticalFault() {
+      for (const key of activeFaults) {
+        if (getFaultSpec(key)?.severity === 'crit') return true;
+      }
+      return false;
+    }
 
     function setFaultsPanelOpen(open) {
       if (!faultsPanelEl || !btnFaultsToggle) return;
@@ -7191,45 +8360,117 @@
       btnFaultsToggle.setAttribute('aria-expanded', String(next));
     }
 
-    function getActiveFaultSpec() {
-      if (activeFault === 'parada-retroceso' && lowSpeedSubmode === 'slip') {
-        return FAULT_SPECS['baja-velocidad'];
-      }
-      return FAULT_SPECS[activeFault] || null;
-    }
-
     function syncFaultUI() {
-      const spec = getActiveFaultSpec();
-      const isFault = Boolean(spec);
-      const isCrit = isFault && spec.severity === 'crit';
+      const ordered = getOrderedActiveFaults();
+      const count = ordered.length;
+      const isFault = count > 0;
+      const isAnyCrit = hasAnyCriticalFault();
+
+      if (!isFault) {
+        inspectedFault = null;
+      } else if (!inspectedFault || !activeFaults.has(inspectedFault)) {
+        inspectedFault = ordered[0];
+      }
+
+      const inspectedSpec = isFault ? getFaultSpec(inspectedFault) : null;
+      const inspectedIdx = isFault ? ordered.indexOf(inspectedFault) : -1;
+      const inspectedIsCrit = inspectedSpec ? inspectedSpec.severity === 'crit' : false;
 
       if (faultsStatusText) {
-        faultsStatusText.textContent = isFault ? spec.statusText : 'Normal';
-        faultsStatusText.classList.toggle('is-warn', isFault && !isCrit);
-        faultsStatusText.classList.toggle('is-crit', isCrit);
+        if (!isFault) {
+          faultsStatusText.textContent = 'Normal';
+        } else if (count === 1) {
+          faultsStatusText.textContent = inspectedSpec.statusText;
+        } else {
+          faultsStatusText.textContent = `${count} Fallas Activas`;
+        }
+        faultsStatusText.classList.toggle('is-warn', isFault && !isAnyCrit);
+        faultsStatusText.classList.toggle('is-crit', isAnyCrit);
       }
 
       if (btnFaultsToggle) {
-        btnFaultsToggle.classList.toggle('has-fault-warn', isFault && !isCrit);
-        btnFaultsToggle.classList.toggle('has-fault-crit', isCrit);
+        btnFaultsToggle.classList.toggle('has-fault-warn', isFault && !isAnyCrit);
+        btnFaultsToggle.classList.toggle('has-fault-crit', isAnyCrit);
       }
       if (faultsToggleLabel) {
-        faultsToggleLabel.textContent = isFault ? `Falla: ${spec.shortLabel}` : 'Fallas BCP';
+        if (!isFault) {
+          faultsToggleLabel.textContent = 'Fallas BCP';
+        } else if (count === 1) {
+          faultsToggleLabel.textContent = `Falla: ${inspectedSpec.shortLabel}`;
+        } else {
+          faultsToggleLabel.textContent = `${count} Fallas Activas`;
+        }
       }
 
       faultScenarioBtns.forEach((btn) => {
-        const isMatch = btn.dataset.fault === activeFault;
-        btn.classList.toggle('active', isMatch);
-        btn.setAttribute('aria-pressed', String(isMatch));
+        const key = btn.dataset.fault;
+        const isActive = activeFaults.has(key);
+        const isInspected = isActive && key === inspectedFault;
+        const spec = getFaultSpec(key);
+        if (spec) {
+          btn.dataset.severity = spec.severity;
+        }
+        btn.classList.toggle('active', isActive);
+        btn.classList.toggle('is-inspected', isInspected && count > 1);
+        btn.setAttribute('aria-pressed', String(isActive));
       });
+
+      if (faultActiveSummaryEl && faultActiveTabsEl) {
+        faultActiveSummaryEl.classList.toggle('visible', isFault);
+        faultActiveSummaryEl.classList.toggle('is-crit', isAnyCrit);
+        if (faultActiveSummaryTitle) {
+          faultActiveSummaryTitle.textContent = count === 1
+            ? '1 Falla activa'
+            : `${count} Fallas activas simultáneas`;
+        }
+        if (faultActiveSummaryHint) {
+          faultActiveSummaryHint.textContent = count > 1 ? 'Selecciona para inspeccionar' : 'Diagnóstico abajo';
+        }
+        faultActiveTabsEl.innerHTML = '';
+        ordered.forEach((key) => {
+          const spec = getFaultSpec(key);
+          if (!spec) return;
+          const tab = document.createElement('button');
+          tab.type = 'button';
+          tab.role = 'tab';
+          tab.className = 'fault-active-tab';
+          if (spec.severity === 'crit') tab.classList.add('is-crit');
+          if (key === inspectedFault) tab.classList.add('selected');
+          tab.setAttribute('aria-selected', String(key === inspectedFault));
+          tab.title = `Ver diagnóstico y procedimiento de ${spec.shortLabel}`;
+          const dot = document.createElement('span');
+          dot.className = 'fault-active-tab-dot';
+          dot.setAttribute('aria-hidden', 'true');
+          const lbl = document.createElement('span');
+          lbl.textContent = spec.shortLabel;
+          tab.appendChild(dot);
+          tab.appendChild(lbl);
+          tab.addEventListener('click', () => {
+            inspectedFault = key;
+            syncFaultUI();
+          });
+          faultActiveTabsEl.appendChild(tab);
+        });
+      }
 
       if (faultDiagnosisBox) {
         faultDiagnosisBox.classList.toggle('visible', isFault);
-        faultDiagnosisBox.classList.toggle('is-crit', isCrit);
-        if (isFault) {
-          faultDiagnosisTitle.textContent = `Diagnóstico · ${spec.shortLabel}`;
-          faultDiagnosisText.textContent = spec.diagnosis;
-          faultDiagnosisAction.textContent = spec.action;
+        faultDiagnosisBox.classList.toggle('is-crit', inspectedIsCrit);
+        if (isFault && inspectedSpec) {
+          faultDiagnosisTitle.textContent = `Diagnóstico · ${inspectedSpec.shortLabel}`;
+          if (faultDiagnosisCounter) {
+            faultDiagnosisCounter.textContent = count > 1 ? `${inspectedIdx + 1} / ${count}` : '';
+          }
+          faultDiagnosisText.textContent = inspectedSpec.diagnosis;
+          if (faultDiagnosisSteps) {
+            faultDiagnosisSteps.innerHTML = '';
+            const steps = Array.isArray(inspectedSpec.steps) ? inspectedSpec.steps : [];
+            steps.forEach((stepText) => {
+              const li = document.createElement('li');
+              li.textContent = stepText;
+              faultDiagnosisSteps.appendChild(li);
+            });
+          }
         }
       }
 
@@ -7239,10 +8480,15 @@
 
       if (faultAlertBannerEl) {
         faultAlertBannerEl.classList.toggle('visible', isFault);
-        faultAlertBannerEl.classList.toggle('is-crit', isCrit);
+        faultAlertBannerEl.classList.toggle('is-crit', isAnyCrit);
         faultAlertBannerEl.setAttribute('aria-hidden', String(!isFault));
         if (isFault && faultAlertCopyEl) {
-          faultAlertCopyEl.innerHTML = `<strong>${spec.bannerPrefix}</strong> ${spec.bannerSummary}`;
+          if (count === 1 && inspectedSpec) {
+            faultAlertCopyEl.innerHTML = `<strong>${inspectedSpec.bannerPrefix}</strong> ${inspectedSpec.bannerSummary}`;
+          } else {
+            const labels = ordered.map((k) => getFaultSpec(k)?.shortLabel).filter(Boolean).join(' · ');
+            faultAlertCopyEl.innerHTML = `<strong>${count} fallas activas:</strong> ${labels}`;
+          }
         }
       }
     }
@@ -7251,101 +8497,257 @@
       targetRpm = THREE.MathUtils.clamp(Math.round(nextRpm), 0, 350);
       rpmSlider.value = String(targetRpm);
       updateSliderVisual();
+      updateSubmergenceSliderVisual();
+      updateTempSliderVisual();
     }
 
-    function setActiveFault(faultKey, options = {}) {
-      const fromSlider = Boolean(options.fromSlider);
-      const nextKey = FAULT_SPECS[faultKey] && faultKey !== 'baja-velocidad' ? faultKey : 'normal';
+    function isCombinedElastomerStress() {
+      return targetTemp >= COMBO_TEMP_MIN && targetPsi >= COMBO_PSI_MIN && targetRpm >= COMBO_RPM_MIN;
+    }
 
-      if (nextKey === 'normal') {
-        activeFault = 'normal';
-        faultElapsed = 0;
-        lowSpeedSubmode = 'backspin';
+    function resetAllFaults() {
+      activeFaults.clear();
+      inspectedFault = null;
+      faultElapsed = 0;
+      lowSpeedSubmode = 'backspin';
+      elastomerStressSubmode = 'thermal';
+      submergenceSubmode = 'direct';
+      diluentLossSubmode = 'cut';
 
-        if (!fromSlider) {
-          const restoredRpm =
-            savedNormalSnapshot &&
-            savedNormalSnapshot.targetRpm >= RPM_MIN_NORMAL &&
-            savedNormalSnapshot.targetRpm <= RPM_MAX_NORMAL
-              ? savedNormalSnapshot.targetRpm
-              : RPM_DEFAULT_NORMAL;
-          setRpmSliderValue(restoredRpm);
-          if (savedNormalSnapshot) {
-            setFluidMode(savedNormalSnapshot.fluidMode);
-          }
-        } else if (savedNormalSnapshot && savedNormalSnapshot.fluidMode && fluidMode !== savedNormalSnapshot.fluidMode) {
-          // Preserve user's current fluid mode when manually adjusting slider back to normal
+      setRpmSliderValue(RPM_DEFAULT_NORMAL);
+      setPsiSliderValue(PSI_DEFAULT_NORMAL);
+      setSubmergenceSliderValue(SUBM_DEFAULT_NORMAL);
+      setTempSliderValue(TEMP_DEFAULT_NORMAL);
+      setDiluentSliderValue(DILUENT_DEFAULT_NORMAL, { snapCurrent: true });
+      setFluidMode('diluido', { adjustSliders: false, syncDiluent: false });
+
+      driveHeadGroup.position.set(0, 0, 0);
+      mats.vfdLedRun.color.copy(_vfdLedGreen);
+      mats.vfdLedRun.emissive.copy(_vfdLedGreen);
+      syncFaultUI();
+      if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
+      else if (typeof lastTelemetryUpdate === 'number') lastTelemetryUpdate = -1;
+    }
+
+    // Unified multi-fault evaluation: evaluates every variable independently so simultaneous faults never overwrite each other
+    function evaluateControlFaults(changedSource = null, meta = {}) {
+      const prevActive = new Set(activeFaults);
+      const prevLowSubmode = lowSpeedSubmode;
+
+      const diluentLow = targetDiluentPct < DILUENT_LOW_FAULT || fluidMode === 'extrapesado';
+      const diluentExcess = targetDiluentPct > DILUENT_HIGH_FAULT;
+      const tempHigh = targetTemp > TEMP_MAX_NORMAL;
+      const tempLow = targetTemp <= TEMP_MIN_NORMAL;
+      const comboElastomer = isCombinedElastomerStress();
+      const psiHigh = targetPsi > PSI_MAX_NORMAL;
+      const psiLow = targetPsi <= PSI_MIN_NORMAL;
+      const rpmOver = targetRpm > RPM_MAX_NORMAL;
+      const rpmLow = targetRpm < RPM_MIN_NORMAL;
+
+      const dynSubm = computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi);
+      const submDirectLow = targetSubmergence < SUBM_MIN_NORMAL;
+      const submOverpumpLow = !submDirectLow && dynSubm < SUBM_MIN_NORMAL;
+      const submLow = submDirectLow || submOverpumpLow;
+
+      const syncEntry = (key, isOn) => {
+        if (isOn) activeFaults.add(key);
+        else activeFaults.delete(key);
+      };
+
+      syncEntry('corte-diluente', diluentLow);
+      syncEntry('exceso-diluente', diluentExcess);
+      syncEntry('baja-sumergencia', submLow);
+      syncEntry('baja-presion', psiLow);
+      syncEntry('baja-temperatura', tempLow);
+      syncEntry('alta-presion', psiHigh);
+      syncEntry('sobrecarga-torque', rpmOver);
+      syncEntry('parada-retroceso', rpmLow);
+      syncEntry('dano-elastomero', tempHigh || comboElastomer);
+
+      diluentLossSubmode = targetDiluentPct === 0 ? 'cut' : 'low';
+
+      if (submLow) {
+        submergenceSubmode = submDirectLow ? 'direct' : 'overpump';
+      } else {
+        submergenceSubmode = 'direct';
+      }
+
+      if (tempHigh || comboElastomer) {
+        elastomerStressSubmode = tempHigh ? 'thermal' : 'combined';
+      } else {
+        elastomerStressSubmode = 'thermal';
+      }
+
+      if (rpmLow) {
+        const nextSubmode = targetRpm === 0 ? 'backspin' : 'slip';
+        if (!prevActive.has('parada-retroceso') || prevLowSubmode !== nextSubmode) {
+          faultElapsed = 0;
+          faultStartRpm = Math.max(30, Math.abs(currentRpm));
         }
-        savedNormalSnapshot = null;
+        lowSpeedSubmode = nextSubmode;
+      } else {
+        lowSpeedSubmode = 'backspin';
+      }
 
+      if (activeFaults.size === 0) {
+        faultElapsed = 0;
         driveHeadGroup.position.set(0, 0, 0);
         mats.vfdLedRun.color.copy(_vfdLedGreen);
         mats.vfdLedRun.emissive.copy(_vfdLedGreen);
-        syncFaultUI();
-        if (typeof lastTelemetryUpdate === 'number') lastTelemetryUpdate = -1;
-        return;
-      }
-
-      // Snapshot clean pre-fault operating state the first time a fault is triggered
-      if (activeFault === 'normal') {
-        savedNormalSnapshot = {
-          targetRpm: THREE.MathUtils.clamp(targetRpm, RPM_MIN_NORMAL, RPM_MAX_NORMAL),
-          fluidMode,
-        };
-      }
-
-      const wasSameFault = activeFault === nextKey;
-      activeFault = nextKey;
-
-      if (nextKey === 'corte-diluente') {
-        faultElapsed = 0;
-        setFluidMode('extrapesado');
-        if (!fromSlider && (targetRpm < RPM_MIN_NORMAL || targetRpm > RPM_MAX_NORMAL)) {
-          setRpmSliderValue(RPM_DEFAULT_NORMAL);
+      } else {
+        // Focus diagnostic box on the fault associated with the control the user just moved, or any newly triggered fault
+        let focusCandidate = null;
+        if (changedSource === 'fluid' || changedSource === 'diluent') {
+          if (diluentLow) focusCandidate = 'corte-diluente';
+          else if (diluentExcess) focusCandidate = 'exceso-diluente';
+        } else if (changedSource === 'subm' && submLow) {
+          focusCandidate = 'baja-sumergencia';
+        } else if (changedSource === 'temp') {
+          if (tempHigh || comboElastomer) focusCandidate = 'dano-elastomero';
+          else if (tempLow) focusCandidate = 'baja-temperatura';
+        } else if (changedSource === 'psi') {
+          if (psiHigh) focusCandidate = 'alta-presion';
+          else if (psiLow) focusCandidate = 'baja-presion';
+          else if (comboElastomer) focusCandidate = 'dano-elastomero';
+          else if (submLow) focusCandidate = 'baja-sumergencia';
+        } else if (changedSource === 'rpm') {
+          if (rpmOver) focusCandidate = 'sobrecarga-torque';
+          else if (rpmLow) focusCandidate = 'parada-retroceso';
+          else if (submLow && !prevActive.has('baja-sumergencia')) focusCandidate = 'baja-sumergencia';
+          else if (comboElastomer) focusCandidate = 'dano-elastomero';
         }
-      } else if (nextKey === 'baja-sumergencia') {
-        faultElapsed = 0;
-        if (!fromSlider && (targetRpm < RPM_MIN_NORMAL || targetRpm > RPM_MAX_NORMAL)) {
-          setRpmSliderValue(RPM_DEFAULT_NORMAL);
-        }
-      } else if (nextKey === 'sobrecarga-torque') {
-        if (!wasSameFault) faultElapsed = 0;
-        if (!fromSlider) {
-          setRpmSliderValue(RPM_FAULT_OVERSPEED);
-        }
-      } else if (nextKey === 'parada-retroceso') {
-        if (!fromSlider) {
-          lowSpeedSubmode = 'backspin';
-          faultElapsed = 0;
-          faultStartRpm = Math.max(40, Math.abs(currentRpm));
-          setRpmSliderValue(RPM_FAULT_STOP);
-        } else {
-          const nextSubmode = targetRpm === 0 ? 'backspin' : 'slip';
-          if (!wasSameFault || lowSpeedSubmode !== nextSubmode) {
-            faultElapsed = 0;
-            faultStartRpm = Math.max(30, Math.abs(currentRpm));
+
+        if (!focusCandidate) {
+          for (const key of activeFaults) {
+            if (!prevActive.has(key)) {
+              focusCandidate = key;
+              break;
+            }
           }
-          lowSpeedSubmode = nextSubmode;
+        }
+        if (focusCandidate && activeFaults.has(focusCandidate)) {
+          inspectedFault = focusCandidate;
         }
       }
 
+      updateDiluentSliderVisual();
+      updatePsiSliderVisual();
+      updateSubmergenceSliderVisual();
+      updateTempSliderVisual();
+      updateSliderVisual();
       syncFaultUI();
-      if (typeof lastTelemetryUpdate === 'number') lastTelemetryUpdate = -1;
     }
 
-    // Bidirectional sync: moving the RPM slider in "DATOS EN TIEMPO REAL" updates Fault state automatically
+    // Manual toggle for an individual fault button (preserves all other active faults!)
+    function toggleManualFault(faultKey) {
+      if (!FAULT_SPECS[faultKey]) return;
+      const turningOn = !activeFaults.has(faultKey);
+
+      if (turningOn) {
+        if (faultKey === 'corte-diluente') {
+          setDiluentSliderValue(0, { snapCurrent: true });
+          if (targetPsi > PSI_MIN_NORMAL && targetPsi <= PSI_MAX_NORMAL) {
+            setPsiSliderValue(Math.max(targetPsi, 785));
+          }
+        } else if (faultKey === 'exceso-diluente') {
+          setDiluentSliderValue(DILUENT_FAULT_EXCESS, { snapCurrent: true });
+        } else if (faultKey === 'baja-sumergencia') {
+          setSubmergenceSliderValue(SUBM_FAULT_LOW);
+        } else if (faultKey === 'baja-presion') {
+          setPsiSliderValue(PSI_FAULT_LOW);
+        } else if (faultKey === 'baja-temperatura') {
+          setTempSliderValue(TEMP_FAULT_LOW);
+        } else if (faultKey === 'parada-retroceso') {
+          faultStartRpm = Math.max(40, Math.abs(currentRpm));
+          faultElapsed = 0;
+          setRpmSliderValue(RPM_FAULT_STOP);
+        } else if (faultKey === 'sobrecarga-torque') {
+          setRpmSliderValue(RPM_FAULT_OVERSPEED);
+        } else if (faultKey === 'alta-presion') {
+          setPsiSliderValue(PSI_FAULT_HIGH);
+        } else if (faultKey === 'dano-elastomero') {
+          setTempSliderValue(TEMP_FAULT_HIGH);
+        }
+        evaluateControlFaults();
+        if (activeFaults.has(faultKey)) {
+          inspectedFault = faultKey;
+          syncFaultUI();
+        }
+      } else {
+        // Turn off ONLY this fault by returning its own parameter to normal band
+        if (faultKey === 'corte-diluente' || faultKey === 'exceso-diluente') {
+          setDiluentSliderValue(DILUENT_DEFAULT_NORMAL, { snapCurrent: true });
+        } else if (faultKey === 'baja-sumergencia') {
+          setSubmergenceSliderValue(SUBM_DEFAULT_NORMAL);
+          if (computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi) < SUBM_MIN_NORMAL) {
+            setSubmergenceSliderValue(460);
+          }
+        } else if (faultKey === 'baja-presion' || faultKey === 'alta-presion') {
+          setPsiSliderValue(PSI_DEFAULT_NORMAL);
+        } else if (faultKey === 'baja-temperatura' || faultKey === 'dano-elastomero') {
+          setTempSliderValue(TEMP_DEFAULT_NORMAL);
+        } else if (faultKey === 'parada-retroceso' || faultKey === 'sobrecarga-torque') {
+          setRpmSliderValue(RPM_DEFAULT_NORMAL);
+        }
+        evaluateControlFaults();
+      }
+
+      if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
+      else if (typeof lastTelemetryUpdate === 'number') lastTelemetryUpdate = -1;
+    }
+
+    // Bidirectional sync: moving % Diluent, RPM, Pressure (PSI), Submergence (ft) or Temperature (°C) updates multi-fault state & live trend immediately
+    if (diluentSlider) {
+      diluentSlider.addEventListener('input', (e) => {
+        const nextPct = Number(e.target.value);
+        setDiluentSliderValue(nextPct, { snapCurrent: true });
+        evaluateControlFaults('diluent');
+        if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
+      });
+    }
+
     rpmSlider.addEventListener('input', (e) => {
       targetRpm = Number(e.target.value);
+      currentRpm = THREE.MathUtils.lerp(currentRpm, targetRpm, 0.55);
       updateSliderVisual();
-
-      if (targetRpm > RPM_MAX_NORMAL) {
-        setActiveFault('sobrecarga-torque', { fromSlider: true });
-      } else if (targetRpm < RPM_MIN_NORMAL) {
-        setActiveFault('parada-retroceso', { fromSlider: true });
-      } else if (activeFault === 'sobrecarga-torque' || activeFault === 'parada-retroceso') {
-        setActiveFault('normal', { fromSlider: true });
-      }
+      updateSubmergenceSliderVisual();
+      updateTempSliderVisual();
+      evaluateControlFaults('rpm');
+      if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
     });
+
+    if (psiSlider) {
+      psiSlider.addEventListener('input', (e) => {
+        targetPsi = Number(e.target.value);
+        currentPsi = targetPsi;
+        updatePsiSliderVisual();
+        updateSubmergenceSliderVisual();
+        updateTempSliderVisual();
+        evaluateControlFaults('psi');
+        if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
+      });
+    }
+
+    if (submSlider) {
+      submSlider.addEventListener('input', (e) => {
+        targetSubmergence = Number(e.target.value);
+        currentSubmergence = targetSubmergence;
+        effectiveSubmergence = computeEffectiveSubmergence(currentSubmergence, currentRpm, currentPsi);
+        updateSubmergenceSliderVisual();
+        evaluateControlFaults('subm');
+        if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
+      });
+    }
+
+    if (tempSlider) {
+      tempSlider.addEventListener('input', (e) => {
+        targetTemp = Number(e.target.value);
+        currentTemp = targetTemp;
+        updateTempSliderVisual();
+        evaluateControlFaults('temp');
+        if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
+      });
+    }
 
     if (btnFaultsToggle) {
       btnFaultsToggle.addEventListener('click', (e) => {
@@ -7365,16 +8767,15 @@
     faultScenarioBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         const key = btn.dataset.fault;
-        if (activeFault === key) setActiveFault('normal');
-        else setActiveFault(key);
+        toggleManualFault(key);
       });
     });
 
     if (btnFaultReset) {
-      btnFaultReset.addEventListener('click', () => setActiveFault('normal'));
+      btnFaultReset.addEventListener('click', () => resetAllFaults());
     }
     if (btnFaultBannerReset) {
-      btnFaultBannerReset.addEventListener('click', () => setActiveFault('normal'));
+      btnFaultBannerReset.addEventListener('click', () => resetAllFaults());
     }
     if (btnFaultBannerOpen) {
       btnFaultBannerOpen.addEventListener('click', () => setFaultsPanelOpen(true));
@@ -7398,6 +8799,13 @@
         title: 'Plataforma de Concreto',
         desc: 'Losa estructural que estabiliza el cabezal del pozo, el tablero VFD y el múltiple de líneas en superficie, brindando una base nivelada y segura para la operación BCP.',
         preset: 'plataforma-celler',
+      },
+      'manga-viento': {
+        category: 'SEGURIDAD EN SUPERFICIE',
+        catKey: 'superficie',
+        title: 'Manga de Viento (Windsock)',
+        desc: 'Indicador visual de dirección e intensidad del viento instalado en la macolla petrolera. Es esencial para la seguridad industrial en la Faja del Orinoco ante eventuales fugas de gas o H₂S, indicando la ruta de evacuación a barlovento.',
+        preset: 'superficie-overview',
       },
       'celler': {
         category: 'SUPERFICIE',
@@ -7763,6 +9171,7 @@
     rotorTip.userData.inspectId = 'rotor';
 
     padGroup.userData.inspectId = 'plataforma';
+    windsockGroup.userData.inspectId = 'manga-viento';
     cellarGroup.userData.inspectId = 'celler';
     wellheadGroup.userData.inspectId = 'cabezal-pozo';
     teProdGroup.userData.inspectId = 'te-produccion';
@@ -7951,7 +9360,7 @@
       else pushRect(btnGuideToggle);
       pushRect(creditsDockEl);
       pushRect(faultsDockEl);
-      if (activeFault !== 'normal') pushRect(faultAlertBannerEl);
+      if (hasAnyFault()) pushRect(faultAlertBannerEl);
       return rects;
     }
 
@@ -8676,7 +10085,18 @@
       vfdLocalLight.intensity = THREE.MathUtils.lerp(vfdLocalLight.intensity, target.vfdLightIntensity, blend);
     }
 
-    function updateGeoLabels() {
+    const prefersReducedMotionQuery = window.matchMedia
+      ? window.matchMedia('(prefers-reduced-motion: reduce)')
+      : null;
+
+    function updateGeoLabels(elapsed = 0) {
+      // Keep #geo-labels-layer atmospheric state synced with windsock gust/dust detection
+      const gustActive = wsGustIntensity > 0.04;
+      const dustActive = weatherDustBlend > 0.08;
+      geoLabelsLayerEl.classList.toggle('wind-gusts', gustActive);
+      geoLabelsLayerEl.classList.toggle('wind-dust', dustActive);
+      geoLabelsLayerEl.dataset.windState = dustActive ? 'dust' : (gustActive ? 'gusts' : 'calm');
+
       if (!geoLabelsVisible) return;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
@@ -8687,6 +10107,13 @@
       const tipActive = tooltipEl.classList.contains('visible');
       const tipRect = tipActive ? tooltipEl.getBoundingClientRect() : null;
       const activeId = pinnedInspectId || hoveredInspectId;
+      const allowWindSway = gustActive && !(prefersReducedMotionQuery && prefersReducedMotionQuery.matches);
+      // Shared gust envelope aligned with windsock wave frequencies (low savanna surge + brisk gust flutter)
+      const gustEnvelope = allowWindSway
+        ? wsGustIntensity * (0.72 + 0.28 * Math.sin(elapsed * 1.35))
+        : 0;
+      const dustExtra = dustActive ? 1.18 : 1.0;
+      const windPushDir = Math.abs(wsWindDirX) > 0.15 ? Math.sign(wsWindDirX) : 1;
 
       const placed = [];
       for (let i = 0; i < geoLabelEntries.length; i++) {
@@ -8747,6 +10174,7 @@
         }
 
         const isHoveredLabel = hoveredGeoLabelId === entry.cfg.id;
+        const isActiveLabel = activeId === entry.cfg.id;
         const tooltipOverlap = !isHoveredLabel && tipRect
           ? rectOverlapArea(finalBox, {
               left: tipRect.left - 8,
@@ -8756,7 +10184,7 @@
             }) > 0
           : false;
 
-        entry.el.classList.toggle('active', activeId === entry.cfg.id);
+        entry.el.classList.toggle('active', isActiveLabel);
         entry.el.classList.toggle('yield-tooltip', tooltipOverlap);
 
         if (panelBlocked || ly + h > vh - 8) {
@@ -8765,7 +10193,19 @@
         } else {
           entry.el.style.opacity = '1';
           entry.el.style.pointerEvents = tooltipOverlap ? 'none' : 'auto';
-          entry.el.style.transform = `translate3d(${Math.round(lx)}px, ${Math.round(ly)}px, 0)`;
+          if (gustEnvelope > 0.01 && !isHoveredLabel && !isActiveLabel) {
+            // Subtle organic sway staggered per geological stratum, downwind-biased to match windsock
+            const phase = i * 1.18 + entry.cfg.anchor.y * 0.24;
+            const waveMain = Math.sin(elapsed * 2.35 + phase);
+            const waveFlutter = Math.sin(elapsed * 4.9 + phase * 1.7) * 0.34;
+            const amp = gustEnvelope * dustExtra;
+            const swayX = (waveMain * 2.1 + waveFlutter * 1.1 + windPushDir * 1.35) * amp;
+            const swayY = Math.cos(elapsed * 1.85 + phase * 1.3) * 0.95 * amp;
+            const swayRot = (waveMain * 1.25 + waveFlutter * 0.65 + windPushDir * 0.45) * amp;
+            entry.el.style.transform = `translate3d(${(lx + swayX).toFixed(2)}px, ${(ly + swayY).toFixed(2)}px, 0) rotate(${swayRot.toFixed(2)}deg)`;
+          } else {
+            entry.el.style.transform = `translate3d(${Math.round(lx)}px, ${Math.round(ly)}px, 0)`;
+          }
           placed.push({ lx, ly, w, h });
         }
       }
@@ -9098,10 +10538,10 @@
     rpmSlider.addEventListener('input', armAudioOnGesture, { once: true });
 
     // =========================================================================
-    // 10D. D3.JS INTERACTIVE 10-MINUTE TELEMETRY AREA CHART (BPD & PSI)
+    // 10D. D3.JS INSTANT-REACTIVE LIVE TELEMETRY TREND CHART (30s: BPD, PSI, RPM)
     // =========================================================================
     const telemetryTrendChart = (() => {
-      const WINDOW_MS = 10 * 60 * 1000;
+      const WINDOW_MS = 30 * 1000; // Short 30-second live window for immediate visual feedback
       const SVG_W = 234;
       const SVG_H = 108;
       const MARGIN = { top: 8, right: 25, bottom: 18, left: 25 };
@@ -9111,51 +10551,31 @@
       const probeBarEl = document.getElementById('chart-probe-bar');
       const btnToggleBpd = document.getElementById('btn-toggle-bpd');
       const btnTogglePsi = document.getElementById('btn-toggle-psi');
+      const btnToggleRpm = document.getElementById('btn-toggle-rpm');
       const btnResetZoom = document.getElementById('btn-chart-reset-zoom');
 
       let showBpd = true;
       let showPsi = true;
+      let showRpm = true;
       let zoomTransform = d3.zoomIdentity;
       let hoverClientRelX = null;
       let lastSampleTimeMs = 0;
+      let lastSampleBpd = 446;
+      let lastSamplePsi = 545;
       let lastSampleRpm = 180;
 
-      // Seed realistic 10-minute operational history ending at current 180 RPM steady state
-      // so users can immediately inspect how past speed steps drove BPD & PSI responses.
+      // Seed calm 30-second live baseline at initial steady operating point (180 RPM, 446 BPD, 545 PSI)
       const history = [];
       const initNowMs = Date.now();
-      const seedCount = 120; // 5s step over last 10 minutes
+      const seedCount = 60; // 0.5s steps over the recent 30 seconds
       for (let i = 0; i <= seedCount; i++) {
-        const frac = i / seedCount;
-        const minsAgo = (1 - frac) * 10;
-        let histRpm = 180;
-        if (minsAgo > 7.2) {
-          histRpm = 115;
-        } else if (minsAgo > 6.6) {
-          const u = (7.2 - minsAgo) / 0.6;
-          histRpm = 115 + (152 - 115) * (u * u * (3 - 2 * u));
-        } else if (minsAgo > 4.4) {
-          histRpm = 152;
-        } else if (minsAgo > 3.8) {
-          const u = (4.4 - minsAgo) / 0.6;
-          histRpm = 152 + (128 - 152) * (u * u * (3 - 2 * u));
-        } else if (minsAgo > 2.3) {
-          histRpm = 128;
-        } else if (minsAgo > 1.6) {
-          const u = (2.3 - minsAgo) / 0.7;
-          histRpm = 128 + (180 - 128) * (u * u * (3 - 2 * u));
-        } else {
-          histRpm = 180;
-        }
-
-        const microWave = (Math.sin(i * 0.65) + Math.cos(i * 1.15)) * 0.5;
-        const bpdVal = Math.max(0, Math.round(histRpm * 2.48 + microWave * 3.5));
-        const psiVal = Math.round(280 + histRpm * 1.48 + microWave * 2.5);
+        const secsAgo = ((seedCount - i) / seedCount) * 30;
+        const microWave = (Math.sin(i * 0.55) + Math.cos(i * 0.95)) * 0.5;
         history.push({
-          time: initNowMs - Math.round(minsAgo * 60 * 1000),
-          bpd: bpdVal,
-          psi: psiVal,
-          rpm: Math.round(histRpm),
+          time: initNowMs - Math.round(secsAgo * 1000),
+          bpd: Math.round(446 + microWave * 3.0),
+          psi: Math.round(545 + microWave * 2.5),
+          rpm: 180,
         });
       }
       lastSampleTimeMs = initNowMs;
@@ -9175,21 +10595,22 @@
         .attr('id', 'trend-grad-bpd')
         .attr('x1', '0%').attr('y1', '0%')
         .attr('x2', '0%').attr('y2', '100%');
-      gradBpd.append('stop').attr('offset', '0%').attr('stop-color', '#38bdf8').attr('stop-opacity', 0.38);
+      gradBpd.append('stop').attr('offset', '0%').attr('stop-color', '#38bdf8').attr('stop-opacity', 0.34);
       gradBpd.append('stop').attr('offset', '100%').attr('stop-color', '#38bdf8').attr('stop-opacity', 0.02);
 
       const gradPsi = defs.append('linearGradient')
         .attr('id', 'trend-grad-psi')
         .attr('x1', '0%').attr('y1', '0%')
         .attr('x2', '0%').attr('y2', '100%');
-      gradPsi.append('stop').attr('offset', '0%').attr('stop-color', '#f59e0b').attr('stop-opacity', 0.30);
+      gradPsi.append('stop').attr('offset', '0%').attr('stop-color', '#f59e0b').attr('stop-opacity', 0.26);
       gradPsi.append('stop').attr('offset', '100%').attr('stop-color', '#f59e0b').attr('stop-opacity', 0.02);
 
       const rootG = svg.append('g')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-      const yBpd = d3.scaleLinear().domain([0, 900]).range([PLOT_H, 0]);
-      const yPsi = d3.scaleLinear().domain([200, 1100]).range([PLOT_H, 0]);
+      const yBpd = d3.scaleLinear().domain([0, 900]).range([PLOT_H, 0]).clamp(true);
+      const yPsi = d3.scaleLinear().domain([200, 1250]).range([PLOT_H, 0]).clamp(true);
+      const yRpm = d3.scaleLinear().domain([0, 360]).range([PLOT_H, 0]).clamp(true);
       const xBase = d3.scaleTime()
         .domain([new Date(initNowMs - WINDOW_MS), new Date(initNowMs)])
         .range([0, PLOT_W]);
@@ -9220,6 +10641,13 @@
         .attr('stroke-width', 1.55)
         .attr('stroke-linejoin', 'round');
 
+      const rpmLinePath = plotG.append('path')
+        .attr('fill', 'none')
+        .attr('stroke', '#34d399')
+        .attr('stroke-width', 1.35)
+        .attr('stroke-dasharray', '3 2')
+        .attr('stroke-linejoin', 'round');
+
       const liveDotPsi = plotG.append('circle')
         .attr('r', 2.4)
         .attr('fill', '#fbbf24')
@@ -9229,6 +10657,12 @@
       const liveDotBpd = plotG.append('circle')
         .attr('r', 2.6)
         .attr('fill', '#38bdf8')
+        .attr('stroke', '#090d16')
+        .attr('stroke-width', 1);
+
+      const liveDotRpm = plotG.append('circle')
+        .attr('r', 2.3)
+        .attr('fill', '#34d399')
         .attr('stroke', '#090d16')
         .attr('stroke-width', 1);
 
@@ -9244,7 +10678,7 @@
       const yAxisPsiG = rootG.append('g')
         .attr('class', 'chart-axis chart-axis-psi')
         .attr('transform', `translate(${PLOT_W},0)`)
-        .call(d3.axisRight(yPsi).tickValues([200, 650, 1100]).tickSize(2.5).tickPadding(2));
+        .call(d3.axisRight(yPsi).tickValues([200, 725, 1250]).tickSize(2.5).tickPadding(2));
 
       // Interactive crosshair overlay
       const crosshairG = rootG.append('g')
@@ -9259,14 +10693,20 @@
         .attr('stroke-dasharray', '2 2');
 
       const hoverDotPsi = crosshairG.append('circle')
-        .attr('r', 3.2)
+        .attr('r', 3.1)
         .attr('fill', '#fbbf24')
         .attr('stroke', '#090d16')
         .attr('stroke-width', 1.2);
 
       const hoverDotBpd = crosshairG.append('circle')
-        .attr('r', 3.4)
+        .attr('r', 3.3)
         .attr('fill', '#38bdf8')
+        .attr('stroke', '#090d16')
+        .attr('stroke-width', 1.2);
+
+      const hoverDotRpm = crosshairG.append('circle')
+        .attr('r', 3.0)
+        .attr('fill', '#34d399')
         .attr('stroke', '#090d16')
         .attr('stroke-width', 1.2);
 
@@ -9274,10 +10714,8 @@
 
       function formatRelTime(timeMs, refNowMs) {
         const diffSec = Math.max(0, Math.round((refNowMs - timeMs) / 1000));
-        if (diffSec < 3) return 'Ahora';
-        const m = Math.floor(diffSec / 60);
-        const s = diffSec % 60;
-        return `-${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (diffSec < 1) return 'Ahora';
+        return `-${diffSec}s`;
       }
 
       function getCurrentXScale() {
@@ -9309,6 +10747,10 @@
           .style('display', showPsi ? null : 'none')
           .attr('cx', cx)
           .attr('cy', yPsi(pt.psi));
+        hoverDotRpm
+          .style('display', showRpm ? null : 'none')
+          .attr('cx', cx)
+          .attr('cy', yRpm(Math.max(0, pt.rpm)));
 
         const relStr = formatRelTime(pt.time, latestTime);
         probeBarEl.innerHTML =
@@ -9321,7 +10763,7 @@
       function clearProbe() {
         hoverClientRelX = null;
         crosshairG.style('display', 'none');
-        probeBarEl.innerHTML = '<span>Correlación RPM → BPD / PSI · Hover / Zoom</span>';
+        probeBarEl.innerHTML = '<span>En vivo · BPD / PSI / RPM · Hover / Zoom</span>';
       }
 
       function render() {
@@ -9352,16 +10794,23 @@
           .y((d) => yPsi(d.psi))
           .curve(d3.curveMonotoneX);
 
+        const rpmLineGen = d3.line()
+          .x((d) => xScale(d.time))
+          .y((d) => yRpm(Math.max(0, d.rpm)))
+          .curve(d3.curveMonotoneX);
+
         bpdAreaPath.datum(history).attr('d', bpdAreaGen);
         bpdLinePath.datum(history).attr('d', bpdLineGen);
         psiAreaPath.datum(history).attr('d', psiAreaGen);
         psiLinePath.datum(history).attr('d', psiLineGen);
+        rpmLinePath.datum(history).attr('d', rpmLineGen);
 
         const lastPt = history[history.length - 1];
         liveDotBpd.attr('cx', xScale(lastPt.time)).attr('cy', yBpd(lastPt.bpd));
         liveDotPsi.attr('cx', xScale(lastPt.time)).attr('cy', yPsi(lastPt.psi));
+        liveDotRpm.attr('cx', xScale(lastPt.time)).attr('cy', yRpm(Math.max(0, lastPt.rpm)));
 
-        // Time axis ticks mapped cleanly to relative minutes/seconds
+        // Short dynamic time axis ticks in seconds (-30s, -15s, Ahora)
         const [dStart, dEnd] = xScale.domain();
         const midTime = new Date((dStart.getTime() + dEnd.getTime()) * 0.5);
         const tickDates = [dStart, midTime, dEnd];
@@ -9372,14 +10821,10 @@
             .tickPadding(3)
             .tickFormat((dt) => {
               const sec = Math.max(0, Math.round((latestTime - dt.getTime()) / 1000));
-              if (sec < 3) return 'Ahora';
-              if (sec % 60 === 0) return `-${sec / 60}m`;
-              const m = Math.floor(sec / 60);
-              const s = sec % 60;
-              return `-${m}:${String(s).padStart(2, '0')}`;
+              if (sec < 1) return 'Ahora';
+              return `-${sec}s`;
             })
         );
-        // Align first and last X tick labels nicely inside SVG margins
         xAxisG.selectAll('.tick text').each(function (d, idx, nodes) {
           if (idx === 0) d3.select(this).attr('text-anchor', 'start');
           else if (idx === nodes.length - 1) d3.select(this).attr('text-anchor', 'end');
@@ -9392,34 +10837,49 @@
       }
 
       function applySeriesVisibility() {
-        bpdAreaPath.transition().duration(180).style('opacity', showBpd ? 1 : 0);
-        bpdLinePath.transition().duration(180).style('opacity', showBpd ? 1 : 0);
-        liveDotBpd.transition().duration(180).style('opacity', showBpd ? 1 : 0);
-        yAxisBpdG.transition().duration(180).style('opacity', showBpd ? 1 : 0.25);
+        bpdAreaPath.transition().duration(150).style('opacity', showBpd ? 1 : 0);
+        bpdLinePath.transition().duration(150).style('opacity', showBpd ? 1 : 0);
+        liveDotBpd.transition().duration(150).style('opacity', showBpd ? 1 : 0);
+        yAxisBpdG.transition().duration(150).style('opacity', showBpd ? 1 : 0.25);
         btnToggleBpd.classList.toggle('is-muted', !showBpd);
         btnToggleBpd.setAttribute('aria-pressed', String(showBpd));
 
-        psiAreaPath.transition().duration(180).style('opacity', showPsi ? 1 : 0);
-        psiLinePath.transition().duration(180).style('opacity', showPsi ? 1 : 0);
-        liveDotPsi.transition().duration(180).style('opacity', showPsi ? 1 : 0);
-        yAxisPsiG.transition().duration(180).style('opacity', showPsi ? 1 : 0.25);
+        psiAreaPath.transition().duration(150).style('opacity', showPsi ? 1 : 0);
+        psiLinePath.transition().duration(150).style('opacity', showPsi ? 1 : 0);
+        liveDotPsi.transition().duration(150).style('opacity', showPsi ? 1 : 0);
+        yAxisPsiG.transition().duration(150).style('opacity', showPsi ? 1 : 0.25);
         btnTogglePsi.classList.toggle('is-muted', !showPsi);
         btnTogglePsi.setAttribute('aria-pressed', String(showPsi));
+
+        rpmLinePath.transition().duration(150).style('opacity', showRpm ? 0.92 : 0);
+        liveDotRpm.transition().duration(150).style('opacity', showRpm ? 1 : 0);
+        if (btnToggleRpm) {
+          btnToggleRpm.classList.toggle('is-muted', !showRpm);
+          btnToggleRpm.setAttribute('aria-pressed', String(showRpm));
+        }
 
         if (hoverClientRelX !== null) updateProbeForX(hoverClientRelX);
       }
 
       btnToggleBpd.addEventListener('click', () => {
-        if (showBpd && !showPsi) showPsi = true;
+        if (showBpd && !showPsi && !showRpm) showPsi = true;
         else showBpd = !showBpd;
         applySeriesVisibility();
       });
 
       btnTogglePsi.addEventListener('click', () => {
-        if (showPsi && !showBpd) showBpd = true;
+        if (showPsi && !showBpd && !showRpm) showBpd = true;
         else showPsi = !showPsi;
         applySeriesVisibility();
       });
+
+      if (btnToggleRpm) {
+        btnToggleRpm.addEventListener('click', () => {
+          if (showRpm && !showBpd && !showPsi) showBpd = true;
+          else showRpm = !showRpm;
+          applySeriesVisibility();
+        });
+      }
 
       // Interactive overlay for crosshair hover + D3 horizontal zoom/pan
       const overlayRect = rootG.append('rect')
@@ -9430,7 +10890,7 @@
         .attr('fill', 'transparent');
 
       const zoomBehavior = d3.zoom()
-        .scaleExtent([1, 10])
+        .scaleExtent([1, 6])
         .translateExtent([[0, 0], [PLOT_W, PLOT_H]])
         .extent([[0, 0], [PLOT_W, PLOT_H]])
         .on('zoom', (event) => {
@@ -9453,27 +10913,44 @@
 
       overlayRect.on('dblclick', (event) => {
         event.preventDefault();
-        overlayRect.transition().duration(220).call(zoomBehavior.transform, d3.zoomIdentity);
+        overlayRect.transition().duration(180).call(zoomBehavior.transform, d3.zoomIdentity);
       });
 
       btnResetZoom.addEventListener('click', () => {
-        overlayRect.transition().duration(220).call(zoomBehavior.transform, d3.zoomIdentity);
+        overlayRect.transition().duration(180).call(zoomBehavior.transform, d3.zoomIdentity);
       });
 
-      function recordSample(bpd, psi, rpm) {
+      function recordSample(bpd, psi, rpm, forceImmediate = false) {
         const nowMs = Date.now();
         const elapsedSinceLast = nowMs - lastSampleTimeMs;
-        const rpmDelta = Math.abs(rpm - lastSampleRpm);
+        const hasChange =
+          Math.abs(bpd - lastSampleBpd) >= 2 ||
+          Math.abs(psi - lastSamplePsi) >= 2 ||
+          Math.abs(rpm - lastSampleRpm) >= 1;
 
-        // Log every 1.0s during steady state, or every 0.25s while RPM changes noticeably
-        if (elapsedSinceLast < 250) return;
-        if (elapsedSinceLast < 1000 && rpmDelta < 4) return;
+        // Instant response on any slider/fluid/fault change (35ms floor during fast drag), continuous 350ms scroll at steady state
+        if (!forceImmediate) {
+          if (hasChange && elapsedSinceLast < 60) return;
+          if (!hasChange && elapsedSinceLast < 350) return;
+        }
 
-        lastSampleTimeMs = nowMs;
+        // If triggered within < 35ms of the last point (rapid slider drag), update latest point in-place for silky reactivity
+        if (elapsedSinceLast < 35 && history.length > 0) {
+          const tip = history[history.length - 1];
+          tip.time = Math.max(tip.time, nowMs);
+          tip.bpd = bpd;
+          tip.psi = psi;
+          tip.rpm = rpm;
+        } else {
+          history.push({ time: nowMs, bpd, psi, rpm });
+          lastSampleTimeMs = nowMs;
+        }
+
+        lastSampleBpd = bpd;
+        lastSamplePsi = psi;
         lastSampleRpm = rpm;
-        history.push({ time: nowMs, bpd, psi, rpm });
 
-        // Prune samples older than 10 minutes, keeping 1 boundary anchor so left edge never clips
+        // Keep sliding 30-second window with 1 anchor sample at left boundary
         const cutoff = nowMs - WINDOW_MS;
         while (history.length > 2 && history[1].time < cutoff) {
           history.shift();
@@ -9532,43 +11009,66 @@
     let pulsePhase = 0;
 
     function updateProcessFlow(dt, elapsed = 0) {
-      const effectiveTargetDilution = activeFault === 'corte-diluente' ? 0 : targetDilution;
-      dilutionBlend = THREE.MathUtils.damp(dilutionBlend, effectiveTargetDilution, 4.5, dt);
+      const isDilLoss = hasFault('corte-diluente');
+      const isDilExcess = hasFault('exceso-diluente');
+      const isGasLock = hasFault('baja-sumergencia');
+      const isLowPress = hasFault('baja-presion');
+      const isLowTemp = hasFault('baja-temperatura');
+      const isBackspin = hasFault('parada-retroceso') && lowSpeedSubmode === 'backspin';
+      const isLowSlip = hasFault('parada-retroceso') && lowSpeedSubmode === 'slip';
+      const isHighPressure = hasFault('alta-presion');
+      const isElastomerDamage = hasFault('dano-elastomero');
+
+      const effectiveTargetDilution = THREE.MathUtils.clamp(currentDiluentPct / DILUENT_DEFAULT_NORMAL, 0, 1);
+      dilutionBlend = THREE.MathUtils.damp(dilutionBlend, effectiveTargetDilution, 5.5, dt);
       if (Math.abs(dilutionBlend - effectiveTargetDilution) < 0.002) dilutionBlend = effectiveTargetDilution;
 
+      const dilRatio = THREE.MathUtils.clamp(currentDiluentPct / DILUENT_DEFAULT_NORMAL, 0, 1.95);
       const rpmRatio = currentRpm / 180;
-      const isGasLock = activeFault === 'baja-sumergencia';
-      const isDilLoss = activeFault === 'corte-diluente';
-      const isBackspin = activeFault === 'parada-retroceso' && lowSpeedSubmode === 'backspin';
-      const isLowSlip = activeFault === 'parada-retroceso' && lowSpeedSubmode === 'slip';
 
-      let viscositySpeedFactor = 0.52 + 0.72 * dilutionBlend; // 0.52x sluggish without dilution vs 1.24x agile with diluent
-      if (isDilLoss) viscositySpeedFactor *= 0.78;
-      if (isLowSlip) viscositySpeedFactor *= 0.45;
+      let viscositySpeedFactor = 0.50 + 0.74 * dilutionBlend + Math.max(0, dilRatio - 1) * 0.16;
+      if (isDilLoss) viscositySpeedFactor *= 0.80;
+      if (isDilExcess) viscositySpeedFactor *= 0.86; // internal slippage slows net forward progression despite thin fluid
+      if (isLowTemp) viscositySpeedFactor *= 0.76;
+      if (isLowSlip) viscositySpeedFactor *= 0.48;
+      if (isHighPressure) viscositySpeedFactor *= 0.80;
+      if (isLowPress) viscositySpeedFactor *= 0.84;
+      if (isElastomerDamage) viscositySpeedFactor *= 0.66;
+      viscositySpeedFactor = Math.max(0.18, viscositySpeedFactor);
 
       let slugMod = 1.0;
       if (isGasLock) {
         const wave = Math.sin(elapsed * 3.1) * 0.5 + Math.sin(elapsed * 7.4) * 0.35 + Math.cos(elapsed * 1.6) * 0.25;
-        slugMod = THREE.MathUtils.clamp(0.46 + wave * 0.42, 0.12, 0.92);
+        slugMod *= THREE.MathUtils.clamp(0.46 + wave * 0.42, 0.14, 0.92);
       }
+      if (isLowPress) {
+        const lowPWave = Math.sin(elapsed * 2.5) * 0.5 + Math.cos(elapsed * 4.1) * 0.5;
+        slugMod *= THREE.MathUtils.clamp(0.76 + lowPWave * 0.12, 0.58, 0.92);
+      }
+      if (isElastomerDamage) {
+        const slipWave = Math.sin(elapsed * 4.4) * 0.5 + Math.cos(elapsed * 2.1) * 0.5;
+        slugMod *= THREE.MathUtils.clamp(0.70 + slipWave * 0.16, 0.48, 0.88);
+      }
+      slugMod = Math.max(0.12, slugMod);
 
       // Allow subtle downward fluid slip during reverse backspin; keep flowProgress positive-wrapped
       flowProgress += dt * rpmRatio * 0.28 * viscositySpeedFactor * slugMod;
       if (flowProgress < 0) flowProgress = ((flowProgress % 1) + 1) % 1;
 
-      if (dilutionBlend > 0.02 && !isBackspin) {
-        dilProgress += dt * Math.max(0, rpmRatio) * 0.28;
+      if (currentDiluentPct > 0.4 && !isBackspin) {
+        dilProgress += dt * Math.max(0.18, Math.max(0, rpmRatio)) * 0.28 * THREE.MathUtils.clamp(0.55 + dilRatio * 0.55, 0.35, 1.85);
       }
-      const gasBoost = isGasLock ? 2.45 : 1.0;
+      const gasBoost = isGasLock ? 2.45 : (isLowPress ? 1.45 : 1.0);
       gasProgress += dt * (0.08 + Math.abs(rpmRatio) * 0.68) * 0.16 * gasBoost;
 
-      // Subtle emissivity shift so #0d0b0a stays pure deep black in extra-heavy mode and #4a2c18 reads richly when diluted
-      flowMats.prodMix.emissiveIntensity = 0.03 + 0.14 * dilutionBlend;
+      // Subtle emissivity shift so #0d0b0a stays pure deep black at 0% and #4a2c18 reads richly as diluent increases
+      flowMats.prodMix.emissiveIntensity = 0.03 + 0.14 * dilutionBlend + Math.max(0, dilRatio - 1) * 0.04;
 
-      // Subtle reservoir drawdown shimmer & lower fluid level during low submergence / gas entrainment
+      // Reservoir fluid level tracks live effective submergence (drops cleanly during low submergence / over-pumping)
       const activeFactor = THREE.MathUtils.clamp(Math.abs(currentRpm) / 350, 0, 1);
       poolPhase += dt * (1.2 + activeFactor * 3.0);
-      const targetPoolY = isGasLock ? -11.05 : -10.88;
+      const submNorm = THREE.MathUtils.clamp((effectiveSubmergence - SUBM_MIN) / (SUBM_MAX - SUBM_MIN), 0, 1);
+      const targetPoolY = THREE.MathUtils.lerp(-11.12, -10.82, submNorm) - (isGasLock ? 0.04 : 0);
       oilPool.position.y = THREE.MathUtils.damp(oilPool.position.y, targetPoolY + Math.sin(poolPhase) * 0.008 * activeFactor, 3.2, dt);
       meniscus.scale.setScalar(1 + Math.sin(poolPhase * 1.1) * (isGasLock ? 0.048 : 0.025) * Math.max(0.25, activeFactor));
       reservoirGlow.intensity = 4.8 + activeFactor * 1.8;
@@ -9579,7 +11079,6 @@
         const t = (((s.phase + flowProgress * 1.15) % 1) + 1) % 1;
 
         if (t < 0.42) {
-          // Radial entry from rock perforation walls inward & downward toward gas anchor intake
           const k = t / 0.42;
           const r = THREE.MathUtils.lerp(1.06, 0.26, k);
           const yStart = -10.42 + (s.lane % 5) * 0.22;
@@ -9588,7 +11087,6 @@
           _flowTan.set(-Math.cos(s.angle), -0.45 * k, Math.sin(s.angle)).normalize();
           _flowScale.set(0.030, 0.052, 0.030);
         } else {
-          // Drawn into Dip Tube bell & ascending cleanly through Stop Nipple into Pump Suction
           const k = (t - 0.42) / 0.58;
           const y = THREE.MathUtils.lerp(-10.72, -8.90, k);
           const swirl = s.angle + k * 2.2;
@@ -9609,10 +11107,8 @@
       for (let i = 0; i < CAVITY_COUNT; i++) {
         const t = ((((i / CAVITY_COUNT) + flowProgress * 0.95) % 1) + 1) % 1;
         const y = -8.86 + t * 2.98;
-        // Follow the 2-lobe elastomer cavity opposite the turning rotor lobe
         const cavityPhi = t * Math.PI * 2 * 2.25 + (i % 2) * Math.PI;
         const cavityAngle = cavityPhi + rotorAngle * 0.5;
-        // Keep pockets visible in the cutaway front/back side arc
         const rad = 0.118;
         _flowPos.set(
           Math.cos(cavityAngle) * rad,
@@ -9621,14 +11117,19 @@
         );
         _flowTan.set(-Math.sin(cavityAngle) * 0.25, 1.0, -Math.cos(cavityAngle) * 0.20).normalize();
         _flowQuat.setFromUnitVectors(_upAxis, _flowTan);
-        const cavityFillScale = isGasLock ? (0.58 + 0.42 * slugMod) : 1.0;
+        let cavityFillScale = 1.0;
+        if (isGasLock) cavityFillScale *= (0.58 + 0.42 * slugMod);
+        if (isLowPress) cavityFillScale *= 0.84;
+        if (isDilExcess) cavityFillScale *= 0.88;
+        if (isElastomerDamage) cavityFillScale *= (0.72 + 0.18 * slugMod);
+        cavityFillScale = Math.max(0.42, cavityFillScale);
         _flowScale.set(0.056 * cavityFillScale, 0.088 * cavityFillScale, 0.050 * cavityFillScale);
         _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
         cavityFlowMesh.setMatrixAt(i, _flowMat4);
       }
       cavityFlowMesh.instanceMatrix.needsUpdate = true;
 
-      // 3. Tubing ascent -> TE de Producción -> Surface production line (dark #0d0b0a without dilution; transitions to #4a2c18 after TE when diluted)
+      // 3. Tubing ascent -> TE de Producción -> Surface production line
       for (let i = 0; i < PROD_COUNT; i++) {
         const s = prodSeeds[i];
         const t = (((s.phase + flowProgress * 0.55) % 1) + 1) % 1;
@@ -9636,43 +11137,40 @@
         prodCurve.getTangentAt(t, _flowTan);
 
         if (t < 0.56) {
-          // Spiral gently in tubing annulus around rotating sucker rod
           const swirlA = s.angleJitter + t * 18.0 + rotorAngle * 0.4;
           const rTubing = 0.135 + s.radialJitter;
           _flowPos.x = Math.cos(swirlA) * rTubing;
           _flowPos.z = -Math.abs(Math.sin(swirlA)) * rTubing * 0.85 - 0.02;
         } else {
-          // Slight radial scatter inside horizontal surface production sight-pipe
           _flowPos.y += Math.sin(s.angleJitter + t * 12) * 0.024;
           _flowPos.z += Math.cos(s.angleJitter) * 0.024;
         }
 
         _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
-        const dropletThickness = 1 + (1 - dilutionBlend) * 0.14;
-        const gasGap = isGasLock ? (0.62 + 0.38 * Math.sin(s.phase * 18 + elapsed * 4.5)) : 1.0;
+        const dropletThickness = 1 + (1 - dilutionBlend) * 0.14 + (isLowTemp ? 0.08 : 0) + (isDilExcess ? 0.06 : 0);
+        const gasGap = isGasLock ? (0.62 + 0.38 * Math.sin(s.phase * 18 + elapsed * 4.5)) : (isLowPress ? 0.86 : 1.0);
         _flowScale.set(0.036 * dropletThickness * gasGap, 0.068 * gasGap, 0.036 * dropletThickness * gasGap);
         _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
         prodFlowMesh.setMatrixAt(i, _flowMat4);
 
-        // Stay jet-black (#0d0b0a) entering from wellbore; shift to amber-brown (#4a2c18) after TE de Producción only when diluent is active
-        const mixFactor = THREE.MathUtils.smoothstep(t, 0.56, 0.68) * dilutionBlend;
+        const mixFactor = THREE.MathUtils.smoothstep(t, 0.56, 0.68) * THREE.MathUtils.clamp(dilutionBlend * (isDilExcess ? 1.15 : 1.0), 0, 1);
         _colScratch.copy(_colCrude).lerp(_colDiluted, mixFactor);
         prodFlowMesh.setColorAt(i, _colScratch);
       }
       prodFlowMesh.instanceMatrix.needsUpdate = true;
       if (prodFlowMesh.instanceColor) prodFlowMesh.instanceColor.needsUpdate = true;
 
-      // 4. Diluent injection stream entering TE de Producción (stops & hides in Crudo Extrapesado mode or Corte de Diluente fault)
-      const dilActive = dilutionBlend > 0.02;
+      // 4. Diluent injection stream entering TE de Producción (scales dynamically with % de diluente: 0% hidden -> 35% surge)
+      const dilActive = currentDiluentPct > 0.4;
       dilFlowMesh.visible = dilActive;
-      flowMats.diluent.opacity = 0.94 * dilutionBlend;
+      flowMats.diluent.opacity = dilActive ? THREE.MathUtils.clamp(0.32 + dilutionBlend * 0.64, 0, 0.98) : 0;
       if (dilActive) {
         for (let i = 0; i < DIL_COUNT; i++) {
           const t = ((i / DIL_COUNT) + dilProgress * 0.82) % 1;
           diluentFlowCurve.getPointAt(t, _flowPos);
           diluentFlowCurve.getTangentAt(t, _flowTan);
           _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
-          const dScale = 0.35 + 0.65 * dilutionBlend;
+          const dScale = THREE.MathUtils.clamp(0.35 + dilRatio * 0.65, 0.35, 1.38);
           _flowScale.set(0.024 * dScale, 0.050 * dScale, 0.024 * dScale);
           _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
           dilFlowMesh.setMatrixAt(i, _flowMat4);
@@ -9681,7 +11179,7 @@
       }
 
       // 5. Annulus gas separation bubbles: Gas Anchor vents -> Casing Annulus -> Línea de Gas del Anular
-      const gasBubbleMult = isGasLock ? 1.48 : 1.0;
+      const gasBubbleMult = isGasLock ? 1.48 : (isLowPress ? 1.18 : 1.0);
       for (let i = 0; i < GAS_COUNT; i++) {
         const s = gasSeeds[i];
         const t = (s.phase + gasProgress) % 1;
@@ -9689,7 +11187,6 @@
         gasFullCurve.getTangentAt(t, _flowTan);
 
         if (t < 0.42) {
-          // Keep bubbles riding visibly inside the cutaway casing-tubing annulus (Z <= -0.05)
           const rAnn = 0.36;
           const arcA = 0.25 + ((Math.sin(s.swirlOffset + t * 10) * 0.5 + 0.5) * (Math.PI - 0.50));
           _flowPos.x = Math.cos(arcA) * rAnn;
@@ -9706,17 +11203,16 @@
     }
 
     function stepScene(dt, elapsed) {
-      if (activeFault !== 'normal') {
+      if (hasAnyFault()) {
         faultElapsed += dt;
       }
 
-      // Determine effective target RPM according to active operational fault (normal uses user slider directly)
-      const isBackspinActive = activeFault === 'parada-retroceso' && lowSpeedSubmode === 'backspin';
-      const isLowSpeedSlip = activeFault === 'parada-retroceso' && lowSpeedSubmode === 'slip';
+      // Determine effective target RPM according to active operational faults (normal uses user slider directly)
+      const isBackspinActive = hasFault('parada-retroceso') && lowSpeedSubmode === 'backspin';
+      const isLowSpeedSlip = hasFault('parada-retroceso') && lowSpeedSubmode === 'slip';
 
       let effectiveTargetRpm = targetRpm;
       if (isBackspinActive) {
-        // Phase 1 (0..1.35s): rapid deceleration -> Phase 2 (1.35..6.0s): reverse backspin -> Phase 3: locked stall at 0 RPM
         if (faultElapsed < 1.35) {
           effectiveTargetRpm = 0;
         } else if (faultElapsed < 6.0) {
@@ -9728,11 +11224,17 @@
         }
       }
 
-      // Smoothly damp RPM changes
+      // Smoothly damp RPM, % Diluent, Pressure (PSI), Submergence (ft) and Temperature (°C) setpoints
       currentRpm = THREE.MathUtils.damp(currentRpm, effectiveTargetRpm, isBackspinActive ? 4.2 : 6.0, dt);
       if (isBackspinActive && faultElapsed >= 6.0 && Math.abs(currentRpm) < 0.25) {
         currentRpm = 0;
       }
+      currentDiluentPct = THREE.MathUtils.damp(currentDiluentPct, targetDiluentPct, 6.5, dt);
+      if (Math.abs(currentDiluentPct - targetDiluentPct) < 0.05) currentDiluentPct = targetDiluentPct;
+      currentPsi = THREE.MathUtils.damp(currentPsi, targetPsi, 6.5, dt);
+      currentSubmergence = THREE.MathUtils.damp(currentSubmergence, targetSubmergence, 6.0, dt);
+      effectiveSubmergence = computeEffectiveSubmergence(currentSubmergence, currentRpm, currentPsi);
+      currentTemp = THREE.MathUtils.damp(currentTemp, targetTemp, 5.5, dt);
 
       // Angular velocity scaled for smooth visual readability (rad/s; negative during backspin reverses shaft/rotor/belt)
       const visualOmega = (currentRpm / 60) * Math.PI * 0.42;
@@ -9748,31 +11250,64 @@
       // Scroll V-belt texture to show live belt travel
       beltTex.offset.x -= (visualOmega * 0.24) * dt;
 
-      // Subtle mechanical vibration on drive head during high-torque / overspeed overload
-      if (activeFault === 'sobrecarga-torque') {
+      // Compose subtle mechanical vibration on drive head across all active stress faults
+      let vibAmp = 0;
+      if (hasFault('sobrecarga-torque')) {
         const overspeedFactor = THREE.MathUtils.clamp((Math.abs(currentRpm) - 200) / 150, 0.35, 1.25);
-        const vibAmp = 0.011 * overspeedFactor;
-        driveHeadGroup.position.x = Math.sin(elapsed * 46.0) * vibAmp;
-        driveHeadGroup.position.z = Math.cos(elapsed * 53.0) * vibAmp * 0.75;
+        vibAmp += 0.010 * overspeedFactor;
+      }
+      if (hasFault('alta-presion')) {
+        const overP = THREE.MathUtils.clamp((currentPsi - PSI_MAX_NORMAL) / (PSI_MAX - PSI_MAX_NORMAL), 0.2, 1.0);
+        vibAmp += 0.0065 * overP;
+      }
+      if (hasFault('dano-elastomero')) {
+        const pinchPulse = 0.55 + 0.45 * Math.sin(elapsed * 7.5);
+        vibAmp += 0.0075 * pinchPulse;
+      }
+      if (hasFault('baja-temperatura') && hasFault('corte-diluente') && Math.abs(currentRpm) > 20) {
+        vibAmp += 0.004;
+      }
+      vibAmp = Math.min(0.015, vibAmp);
+
+      if (vibAmp > 0.0002) {
+        driveHeadGroup.position.x = Math.sin(elapsed * 44.0) * vibAmp;
+        driveHeadGroup.position.z = Math.cos(elapsed * 51.0) * vibAmp * 0.78;
       } else if (driveHeadGroup.position.x !== 0 || driveHeadGroup.position.z !== 0) {
         driveHeadGroup.position.x = THREE.MathUtils.damp(driveHeadGroup.position.x, 0, 12, dt);
         driveHeadGroup.position.z = THREE.MathUtils.damp(driveHeadGroup.position.z, 0, 12, dt);
       }
 
+      // 3D visual feedback on cutaway pump elastomer when approaching/exceeding thermal degradation threshold
+      if (typeof elastomerMat !== 'undefined') {
+        const isElastomerFault = hasFault('dano-elastomero');
+        const rawHeat = THREE.MathUtils.clamp((currentTemp - 82) / 36, 0, 1);
+        const elastHeat = isElastomerFault ? Math.max(0.75, rawHeat) : rawHeat * 0.65;
+        elastomerMat.color.copy(_elastomerHealthyCol).lerp(_elastomerHeatCol, elastHeat);
+        elastomerMat.emissive.copy(_elastomerHealthyEm).lerp(_elastomerHeatEm, elastHeat);
+        const heatPulse = isElastomerFault ? (0.5 + 0.5 * Math.sin(elapsed * 5.2)) * 0.34 : 0;
+        elastomerMat.emissiveIntensity = 0.22 + elastHeat * 0.58 + heatPulse;
+      }
+
       // Update synchronized 3D fluid, progressive cavity, diluent & annulus gas flows
       updateProcessFlow(dt, elapsed);
 
-      // Subtle manometer needle reaction to pressure & pump pulsation (reacts also to active fault load/flutter)
-      let normLoad = THREE.MathUtils.clamp((Math.max(0, currentRpm) / 350) + (1 - dilutionBlend) * 0.18, 0, 1.12);
-      if (activeFault === 'corte-diluente') normLoad = THREE.MathUtils.clamp(normLoad + 0.22, 0, 1.24);
-      else if (activeFault === 'sobrecarga-torque') normLoad = THREE.MathUtils.clamp(normLoad + 0.28, 0, 1.28);
-      else if (activeFault === 'baja-sumergencia') normLoad = THREE.MathUtils.clamp(normLoad * 0.68 + Math.sin(elapsed * 6.2) * 0.14, 0.12, 1.0);
-      else if (isBackspinActive) normLoad = 0.16;
-      else if (isLowSpeedSlip) normLoad = THREE.MathUtils.clamp(0.18 + (Math.max(0, currentRpm) / 60) * 0.18, 0.16, 0.38);
+      // Manometer needle reaction directly driven by live pressure & composed active faults
+      let normLoad = THREE.MathUtils.clamp((currentPsi - 220) / 860, 0.08, 1.32);
+      if (hasFault('corte-diluente') && !hasFault('baja-presion')) normLoad += 0.10;
+      if (hasFault('sobrecarga-torque')) normLoad += 0.14;
+      if (hasFault('alta-presion')) normLoad = Math.max(normLoad + 0.08, 0.88);
+      if (hasFault('baja-presion')) normLoad = Math.min(normLoad, 0.24);
+      if (hasFault('baja-sumergencia')) normLoad = normLoad * 0.78 + Math.sin(elapsed * 6.2) * 0.12;
+      if (isBackspinActive) normLoad = 0.16;
+      else if (isLowSpeedSlip) normLoad = Math.min(normLoad, 0.18 + (Math.max(0, currentRpm) / 60) * 0.22);
+      normLoad = THREE.MathUtils.clamp(normLoad, 0.08, 1.38);
 
       pulsePhase += dt * (1.5 + normLoad * 4.5);
-      const pulseMag = activeFault === 'baja-sumergencia' ? 0.095 : (activeFault === 'sobrecarga-torque' ? 0.055 : 0.03);
-      const pulse = Math.sin(pulsePhase * (activeFault === 'sobrecarga-torque' ? 3.2 : 1.0)) * pulseMag * normLoad;
+      const pulseMag = hasFault('baja-sumergencia')
+        ? 0.095
+        : ((hasFault('sobrecarga-torque') || hasFault('alta-presion')) ? 0.062 : (hasFault('baja-presion') ? 0.05 : 0.03));
+      const pulseFreq = (hasFault('sobrecarga-torque') || hasFault('alta-presion')) ? 3.2 : 1.0;
+      const pulse = Math.sin(pulsePhase * pulseFreq) * pulseMag * normLoad;
       for (const g of gaugeNeedles) {
         g.pivot.rotation.z = g.baseAngle - normLoad * 1.45 + pulse;
       }
@@ -9808,16 +11343,16 @@
       controls.update();
       syncDepthSliderUI();
 
-      // Smoothly interpolate Studio / Day / Night scene lighting & atmosphere
+      // Smoothly interpolate Studio / Day / Night scene lighting, weather & windsock
       updateLightingTransitions(dt, elapsed);
+      updateWindsock(dt, elapsed);
 
-      // Reflect active operational fault status on VFD cabinet LED cleanly without altering lighting modes
-      const activeSpec = getActiveFaultSpec();
-      if (!activeSpec) {
+      // Reflect composed operational fault status on VFD cabinet LED cleanly without altering lighting modes
+      if (!hasAnyFault()) {
         mats.vfdLedRun.color.copy(_vfdLedGreen);
         mats.vfdLedRun.emissive.copy(_vfdLedGreen);
       } else {
-        const isCritFault = activeSpec.severity === 'crit';
+        const isCritFault = hasAnyCriticalFault();
         const ledCol = isCritFault ? _vfdLedRed : _vfdLedAmber;
         mats.vfdLedRun.color.copy(ledCol);
         mats.vfdLedRun.emissive.copy(ledCol);
@@ -9828,98 +11363,237 @@
       // Keep pinned 3D component tooltip, leader line & discreet hover indicator synced while orbiting/zooming
       updateHoverDotPosition();
       updatePinnedTooltipPosition();
-      updateGeoLabels();
+      updateGeoLabels(elapsed);
 
       // Synchronize ambient machine hum, fluid flow & mechanical clicks with absolute shaft speed
       audioEngine.update(dt, Math.abs(currentRpm));
 
-      // Update real-time telemetry readout at ~6 Hz for crisp readability
-      if (lastTelemetryUpdate < 0 || elapsed - lastTelemetryUpdate > 0.16) {
-        lastTelemetryUpdate = elapsed;
-        const jitter = (Math.sin(elapsed * 2.3) + Math.cos(elapsed * 3.7)) * 0.5;
-        const heavyFactor = 1 - dilutionBlend;
-        const absRpm = Math.abs(currentRpm);
+      // Update real-time telemetry readout & chart (fast ~12 Hz while transitioning, ~6 Hz steady)
+      const isTransitioning =
+        Math.abs(currentRpm - effectiveTargetRpm) > 1.5 ||
+        Math.abs(currentDiluentPct - targetDiluentPct) > 0.2 ||
+        Math.abs(currentPsi - targetPsi) > 2.5 ||
+        Math.abs(currentSubmergence - targetSubmergence) > 2.0 ||
+        Math.abs(currentTemp - targetTemp) > 0.3;
+      const telemetryInterval = isTransitioning ? 0.08 : 0.16;
 
-        // Nominal baseline calculations
-        const volEffSlope = THREE.MathUtils.lerp(2.22, 2.48, dilutionBlend);
-        let bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(currentRpm * volEffSlope + jitter * 4));
+      if (lastTelemetryUpdate < 0 || elapsed - lastTelemetryUpdate > telemetryInterval) {
+        updateTelemetryReadout(elapsed, false);
+      }
+    }
 
-        const psiDiluted = 280 + absRpm * 1.48;
-        const psiHeavyDelta = 95 + absRpm * 0.54;
-        let psi = Math.round(psiDiluted + heavyFactor * psiHeavyDelta + jitter * 3);
+    function updateTelemetryReadout(elapsed, forceChart = false) {
+      lastTelemetryUpdate = elapsed;
+      const jitter = (Math.sin(elapsed * 2.3) + Math.cos(elapsed * 3.7)) * 0.5;
+      const absRpm = Math.abs(currentRpm);
+      const dilPct = THREE.MathUtils.clamp(currentDiluentPct, DILUENT_MIN, DILUENT_MAX);
+      const heavyFactor = THREE.MathUtils.clamp(1 - dilPct / DILUENT_DEFAULT_NORMAL, 0, 1);
 
-        const viscDiluted = 260 - (absRpm / 350) * 55;
-        const viscHeavy = 3650 - (absRpm / 350) * 530;
-        let visc = Math.round(THREE.MathUtils.lerp(viscHeavy, viscDiluted, dilutionBlend) + jitter * (2 + heavyFactor * 16));
+      // Live Pressure, Submergence & Temperature anchored directly to movable sliders (+ realistic physics coupling)
+      let psi = Math.round(currentPsi + jitter * 3);
+      let tempNum = currentTemp + jitter * 0.15;
+      const dynSubm = Math.round(effectiveSubmergence);
 
-        let tempNum = 58.4 + (absRpm / 350) * 18.2 + heavyFactor * 4.6 + jitter * 0.15;
-        let torquePct = Math.round(THREE.MathUtils.clamp(16 + (absRpm / 350) * 44 + heavyFactor * 22 + jitter * 1.5, 0, 108));
+      // Realistic non-linear viscosity model: exponential dilution curve (0% -> ~3,850 cP, 18% -> ~240 cP, 35% -> ~20 cP) × Arrhenius thermal coupling
+      const coldDelta = Math.max(0, TEMP_DEFAULT_NORMAL - currentTemp);
+      const hotDelta = Math.max(0, currentTemp - TEMP_DEFAULT_NORMAL);
+      const tempViscFactor = THREE.MathUtils.clamp(
+        Math.exp(0.036 * coldDelta - 0.022 * hotDelta),
+        0.34,
+        2.35
+      );
+      const shearFactor = 1 - 0.14 * THREE.MathUtils.clamp(absRpm / 350, 0, 1);
+      const baseDilVisc = 3980 * Math.exp(-0.154 * dilPct);
+      let visc = Math.max(16, Math.round(baseDilVisc * tempViscFactor * shearFactor + jitter * (1.5 + heavyFactor * 18)));
 
-        // Coherent telemetry modulation for each optional operational fault
-        if (activeFault === 'corte-diluente') {
-          bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(bpd * 0.72 + jitter * 6));
-          psi = Math.round(psi + 215 + absRpm * 0.24 + jitter * 8);
-          visc = Math.round(Math.max(visc, 4580) + 280 + jitter * 65);
-          tempNum += 7.4;
-          torquePct = Math.round(THREE.MathUtils.clamp(torquePct + 24 + jitter * 2, 68, 94));
-        } else if (activeFault === 'baja-sumergencia') {
-          const gasWave = Math.sin(elapsed * 2.8) * 0.5 + Math.cos(elapsed * 6.1) * 0.35 + Math.sin(elapsed * 1.3) * 0.25;
-          const effMult = THREE.MathUtils.clamp(0.46 + gasWave * 0.26, 0.18, 0.74);
-          bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(bpd * effMult));
-          psi = Math.max(175, Math.round(psi - 108 + gasWave * 54));
-          tempNum += 9.4 + Math.abs(gasWave) * 1.6;
-          torquePct = Math.round(THREE.MathUtils.clamp(torquePct * (0.68 + gasWave * 0.22), 24, 78));
-        } else if (activeFault === 'parada-retroceso') {
-          if (lowSpeedSubmode === 'slip') {
-            // Very low speed (< 60 RPM): severe internal cavity slippage collapses volumetric efficiency & BPD
-            const lowRatio = THREE.MathUtils.clamp(absRpm / RPM_MIN_NORMAL, 0, 1);
-            const slipEff = Math.pow(lowRatio, 1.8) * 0.45;
-            bpd = absRpm < 8 ? 0 : Math.max(0, Math.round(bpd * slipEff + jitter * 2));
-            psi = Math.round(215 + lowRatio * 95 + heavyFactor * 42 + jitter * 4);
-            tempNum = Math.max(52.0, tempNum - 2.2);
-            torquePct = Math.round(THREE.MathUtils.clamp(12 + lowRatio * 18 + heavyFactor * 14, 8, 48));
-          } else {
-            bpd = 0;
-            const bleed = THREE.MathUtils.clamp(Math.exp(-faultElapsed * 0.55), 0, 1);
-            psi = Math.round(198 + bleed * 210 + jitter * 2);
-            tempNum = Math.max(48.0, tempNum - 4.2 * (1 - bleed));
-            torquePct = currentRpm < -2 ? Math.round(THREE.MathUtils.clamp(Math.abs(currentRpm) * 1.15, 14, 72)) : 0;
+      // Theoretical flow strictly proportional to pump geometric displacement & forward speed
+      const bpdTeorico = currentRpm <= 0.5 ? 0 : Math.round(currentRpm * PUMP_DISP_BPD_PER_RPM);
+
+      // Physics-based Volumetric Efficiency: accounts for ΔP slippage, low-viscosity slippage (excess diluent), high-viscosity intake restriction & submergence fill
+      const baseDpFactor = THREE.MathUtils.clamp((currentPsi - 260) / 760, 0.12, 1.45);
+      // Thin fluids (visc < 180 cP) slip much faster across rotor-stator sealing lines; normal ~240 cP @ 545 PSI gives ~90% efficiency
+      const lowViscSlipPenalty = visc < 180
+        ? THREE.MathUtils.clamp(Math.pow((180 - visc) / 165, 1.45) * 0.24 * (0.65 + 0.55 * baseDpFactor), 0, 0.38)
+        : 0;
+      const dpSlipLoss = THREE.MathUtils.clamp(0.065 + Math.max(0, currentPsi - 545) / 2100 + lowViscSlipPenalty, 0.04, 0.62);
+      const highViscFillLoss = visc > 1200
+        ? THREE.MathUtils.clamp(Math.log10(visc / 1200) * 0.17, 0, 0.24)
+        : 0;
+      const submFillFactor = THREE.MathUtils.clamp((effectiveSubmergence - 35) / 140, 0.34, 1.0);
+
+      let effFactor = THREE.MathUtils.clamp((1 - dpSlipLoss) * (1 - highViscFillLoss) * submFillFactor, 0.05, 0.96);
+
+      // Sucker-rod torque responds non-linearly to viscosity (log scale), RPM, and differential pressure (ΔP)
+      const dpTorqueBoost = (currentPsi - PSI_DEFAULT_NORMAL) * 0.056;
+      const viscTorqueBoost = THREE.MathUtils.clamp(Math.log10(Math.max(18, visc) / 240) * 20, -10, 32);
+      let torquePct = Math.round(THREE.MathUtils.clamp(
+        18 + (absRpm / 350) * 44 + dpTorqueBoost + viscTorqueBoost + jitter * 1.5,
+        6,
+        108
+      ));
+
+      // Compose coherent telemetry modulation across ALL simultaneously active faults
+      const isDilLoss = hasFault('corte-diluente');
+      const isDilExcess = hasFault('exceso-diluente');
+      const isGasLock = hasFault('baja-sumergencia');
+      const isLowPress = hasFault('baja-presion');
+      const isLowTemp = hasFault('baja-temperatura');
+      const isStopFault = hasFault('parada-retroceso');
+      const isOverspeed = hasFault('sobrecarga-torque');
+      const isHighPress = hasFault('alta-presion');
+      const isElastDamage = hasFault('dano-elastomero');
+
+      if (isDilLoss) {
+        const lossSev = THREE.MathUtils.clamp((DILUENT_LOW_FAULT - dilPct) / DILUENT_LOW_FAULT, 0.25, 1);
+        effFactor *= (0.90 - lossSev * 0.12);
+        if (!isLowPress && !isHighPress) psi = Math.round(psi + lossSev * 22 + jitter * 5);
+        torquePct += Math.round(10 + lossSev * 10);
+      }
+
+      if (isDilExcess) {
+        const excessNorm = THREE.MathUtils.clamp((dilPct - DILUENT_HIGH_FAULT) / (DILUENT_MAX - DILUENT_HIGH_FAULT), 0.2, 1);
+        // Low viscosity increases internal slippage AND excess diluent displaces useful crude capacity (total handled volume rises)
+        effFactor *= (0.88 - excessNorm * 0.16);
+        const swellDrag = excessNorm * 5;
+        torquePct = Math.max(10, Math.round(torquePct - 4 + swellDrag));
+      }
+
+      if (isLowTemp) {
+        const coldSeverity = THREE.MathUtils.clamp((TEMP_MIN_NORMAL - currentTemp) / (TEMP_MIN_NORMAL - TEMP_MIN), 0.25, 1);
+        effFactor *= (0.92 - coldSeverity * (0.07 + heavyFactor * 0.09));
+        torquePct += Math.round(9 + coldSeverity * (9 + heavyFactor * 12));
+      }
+
+      if (isGasLock) {
+        const gasWave = Math.sin(elapsed * 2.8) * 0.5 + Math.cos(elapsed * 6.1) * 0.35 + Math.sin(elapsed * 1.3) * 0.25;
+        const submSev = THREE.MathUtils.clamp((SUBM_MIN_NORMAL - effectiveSubmergence) / (SUBM_MIN_NORMAL - SUBM_MIN), 0.2, 1);
+        const gasEffMult = THREE.MathUtils.clamp(0.60 - submSev * 0.18 + gasWave * 0.22, 0.18, 0.78);
+        effFactor *= gasEffMult;
+        psi = Math.max(175, Math.round(psi - 32 + gasWave * 38));
+        if (!isLowTemp) tempNum += 4.2 + Math.abs(gasWave) * 1.4;
+        torquePct = Math.round(torquePct * (0.78 + gasWave * 0.16));
+      }
+
+      if (isLowPress) {
+        const lowPSev = THREE.MathUtils.clamp((PSI_MIN_NORMAL - currentPsi) / (PSI_MIN_NORMAL - PSI_MIN), 0.2, 1);
+        effFactor *= (0.82 - lowPSev * 0.18 + Math.sin(elapsed * 3.1) * 0.04);
+        psi = Math.max(260, Math.round(currentPsi + Math.sin(elapsed * 3.6) * 8 + jitter * 3));
+        torquePct = Math.round(torquePct * (0.86 - lowPSev * 0.08));
+      }
+
+      if (isOverspeed) {
+        const overNorm = THREE.MathUtils.clamp((absRpm - RPM_MAX_NORMAL) / (350 - RPM_MAX_NORMAL), 0, 1);
+        effFactor *= (0.92 - overNorm * 0.08);
+        if (!isLowTemp) tempNum += 4.5 + overNorm * 5.0;
+        torquePct = Math.max(torquePct + Math.round(14 + overNorm * 16), Math.round(88 + overNorm * 16));
+      }
+
+      if (isHighPress) {
+        const overP = THREE.MathUtils.clamp((currentPsi - PSI_MAX_NORMAL) / (PSI_MAX - PSI_MAX_NORMAL), 0, 1);
+        effFactor *= (0.82 - overP * 0.22);
+        psi = Math.round(currentPsi + jitter * 9);
+        if (!isLowTemp) tempNum += 2.4 + overP * 4.2;
+        torquePct = Math.max(torquePct + Math.round(10 + overP * 14), Math.round(82 + overP * 22 + heavyFactor * 5));
+      }
+
+      if (isElastDamage) {
+        const overT = elastomerStressSubmode === 'combined'
+          ? THREE.MathUtils.clamp(((currentTemp - 85) / 25) * 0.5 + ((currentPsi - 720) / 350) * 0.5, 0.25, 1)
+          : THREE.MathUtils.clamp((currentTemp - TEMP_MAX_NORMAL) / (TEMP_MAX - TEMP_MAX_NORMAL), 0, 1);
+        const sealWave = Math.sin(elapsed * 3.4) * 0.06;
+        effFactor *= THREE.MathUtils.clamp(0.66 - overT * 0.28 + sealWave, 0.22, 0.74);
+        psi = Math.round(psi + Math.sin(elapsed * 4.8) * 14);
+        const swellTorque = Math.sin(elapsed * 3.8) * 5.0;
+        torquePct = Math.max(torquePct + Math.round(8 + overT * 12 + swellTorque), Math.round(76 + overT * 22 + swellTorque));
+      }
+
+      if (isStopFault) {
+        if (lowSpeedSubmode === 'slip') {
+          const lowRatio = THREE.MathUtils.clamp(absRpm / RPM_MIN_NORMAL, 0, 1);
+          effFactor *= Math.pow(lowRatio, 1.6) * 0.48;
+          if (!isHighPress && !isLowPress) {
+            psi = Math.round(240 + lowRatio * 95 + heavyFactor * 42 + jitter * 4);
           }
-        } else if (activeFault === 'sobrecarga-torque') {
-          const overNorm = THREE.MathUtils.clamp((absRpm - RPM_MAX_NORMAL) / (350 - RPM_MAX_NORMAL), 0, 1);
-          bpd = currentRpm < 1 ? 0 : Math.max(0, Math.round(bpd * (0.88 - overNorm * 0.08) + jitter * 5));
-          psi = Math.round(psi + 185 + overNorm * 125 + absRpm * 0.22 + jitter * 11);
-          visc = Math.round(visc + 680 + overNorm * 360 + jitter * 40);
-          tempNum += 9.8 + overNorm * 8.4;
-          torquePct = Math.round(THREE.MathUtils.clamp(90 + overNorm * 16 + jitter * 3, 90, 108));
+          torquePct = Math.round(THREE.MathUtils.clamp(12 + lowRatio * 18 + heavyFactor * 14 + (isLowTemp ? 10 : 0), 8, 62));
+        } else {
+          effFactor = 0;
+          const bleed = THREE.MathUtils.clamp(Math.exp(-faultElapsed * 0.55), 0, 1);
+          if (!isHighPress && !isLowPress) {
+            psi = Math.round(198 + bleed * 210 + jitter * 2);
+          }
+          torquePct = currentRpm < -2 ? Math.round(THREE.MathUtils.clamp(Math.abs(currentRpm) * 1.15, 14, 72)) : 0;
         }
+      }
 
-        const roundedRpm = Math.round(currentRpm);
-        const temp = tempNum.toFixed(1);
-        const torqueLbFt = Math.round(torquePct * 15.0);
+      const bpdReal = (bpdTeorico <= 0 || (isStopFault && lowSpeedSubmode === 'backspin') || (isStopFault && absRpm < 8))
+        ? 0
+        : THREE.MathUtils.clamp(Math.round(bpdTeorico * effFactor + jitter * 2), 0, bpdTeorico);
+      const volEffPct = bpdTeorico > 0 ? THREE.MathUtils.clamp(Math.round((bpdReal / bpdTeorico) * 100), 0, 100) : 0;
 
-        valBpd.textContent = String(bpd);
-        valPsi.textContent = String(psi);
-        if (valVisc) valVisc.textContent = visc.toLocaleString('en-US');
-        valTemp.textContent = temp;
-        valRpm.textContent = roundedRpm < 0 ? `${roundedRpm} (Rev)` : String(roundedRpm);
-        if (telemetryMiniRpm) {
-          telemetryMiniRpm.textContent = roundedRpm < 0 ? `${roundedRpm} RPM` : `${roundedRpm} RPM`;
+      torquePct = Math.round(THREE.MathUtils.clamp(torquePct, 0, 108));
+
+      const roundedRpm = Math.round(currentRpm);
+      const temp = tempNum.toFixed(1);
+      const torqueLbFt = Math.round(torquePct * 15.0);
+
+      valBpd.textContent = String(bpdReal);
+      if (valBpdTheo) valBpdTheo.textContent = String(bpdTeorico);
+      if (valEff) valEff.textContent = String(volEffPct);
+
+      const effIsCrit = volEffPct < 60;
+      const effIsWarn = !effIsCrit && volEffPct < 80;
+      const effIsGood = !effIsCrit && !effIsWarn;
+      if (valEffWrap) {
+        valEffWrap.classList.toggle('eff-good', effIsGood);
+        valEffWrap.classList.toggle('is-warn', effIsWarn);
+        valEffWrap.classList.toggle('is-crit', effIsCrit);
+      }
+      if (valBpdWrap) {
+        valBpdWrap.classList.toggle('is-warn', effIsWarn);
+        valBpdWrap.classList.toggle('is-crit', effIsCrit && bpdTeorico > 0);
+      }
+      if (effBarFill) {
+        effBarFill.style.width = `${volEffPct}%`;
+        effBarFill.classList.toggle('is-warn', effIsWarn);
+        effBarFill.classList.toggle('is-crit', effIsCrit);
+      }
+
+      valPsi.textContent = String(psi);
+      if (valSubm) valSubm.textContent = String(dynSubm);
+      if (valVisc) {
+        valVisc.textContent = visc.toLocaleString('en-US');
+        if (valViscWrap) {
+          const highViscAlert = dilPct < DILUENT_LOW_FAULT || isLowTemp || visc >= 1000;
+          valViscWrap.classList.toggle('visc-high', highViscAlert);
+          valViscWrap.classList.toggle('visc-low', !highViscAlert);
         }
+      }
+      valTemp.textContent = temp;
+      valRpm.textContent = roundedRpm < 0 ? `${roundedRpm} (Rev)` : String(roundedRpm);
+      if (telemetryMiniRpm) {
+        telemetryMiniRpm.textContent = `${roundedRpm} RPM`;
+      }
 
-        // Update live Torque / Esfuerzo meter inside independent Fault Simulation menu
-        if (faultTorqueVal && faultTorqueFill) {
-          const isOverCrit = torquePct >= 90 || activeFault === 'sobrecarga-torque';
-          const isOverWarn = !isOverCrit && (torquePct >= 75 || activeFault === 'corte-diluente');
-          faultTorqueVal.textContent = `${torquePct}% · ${torqueLbFt.toLocaleString('en-US')} lb·ft`;
-          faultTorqueVal.classList.toggle('is-warn', isOverWarn);
-          faultTorqueVal.classList.toggle('is-crit', isOverCrit);
-          faultTorqueFill.style.width = `${Math.min(100, Math.max(0, torquePct))}%`;
-          faultTorqueFill.classList.toggle('is-warn', isOverWarn);
-          faultTorqueFill.classList.toggle('is-crit', isOverCrit);
-        }
+      // Update live Torque / Esfuerzo meter inside independent Fault Simulation menu
+      if (faultTorqueVal && faultTorqueFill) {
+        const isOverCrit = torquePct >= 90 || isOverspeed || isHighPress || isElastDamage;
+        const isOverWarn = !isOverCrit && (torquePct >= 75 || isDilLoss || isLowTemp);
+        faultTorqueVal.textContent = `${torquePct}% · ${torqueLbFt.toLocaleString('en-US')} lb·ft`;
+        faultTorqueVal.classList.toggle('is-warn', isOverWarn);
+        faultTorqueVal.classList.toggle('is-crit', isOverCrit);
+        faultTorqueFill.style.width = `${Math.min(100, Math.max(0, torquePct))}%`;
+        faultTorqueFill.classList.toggle('is-warn', isOverWarn);
+        faultTorqueFill.classList.toggle('is-crit', isOverCrit);
+      }
 
-        telemetryTrendChart.recordSample(bpd, psi, roundedRpm);
+      telemetryTrendChart.recordSample(bpdReal, psi, roundedRpm, forceChart);
+    }
+
+    function triggerInstantTelemetry() {
+      if (typeof clock !== 'undefined' && typeof telemetryTrendChart !== 'undefined') {
+        updateTelemetryReadout(clock.getElapsedTime(), true);
+      } else {
+        lastTelemetryUpdate = -1;
       }
     }
 
