@@ -3676,8 +3676,8 @@
           <label for="rpm-slider" class="rpm-label">Control de Velocidad</label>
           <span id="rpm-slider-badge" class="rpm-readout">180 RPM</span>
         </div>
-        <input id="rpm-slider" class="rpm-slider" type="range" min="0" max="350" step="1" value="180" />
-        <div class="rpm-ticks" title="Rango normal de operación BCP: 60 a 260 RPM">
+        <input id="rpm-slider" class="rpm-slider" type="range" min="0" max="350" step="1" value="180" title="Control de velocidad VFD (normal: 60–260 RPM · margen temporal hasta 300 RPM ante sumergencia alta > 200 ft)" />
+        <div class="rpm-ticks" title="Rango normal de operación BCP: 60 a 260 RPM (margen temporal hasta 300 RPM con sumergencia > 200 ft)">
           <span>0</span>
           <span>60</span>
           <span>180</span>
@@ -8227,6 +8227,7 @@
 
     const RPM_MIN_NORMAL = 60;
     const RPM_MAX_NORMAL = 260;
+    const RPM_HIGH_SUBM_COMP_MAX = 300; // Margen temporal de abatimiento (261–300 RPM) mientras sumergencia > 200 ft
     const RPM_DEFAULT_NORMAL = 180;
     const RPM_FAULT_OVERSPEED = 320;
     const RPM_FAULT_STOP = 0;
@@ -8273,6 +8274,8 @@
     let targetSubmergence = Number(submSlider ? submSlider.value : SUBM_DEFAULT_NORMAL);
     let currentSubmergence = targetSubmergence;
     let effectiveSubmergence = targetSubmergence;
+    let highSubmReliefActive = false;
+    let lowSubmRecoveryActive = false;
     let targetTemp = Number(tempSlider ? tempSlider.value : TEMP_DEFAULT_NORMAL);
     let currentTemp = targetTemp;
     let fluidMode = targetDiluentPct === 0 ? 'extrapesado' : 'diluido';
@@ -8284,7 +8287,7 @@
       const absRpm = Math.max(0, rpmVal);
       const overPump = THREE.MathUtils.clamp((absRpm - 200) / 80, 0, 1.35);
       const lowPress = THREE.MathUtils.clamp((440 - psiVal) / 110, 0, 1.15);
-      const highRpmDrawdown = absRpm > 260 ? (absRpm - 260) * 0.55 : 0;
+      const highRpmDrawdown = absRpm > RPM_MAX_NORMAL ? (absRpm - RPM_MAX_NORMAL) * 0.25 : 0;
       const drawdownFt = overPump * lowPress * 290 + highRpmDrawdown;
       return THREE.MathUtils.clamp(staticSubm - drawdownFt, SUBM_MIN, SUBM_MAX);
     }
@@ -8508,13 +8511,22 @@
 
     function updateSliderVisual() {
       const pct = (targetRpm / 350) * 100;
+      const dynSubm = computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi);
+      const isHighSubmActive = dynSubm > SUBM_MAX_NORMAL;
+      const effectiveRpmLimit = isHighSubmActive ? RPM_HIGH_SUBM_COMP_MAX : RPM_MAX_NORMAL;
+      const isHighSubmComp = isHighSubmActive && targetRpm > RPM_MAX_NORMAL && targetRpm <= RPM_HIGH_SUBM_COMP_MAX;
+
       let fillStart = '#2563eb';
       let fillEnd = '#3b82f6';
       let badgeColor = '#60a5fa';
-      if (targetRpm > RPM_MAX_NORMAL) {
+      if (targetRpm > effectiveRpmLimit) {
         fillStart = '#dc2626';
         fillEnd = '#ef4444';
         badgeColor = '#f87171';
+      } else if (isHighSubmComp) {
+        fillStart = '#d97706';
+        fillEnd = '#f59e0b';
+        badgeColor = '#fbbf24';
       } else if (targetRpm === 0) {
         fillStart = '#dc2626';
         fillEnd = '#ef4444';
@@ -8525,7 +8537,7 @@
         badgeColor = '#fbbf24';
       }
       rpmSlider.style.background = `linear-gradient(90deg, ${fillStart} 0%, ${fillEnd} ${pct}%, #1e293b ${pct}%)`;
-      rpmSliderBadge.textContent = `${targetRpm} RPM`;
+      rpmSliderBadge.textContent = isHighSubmComp ? `${targetRpm} RPM · Comp.` : `${targetRpm} RPM`;
       rpmSliderBadge.style.color = badgeColor;
       if (telemetryMiniRpm) telemetryMiniRpm.textContent = `${targetRpm} RPM`;
     }
@@ -8587,7 +8599,7 @@
         steps: [
           'Inspeccionar la bomba dosificadora de diluente, filtros en línea y nivel del tanque de nafta/diluente.',
           'Verificar la apertura de la válvula dosificadora y purgar posibles bolsas de gas en la línea de inyección.',
-          'Reducir temporalmente las RPM en el VFD hasta restablecer la dosificación en el punto eficiente (~30% de diluente) y estabilizar caudal, viscosidad y torque.',
+          'Restablecer la dosificación en la franja normal (15–40%, punto eficiente 30%) y moderar las RPM dentro de 60–260 RPM para estabilizar caudal, viscosidad y torque.',
         ],
       },
       'corte-diluente-bajo': {
@@ -8598,9 +8610,9 @@
         bannerSummary: 'dosificación por debajo del mínimo · viscosidad elevada, alto torque y caída de caudal real.',
         diagnosis: 'El porcentaje de diluente cayó por debajo del umbral operativo mínimo (< 15%). La mezcla mantiene viscosidad elevada lejos del punto eficiente (30%), incrementando el torque resistente y reduciendo la eficiencia volumétrica y los barriles reales producidos.',
         steps: [
-          'Incrementar progresivamente la tasa en la bomba dosificadora hasta alcanzar el punto eficiente (~30% de diluente).',
+          'Incrementar progresivamente la tasa en la bomba dosificadora hasta la franja normal (15–40%, punto eficiente 30%).',
           'Revisar presión de suministro de diluente, filtros parcialmente obstruidos y posición de la válvula dosificadora.',
-          'Monitorear el descenso de viscosidad (cP) y la recuperación del Caudal Real (BPD) antes de ajustar nuevamente las RPM en el VFD.',
+          'Monitorear el descenso de viscosidad (cP) y la recuperación del Caudal Real (BPD) manteniendo las RPM dentro de 60–260 RPM.',
         ],
       },
       'exceso-diluente': {
@@ -8611,7 +8623,7 @@
         bannerSummary: 'viscosidad muy baja · mayor resbalamiento interno (slippage) y caída de eficiencia.',
         diagnosis: 'La dosificación de diluente supera el límite operativo recomendado (> 40%) por encima del punto eficiente (30%), reduciendo excesivamente la viscosidad de la mezcla. Esto aumenta el resbalamiento interno (slippage) entre rotor y estator —bajando la Eficiencia Volumétrica (%) y el caudal real efectivo—, desplaza capacidad útil y eleva el riesgo de hinchamiento químico del elastómero.',
         steps: [
-          'Reducir gradualmente la inyección de diluente en la bomba dosificadora o válvula de control hasta retornar al punto eficiente (~30%).',
+          'Reducir gradualmente la inyección de diluente hasta retornar a la franja normal (15–40%, punto eficiente 30%).',
           'Verificar el caudalímetro de diluente y recalibrar la relación diluente/crudo (D/C) según la viscosidad objetivo y el caudal real en cabezal.',
           'Observar la recuperación de la Eficiencia Volumétrica (%) y vigilar signos de hinchamiento (swelling) del elastómero por exposición a aromáticos.',
         ],
@@ -8624,9 +8636,9 @@
         bannerSummary: 'nivel dinámico por debajo de 100 ft · fluctuaciones de caudal y llenado parcial.',
         diagnosis: 'El nivel dinámico de fluido cayó por debajo del mínimo eficiente de 100 ft sobre la succión BCP, permitiendo el ingreso de gas libre. Genera bacheo intermitente en caudal/presión y calentamiento del elastómero por lubricación deficiente.',
         steps: [
-          'Disminuir las RPM en el VFD para permitir la recuperación del nivel dinámico hacia el rango óptimo (100–200 ft).',
-          'Ventear o regular la contrapresión del espacio anular (casing) para facilitar la separación del gas en el ancla.',
-          'Confirmar sumergencia con medición acústica (echometer) antes de incrementar nuevamente la velocidad.',
+          'Disminuir las RPM en el VFD por debajo de 180 RPM (dentro de 60–160 RPM, sin bajar de 60 RPM) para que el aporte del yacimiento recupere el nivel dinámico hacia el rango óptimo (100–200 ft).',
+          'Ventear o regular la contrapresión del espacio anular (casing) mediante el choke de gas para facilitar la separación en el ancla.',
+          'Confirmar que la sumergencia se estabilice entre 100–200 ft con medición acústica (echometer) antes de volver a subir velocidad.',
         ],
       },
       'baja-sumergencia-sobrebombeo': {
@@ -8637,8 +8649,8 @@
         bannerSummary: 'altas RPM con baja presión de aporte · abatimiento del nivel por debajo de 100 ft y arrastre de gas.',
         diagnosis: 'La velocidad de bombeo supera la capacidad de reposición del yacimiento bajo baja presión de sistema, abatiendo el nivel dinámico por debajo de 100 ft. Esto reduce la eficiencia volumétrica e induce arrastre de gas en la succión.',
         steps: [
-          'Reducir gradualmente las RPM en el VFD hasta igualar el caudal de extracción con el aporte real del yacimiento.',
-          'Monitorear la recuperación del nivel de fluido hacia el rango eficiente (100–200 ft) y la estabilización de la presión en cabezal.',
+          'Reducir gradualmente las RPM en el VFD (hacia 60–180 RPM, sin bajar de 60 RPM) hasta igualar la extracción con el aporte real del yacimiento.',
+          'Monitorear la recuperación del nivel de fluido hacia el rango eficiente (100–200 ft) y restablecer la presión del sistema dentro de 355–860 PSI.',
           'Verificar el venteo del anular y el ancla de gas para evitar operación en seco del elastómero.',
         ],
       },
@@ -8648,11 +8660,11 @@
         statusText: 'Alerta · Sumergencia Alta',
         bannerPrefix: 'Exceso de sumergencia / nivel alto (> 200 ft):',
         bannerSummary: 'columna anular > 200 ft · contrapresión excesiva al yacimiento y producción desaprovechada.',
-        diagnosis: 'La sumergencia supera el límite óptimo operativo (100–200 ft). Aunque garantiza llenado completo de cavidades, la columna hidrostática excesiva ejerce contrapresión sobre la formación, limita el diferencial de aporte (drawdown) y refleja potencial de producción desaprovechado o bombeo por debajo del aporte del pozo.',
+        diagnosis: 'La sumergencia supera el límite óptimo operativo (100–200 ft). Aunque garantiza llenado completo de cavidades, la columna hidrostática excesiva ejerce contrapresión sobre la formación, limita el diferencial de aporte (drawdown) y refleja potencial de producción desaprovechado.',
         steps: [
-          'Incrementar progresivamente las RPM en el VFD (dentro de 60–260 RPM) para aumentar la extracción y llevar el nivel dinámico a la franja eficiente (100–200 ft).',
+          'Incrementar progresivamente las RPM en el VFD por encima de 180 RPM (rango normal 60–260 RPM; margen temporal de abatimiento hasta 300 RPM mientras la sumergencia supere 200 ft) para aumentar la extracción y bajar el nivel hacia 100–200 ft.',
+          'Una vez que el nivel dinámico alcance el rango normal (≤ 200 ft), estabilizar de inmediato las RPM dentro del límite seguro (60–260 RPM) para evitar disparo por sobrevelocidad (> 260 RPM).',
           'Confirmar el nivel real en el anular mediante medición acústica (echometer) y contrastar contra la curva de afluencia (IPR) del yacimiento.',
-          'Evaluar si la bomba BCP instalada requiere mayor desplazamiento volumétrico en el próximo servicio para optimizar la producción.',
         ],
       },
       'baja-presion': {
@@ -8661,10 +8673,10 @@
         statusText: 'Alerta · Baja Presión',
         bannerPrefix: 'Baja presión en sistema (≤ 350 PSI):',
         bannerSummary: 'caída de presión de descarga · posible llenado deficiente, pérdida de carga o baja sumergencia.',
-        diagnosis: 'La presión del sistema cayó por debajo del rango operativo normal (≤ 350 PSI). Esto sugiere llenado deficiente en cavidades, pérdida de carga o fuga en línea de superficie, baja sumergencia/aporte del yacimiento o desgaste interno rotor–estator.',
+        diagnosis: 'La presión del sistema cayó por debajo del rango operativo normal (≤ 350 PSI; rango normal 355–860 PSI). Esto sugiere llenado deficiente en cavidades, pérdida de carga o fuga en línea de superficie, baja sumergencia o desgaste interno rotor–estator.',
         steps: [
-          'Verificar la apertura del choke, válvulas de desvío (bypass), válvula check y descartar fugas en la línea de flujo en superficie.',
-          'Comprobar la sumergencia (nivel dinámico de fluido) y la presión del anular para descartar llenado parcial o gas lock.',
+          'Verificar válvulas de descarga, válvula check y descartar fugas o pérdidas de carga en la línea de producción en superficie hasta restablecer 355–860 PSI.',
+          'Comprobar la sumergencia (mantener en 100–200 ft) y el venteo del anular para descartar llenado parcial o arrastre de gas.',
           'Realizar prueba de eficiencia volumétrica y revisar calibración del manómetro de cabezal o posible desgaste del elastómero.',
         ],
       },
@@ -8674,11 +8686,11 @@
         statusText: 'Alerta · Alta Viscosidad',
         bannerPrefix: 'Baja temperatura / alta viscosidad (≤ 55 °C):',
         bannerSummary: 'aumento de viscosidad del crudo pesado/extrapesado · mayor resistencia y esfuerzo torsional.',
-        diagnosis: 'Al operar en temperatura mínima (≤ 55 °C), la viscosidad del crudo pesado/extrapesado se incrementa notablemente, elevando la resistencia viscosa, la carga torsional sobre la sarta de cabillas y la pérdida de carga en la tubería.',
+        diagnosis: 'Al operar en temperatura baja (≤ 55 °C; rango normal 56–98 °C), la viscosidad del crudo pesado/extrapesado se incrementa notablemente, elevando la resistencia viscosa, la carga torsional sobre la sarta de cabillas y la pérdida de carga en la tubería.',
         steps: [
-          'Controlar y moderar las RPM en el VFD para evitar picos de torque excesivos y proteger la sarta de cabillas.',
-          'Evaluar e incrementar la dosificación de diluente (o verificar el calentamiento/traza térmica en línea) para reducir la viscosidad.',
-          'Vigilar en continuo el torque, la presión de descarga y el caudal (BPD) hasta estabilizar la fluidez del sistema.',
+          'Moderar las RPM en el VFD dentro de la ventana segura (60–260 RPM) para evitar picos de torque excesivos y proteger la sarta de cabillas.',
+          'Mantener la dosificación de diluente cerca del punto eficiente (~30%, dentro de 15–40% sin superar 40%) y verificar calentamiento/traza térmica en línea.',
+          'Restablecer la temperatura operativa dentro de 56–98 °C vigilando en continuo torque, presión (355–860 PSI) y caudal (BPD).',
         ],
       },
       'parada-retroceso': {
@@ -8703,8 +8715,8 @@
         diagnosis: 'Operación por debajo del umbral mínimo recomendado (60 RPM). El resbalamiento interno entre lóbulos del estator y rotor desploma la eficiencia volumétrica y dificulta el levantamiento del crudo.',
         steps: [
           'Revisar la consigna de frecuencia en el VFD y descartar limitaciones de corriente o disparos parciales.',
-          'Incrementar progresivamente la velocidad hacia la ventana operativa normal (60–260 RPM) vigilando el caudal.',
-          'Comprobar que la presión de descarga y el aporte del yacimiento acompañen la recuperación de eficiencia.',
+          'Incrementar progresivamente la velocidad hacia la ventana operativa normal (60–260 RPM) vigilando el caudal y la sumergencia (100–200 ft).',
+          'Comprobar que la presión de descarga (355–860 PSI) y el aporte del yacimiento acompañen la recuperación de eficiencia.',
         ],
       },
       'sobrecarga-torque': {
@@ -8713,11 +8725,11 @@
         statusText: 'Crítico · Sobrevelocidad',
         bannerPrefix: 'Sobrecarga / sobrevelocidad (> 260 RPM):',
         bannerSummary: 'alto torque, calentamiento del elastómero y esfuerzo crítico en sarta.',
-        diagnosis: 'Velocidad y torque resistente por encima del rango operativo seguro (60–260 RPM). El exceso de RPM y fricción viscosa sobrecalienta el elastómero y exige al límite la sarta de cabillas y el VFD.',
+        diagnosis: 'Velocidad y torque resistente por encima del límite operativo seguro (60–260 RPM; o > 300 RPM incluso durante abatimiento temporal de sumergencia alta). El exceso de RPM y fricción viscosa sobrecalienta el elastómero y exige al límite la sarta de cabillas y el VFD.',
         steps: [
-          'Reducir inmediatamente las RPM en el VFD a la banda normal (60–260 RPM) para aliviar el par torsional.',
-          'Verificar la inyección de diluente y descartar acumulación de sólidos/arena o rozamiento mecánico en fondo.',
-          'Ajustar el límite de protección de torque en el variador (VFD) para prevenir rotura o desenrosque de cabillas.',
+          'Reducir inmediatamente las RPM en el VFD al rango seguro (60–260 RPM) para aliviar el par torsional y el calentamiento del estator.',
+          'Verificar la inyección de diluente en el punto eficiente (~30%, rango 15–40%) y descartar acumulación de sólidos/arena o rozamiento mecánico en fondo.',
+          'Confirmar la presión de descarga (≤ 860 PSI) y ajustar el límite de protección de torque en el VFD para prevenir rotura de cabillas.',
         ],
       },
       'alta-presion': {
@@ -8726,11 +8738,11 @@
         statusText: 'Crítico · Sobrepresión',
         bannerPrefix: 'Alta presión en sistema (> 860 PSI):',
         bannerSummary: 'mayor ΔP en etapas rotor–estator, sobrecarga de torque y riesgo de resbalamiento interno.',
-        diagnosis: 'La presión de descarga supera el límite seguro de operación (860 PSI), incrementando el diferencial de presión (ΔP) por etapa rotor–estator. Esto dispara el torque y esfuerzo axial en la sarta, induce resbalamiento interno (caída de BPD) y acelera la fatiga del elastómero.',
+        diagnosis: 'La presión de descarga supera el límite seguro de operación (> 860 PSI; rango normal 355–860 PSI), incrementando el diferencial de presión (ΔP) por etapa rotor–estator. Esto dispara el torque y esfuerzo axial en la sarta, induce resbalamiento interno (caída de BPD) y acelera la fatiga del elastómero.',
         steps: [
-          'Inspeccionar válvulas de descarga, choke/manifold y línea de flujo en superficie por bloqueos, válvulas semicerradas o tapones de crudo viscoso.',
-          'Reducir gradualmente las RPM en el VFD y asegurar inyección continua de diluente para disminuir las pérdidas por fricción.',
-          'Verificar la presión de cabezal (THP) y la válvula de alivio/seguridad (PSV) hasta retornar por debajo de 860 PSI.',
+          'Inspeccionar válvulas de descarga, manifold y línea de producción en superficie por bloqueos, válvulas semicerradas o tapones de crudo viscoso.',
+          'Reducir gradualmente las RPM en el VFD (dentro de 60–260 RPM) y asegurar inyección de diluente cerca del punto eficiente (~30%) para disminuir pérdidas por fricción.',
+          'Verificar la presión de cabezal (THP) y la válvula de alivio/seguridad (PSV) hasta retornar al rango seguro (355–860 PSI).',
         ],
       },
       'dano-elastomero': {
@@ -8739,11 +8751,11 @@
         statusText: 'Crítico · Elastómero',
         bannerPrefix: 'Daño / degradación del elastómero (> 98 °C):',
         bannerSummary: 'ablandamiento, hinchamiento y pérdida de interferencia rotor–estator con caída de eficiencia.',
-        diagnosis: 'La temperatura excede el límite térmico del elastómero del estator (> 98 °C), provocando ablandamiento, hinchamiento (swelling), pérdida de interferencia rotor–estator y desgarro/desgaste del caucho. El caudal cae por resbalamiento interno mientras el hinchamiento genera torque anómalo.',
+        diagnosis: 'La temperatura excede el límite térmico del elastómero del estator (> 98 °C; rango seguro 56–98 °C), provocando ablandamiento, hinchamiento (swelling), pérdida de interferencia rotor–estator y desgarro/desgaste del caucho. El caudal cae por resbalamiento interno mientras el hinchamiento genera torque anómalo.',
         steps: [
-          'Bajar de inmediato las RPM en el VFD para reducir el calentamiento por fricción e histéresis; si el torque o la temperatura no ceden, ejecutar parada controlada.',
-          'Confirmar sumergencia/lubricación adecuada del fluido y revisar compatibilidad química del diluente/aromáticos con el elastómero (NBR/HNBR).',
-          'Realizar prueba de eficiencia volumétrica y programar servicio (pull-out) para reemplazar el estator por un elastómero de mayor grado térmico (HNBR/FKM) y reajustar holgura.',
+          'Bajar de inmediato las RPM en el VFD (dentro de 60–260 RPM) y enfriar el sistema hasta retornar a ≤ 98 °C; si el torque o la temperatura no ceden, ejecutar parada controlada.',
+          'Confirmar sumergencia óptima (100–200 ft) para asegurar lubricación continua y mantener diluente en 15–40% (~30%) compatible con el elastómero (NBR/HNBR).',
+          'Realizar prueba de eficiencia volumétrica y programar servicio (pull-out) para reemplazar el estator por un elastómero de mayor grado térmico (HNBR/FKM) si persiste el desgaste.',
         ],
       },
       'dano-elastomero-combinado': {
@@ -8754,8 +8766,8 @@
         bannerSummary: 'histéresis térmica y fatiga mecánica combinada en estator · pérdida severa de eficiencia.',
         diagnosis: 'La combinación simultánea de temperatura elevada (≥ 88 °C), alto diferencial de presión (≥ 760 PSI) y altas RPM (≥ 235 RPM) dispara el calentamiento interno por histéresis del elastómero, causando hinchamiento, fatiga acelerada y desprendimiento de caucho (chunking).',
         steps: [
-          'Reducir primero las RPM en el VFD y aliviar la contrapresión en el manifold/choke para bajar el ΔP por etapa.',
-          'Restablecer refrigeración y lubricación en fondo verificando nivel dinámico y dosificación controlada de diluente compatible.',
+          'Reducir primero las RPM por debajo de 235 RPM (dentro de 60–260 RPM) y aliviar la presión de descarga por debajo de 760 PSI para bajar el ΔP por etapa.',
+          'Restablecer refrigeración por debajo de 88 °C verificando sumergencia óptima (100–200 ft) y diluente controlado (~30%, rango 15–40%).',
           'Monitorear recuperación de eficiencia volumétrica; si persiste alto resbalamiento, planificar cambio de estator a compuesto de alta temperatura.',
         ],
       },
@@ -8767,8 +8779,8 @@
     let faultStartRpm = 180;
     let lowSpeedSubmode = 'backspin'; // 'backspin' (0 RPM / manual stop) vs 'slip' (1..59 RPM via slider)
     let elastomerStressSubmode = 'thermal'; // 'thermal' (> 98 °C) vs 'combined' (T + P + RPM)
-    let submergenceSubmode = 'direct'; // 'direct' (< 120 ft slider) vs 'overpump' (high RPM + low PSI drawdown)
-    let diluentLossSubmode = 'cut'; // 'cut' (0%) vs 'low' (1..4%)
+    let submergenceSubmode = 'direct'; // 'direct' (< 100 ft slider) vs 'overpump' (high RPM + low PSI drawdown)
+    let diluentLossSubmode = 'cut'; // 'cut' (0%) vs 'low' (1..14%)
 
     const _vfdLedGreen = new THREE.Color(0x22c55e);
     const _vfdLedAmber = new THREE.Color(0xf59e0b);
@@ -8979,6 +8991,8 @@
       elastomerStressSubmode = 'thermal';
       submergenceSubmode = 'direct';
       diluentLossSubmode = 'cut';
+      highSubmReliefActive = false;
+      lowSubmRecoveryActive = false;
 
       setRpmSliderValue(RPM_DEFAULT_NORMAL);
       setPsiSliderValue(PSI_DEFAULT_NORMAL);
@@ -9007,14 +9021,19 @@
       const comboElastomer = isCombinedElastomerStress();
       const psiHigh = targetPsi > PSI_MAX_NORMAL;
       const psiLow = targetPsi <= PSI_MIN_NORMAL;
-      const rpmOver = targetRpm > RPM_MAX_NORMAL;
-      const rpmLow = targetRpm < RPM_MIN_NORMAL;
 
       const dynSubm = computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi);
       const submDirectLow = targetSubmergence < SUBM_MIN_NORMAL;
       const submOverpumpLow = !submDirectLow && dynSubm < SUBM_MIN_NORMAL;
       const submLow = submDirectLow || submOverpumpLow;
       const submHigh = !submLow && dynSubm > SUBM_MAX_NORMAL;
+
+      // While high submergence (> 200 ft) is active, allow a controlled temporary RPM compensation margin
+      // (261–300 RPM) so raising RPM relieves the fluid column without prematurely triggering overspeed.
+      // As soon as submergence enters the normal range (<= 200 ft), any RPM > 260 triggers overspeed immediately.
+      const effectiveRpmLimit = submHigh ? RPM_HIGH_SUBM_COMP_MAX : RPM_MAX_NORMAL;
+      const rpmOver = targetRpm > effectiveRpmLimit;
+      const rpmLow = targetRpm < RPM_MIN_NORMAL;
 
       const syncEntry = (key, isOn) => {
         if (isOn) activeFaults.add(key);
@@ -9071,6 +9090,10 @@
         } else if (changedSource === 'subm') {
           if (submLow) focusCandidate = 'baja-sumergencia';
           else if (submHigh) focusCandidate = 'alta-sumergencia';
+          else if (rpmOver && !prevActive.has('sobrecarga-torque')) focusCandidate = 'sobrecarga-torque';
+        } else if (changedSource === 'subm-drawdown') {
+          if (rpmOver) focusCandidate = 'sobrecarga-torque';
+          else if (submLow) focusCandidate = 'baja-sumergencia';
         } else if (changedSource === 'temp') {
           if (tempHigh || comboElastomer) focusCandidate = 'dano-elastomero';
           else if (tempLow) focusCandidate = 'baja-temperatura';
@@ -9080,9 +9103,11 @@
           else if (comboElastomer) focusCandidate = 'dano-elastomero';
           else if (submLow) focusCandidate = 'baja-sumergencia';
           else if (submHigh && !prevActive.has('alta-sumergencia')) focusCandidate = 'alta-sumergencia';
+          else if (rpmOver && !prevActive.has('sobrecarga-torque')) focusCandidate = 'sobrecarga-torque';
         } else if (changedSource === 'rpm') {
           if (rpmOver) focusCandidate = 'sobrecarga-torque';
           else if (rpmLow) focusCandidate = 'parada-retroceso';
+          else if (submHigh && targetRpm > RPM_MAX_NORMAL) focusCandidate = 'alta-sumergencia';
           else if (submLow && !prevActive.has('baja-sumergencia')) focusCandidate = 'baja-sumergencia';
           else if (submHigh && !prevActive.has('alta-sumergencia')) focusCandidate = 'alta-sumergencia';
           else if (comboElastomer) focusCandidate = 'dano-elastomero';
@@ -9123,8 +9148,12 @@
         } else if (faultKey === 'exceso-diluente') {
           setDiluentSliderValue(DILUENT_FAULT_EXCESS, { snapCurrent: true });
         } else if (faultKey === 'baja-sumergencia') {
+          highSubmReliefActive = false;
+          lowSubmRecoveryActive = false;
           setSubmergenceSliderValue(SUBM_FAULT_LOW);
         } else if (faultKey === 'alta-sumergencia') {
+          highSubmReliefActive = false;
+          lowSubmRecoveryActive = false;
           setSubmergenceSliderValue(SUBM_FAULT_HIGH);
         } else if (faultKey === 'baja-presion') {
           setPsiSliderValue(PSI_FAULT_LOW);
@@ -9151,6 +9180,8 @@
         if (faultKey === 'corte-diluente' || faultKey === 'exceso-diluente') {
           setDiluentSliderValue(DILUENT_DEFAULT_NORMAL, { snapCurrent: true });
         } else if (faultKey === 'baja-sumergencia' || faultKey === 'alta-sumergencia') {
+          highSubmReliefActive = false;
+          lowSubmRecoveryActive = false;
           setSubmergenceSliderValue(SUBM_DEFAULT_NORMAL);
           if (faultKey === 'baja-sumergencia' && computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi) < SUBM_MIN_NORMAL) {
             setSubmergenceSliderValue(SUBM_MAX_NORMAL);
@@ -9206,10 +9237,13 @@
 
     if (submSlider) {
       submSlider.addEventListener('input', (e) => {
+        highSubmReliefActive = false;
+        lowSubmRecoveryActive = false;
         targetSubmergence = Number(e.target.value);
         currentSubmergence = targetSubmergence;
         effectiveSubmergence = computeEffectiveSubmergence(currentSubmergence, currentRpm, currentPsi);
         updateSubmergenceSliderVisual();
+        updateSliderVisual();
         evaluateControlFaults('subm');
         if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
       });
@@ -11748,6 +11782,90 @@
       currentPsi = THREE.MathUtils.damp(currentPsi, targetPsi, 6.5, dt);
       currentSubmergence = THREE.MathUtils.damp(currentSubmergence, targetSubmergence, 6.0, dt);
       effectiveSubmergence = computeEffectiveSubmergence(currentSubmergence, currentRpm, currentPsi);
+
+      // Real-time annular fluid level response to corrective RPM adjustments:
+      // 1) High submergence (> 200 ft) + raising RPM (> 180 RPM) progressively draws down the fluid column into 100–200 ft
+      //    and resolves "alta-sumergencia" (immediately activating overspeed if RPM remains > 260 once <= 200 ft).
+      // 2) Low submergence (< 100 ft) + lowering RPM (60–175 RPM) allows reservoir inflow to progressively recover the column into 100–200 ft.
+      const isPumpForward = currentRpm > 5 && !isBackspinActive;
+      if (isPumpForward && effectiveSubmergence > SUBM_MAX_NORMAL && currentRpm > RPM_DEFAULT_NORMAL + 1) {
+        highSubmReliefActive = true;
+        lowSubmRecoveryActive = false;
+      } else if (isPumpForward && effectiveSubmergence < SUBM_MIN_NORMAL && currentRpm >= RPM_MIN_NORMAL && currentRpm < RPM_DEFAULT_NORMAL - 5) {
+        lowSubmRecoveryActive = true;
+        highSubmReliefActive = false;
+      }
+
+      if (highSubmReliefActive) {
+        if (!isPumpForward || currentRpm <= RPM_DEFAULT_NORMAL + 1) {
+          highSubmReliefActive = false;
+        } else {
+          const rpmExcess = Math.max(0, currentRpm - RPM_DEFAULT_NORMAL);
+          const eqEffSubm = currentRpm <= RPM_MAX_NORMAL
+            ? THREE.MathUtils.lerp(185, 145, THREE.MathUtils.clamp(rpmExcess / (RPM_MAX_NORMAL - RPM_DEFAULT_NORMAL), 0, 1))
+            : THREE.MathUtils.lerp(145, 118, THREE.MathUtils.clamp((currentRpm - RPM_MAX_NORMAL) / (350 - RPM_MAX_NORMAL), 0, 1));
+
+          if (effectiveSubmergence > eqEffSubm + 0.5) {
+            const viscBrake = (hasFault('corte-diluente') || hasFault('baja-temperatura')) ? 0.75 : 1.0;
+            const dropFt = Math.min(effectiveSubmergence - eqEffSubm, (rpmExcess / 80) * 30 * viscBrake * dt);
+            const prevWasHigh = hasFault('alta-sumergencia');
+
+            targetSubmergence = THREE.MathUtils.clamp(targetSubmergence - dropFt, SUBM_MIN, SUBM_MAX);
+            currentSubmergence = THREE.MathUtils.clamp(currentSubmergence - dropFt, SUBM_MIN, SUBM_MAX);
+            effectiveSubmergence = computeEffectiveSubmergence(currentSubmergence, currentRpm, currentPsi);
+
+            if (submSlider) {
+              const snappedVal = String(THREE.MathUtils.clamp(Math.round(targetSubmergence / 5) * 5, SUBM_MIN, SUBM_MAX));
+              if (submSlider.value !== snappedVal) submSlider.value = snappedVal;
+            }
+            updateSubmergenceSliderVisual();
+
+            const targetDynSubm = computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi);
+            if (prevWasHigh && (effectiveSubmergence <= SUBM_MAX_NORMAL || targetDynSubm <= SUBM_MAX_NORMAL)) {
+              evaluateControlFaults('subm-drawdown');
+              if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
+            }
+          } else {
+            targetSubmergence = THREE.MathUtils.clamp(Math.round(targetSubmergence), SUBM_MIN, SUBM_MAX);
+            if (submSlider) submSlider.value = String(THREE.MathUtils.clamp(Math.round(targetSubmergence / 5) * 5, SUBM_MIN, SUBM_MAX));
+            highSubmReliefActive = false;
+            evaluateControlFaults('subm-drawdown');
+          }
+        }
+      } else if (lowSubmRecoveryActive) {
+        if (!isPumpForward || currentRpm < RPM_MIN_NORMAL || currentRpm >= RPM_DEFAULT_NORMAL - 3) {
+          lowSubmRecoveryActive = false;
+        } else {
+          const rpmReduction = Math.max(0, RPM_DEFAULT_NORMAL - currentRpm);
+          const eqRecoverSubm = THREE.MathUtils.lerp(118, 155, THREE.MathUtils.clamp((175 - currentRpm) / 115, 0, 1));
+          if (effectiveSubmergence < eqRecoverSubm - 0.5) {
+            const riseFt = Math.min(eqRecoverSubm - effectiveSubmergence, (rpmReduction / 100) * 20 * dt);
+            const prevWasLow = hasFault('baja-sumergencia');
+
+            targetSubmergence = THREE.MathUtils.clamp(targetSubmergence + riseFt, SUBM_MIN, SUBM_MAX);
+            currentSubmergence = THREE.MathUtils.clamp(currentSubmergence + riseFt, SUBM_MIN, SUBM_MAX);
+            effectiveSubmergence = computeEffectiveSubmergence(currentSubmergence, currentRpm, currentPsi);
+
+            if (submSlider) {
+              const snappedVal = String(THREE.MathUtils.clamp(Math.round(targetSubmergence / 5) * 5, SUBM_MIN, SUBM_MAX));
+              if (submSlider.value !== snappedVal) submSlider.value = snappedVal;
+            }
+            updateSubmergenceSliderVisual();
+
+            const targetDynSubm = computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi);
+            if (prevWasLow && effectiveSubmergence >= SUBM_MIN_NORMAL && targetDynSubm >= SUBM_MIN_NORMAL) {
+              evaluateControlFaults('subm-drawdown');
+              if (typeof triggerInstantTelemetry === 'function') triggerInstantTelemetry();
+            }
+          } else {
+            targetSubmergence = THREE.MathUtils.clamp(Math.round(targetSubmergence), SUBM_MIN, SUBM_MAX);
+            if (submSlider) submSlider.value = String(THREE.MathUtils.clamp(Math.round(targetSubmergence / 5) * 5, SUBM_MIN, SUBM_MAX));
+            lowSubmRecoveryActive = false;
+            evaluateControlFaults('subm-drawdown');
+          }
+        }
+      }
+
       currentTemp = THREE.MathUtils.damp(currentTemp, targetTemp, 5.5, dt);
 
       // Angular velocity scaled for smooth visual readability (rad/s; negative during backspin reverses shaft/rotor/belt)
@@ -11889,7 +12007,9 @@
         Math.abs(currentDiluentPct - targetDiluentPct) > 0.2 ||
         Math.abs(currentPsi - targetPsi) > 2.5 ||
         Math.abs(currentSubmergence - targetSubmergence) > 2.0 ||
-        Math.abs(currentTemp - targetTemp) > 0.3;
+        Math.abs(currentTemp - targetTemp) > 0.3 ||
+        highSubmReliefActive ||
+        lowSubmRecoveryActive;
       const telemetryInterval = isTransitioning ? 0.08 : 0.16;
 
       if (lastTelemetryUpdate < 0 || elapsed - lastTelemetryUpdate > telemetryInterval) {
