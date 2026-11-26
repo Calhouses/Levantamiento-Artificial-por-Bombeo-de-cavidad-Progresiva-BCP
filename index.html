@@ -494,8 +494,114 @@
       gap: 2px;
     }
 
-    .nav-card.is-collapsed .nav-list {
+    .nav-card.is-collapsed .nav-list,
+    .nav-card.is-collapsed .flow-anim-controls {
       display: none;
+    }
+
+    .flow-anim-controls {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .flow-anim-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .flow-anim-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .flow-anim-reset-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      height: 17px;
+      padding: 0 5px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15, 23, 42, 0.55);
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, opacity 140ms ease;
+      opacity: 0.55;
+    }
+
+    .flow-anim-reset-btn.is-modified {
+      opacity: 1;
+      border-color: rgba(59, 130, 246, 0.45);
+      background: rgba(37, 99, 235, 0.22);
+      color: #93c5fd;
+    }
+
+    .flow-anim-reset-btn:hover {
+      opacity: 1;
+      border-color: rgba(96, 165, 250, 0.65);
+      background: rgba(37, 99, 235, 0.32);
+      color: #e0f2fe;
+    }
+
+    .flow-anim-reset-btn:focus-visible {
+      outline: 2px solid var(--accent-blue-light);
+      outline-offset: 1px;
+    }
+
+    .flow-ctrl-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .flow-ctrl-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .flow-ctrl-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+
+    .flow-ctrl-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      color: #7dd3fc;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .flow-ctrl-val.is-paused {
+      color: #94a3b8;
+    }
+
+    .flow-ctrl-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
     }
 
     .nav-item-btn {
@@ -2791,8 +2897,8 @@
 <body>
   <div id="viewport" aria-label="Visor 3D del Sistema de Bombeo de Cavidad Progresiva"></div>
 
-  <!-- Toggleable Geological Strata Labels Overlay (Junín 5, Hidden by Default) -->
-  <div id="geo-labels-layer" class="geo-labels-layer hidden" aria-label="Etiquetas de capas geológicas del Bloque Junín 5"></div>
+  <!-- Toggleable Geological Strata Labels Overlay (FPO, Hidden by Default) -->
+  <div id="geo-labels-layer" class="geo-labels-layer hidden" aria-label="Etiquetas de capas geológicas de la Faja Petrolífera del Orinoco (FPO)"></div>
 
   <!-- Pinned 3D Component Leader Line Overlay -->
   <svg id="tooltip-leader-svg" aria-hidden="true">
@@ -2875,7 +2981,7 @@
         </svg>
         <span id="weather-btn-label">Clima: Despejado</span>
       </button>
-      <button type="button" id="btn-geo-labels" class="btn-ghost" title="Mostrar u ocultar etiquetas de capas geológicas (Junín 5)" aria-pressed="false">
+      <button type="button" id="btn-geo-labels" class="btn-ghost" title="Mostrar u ocultar etiquetas de capas geológicas (FPO)" aria-pressed="false">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <polygon points="12 2 2 7 12 12 22 7 12 2" />
           <polyline points="2 12 12 17 22 12" />
@@ -2936,7 +3042,7 @@
               <polygon points="3 11 22 2 13 21 11 13 3 11" />
             </svg>
           </button>
-          <button type="button" class="rail-node" data-rail="geologia" title="Geología · Bloque Junín 5" aria-label="Ir a Geología Junín 5">
+          <button type="button" class="rail-node" data-rail="geologia" title="Geología · Faja Petrolífera del Orinoco (FPO)" aria-label="Ir a Geología Faja Petrolífera del Orinoco (FPO)">
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
               <polygon points="12 3 3 8 12 13 21 8 12 3" />
               <polyline points="3 14 12 19 21 14" />
@@ -3038,8 +3144,8 @@
       </section>
 
       <!-- Sección 3: FLUJO Y NAVEGACIÓN -->
-      <section class="nav-card is-collapsed" data-section="flujo">
-        <button type="button" class="nav-card-header" data-focus="panoramica" aria-expanded="false">
+      <section class="nav-card" data-section="flujo">
+        <button type="button" class="nav-card-header" data-focus="panoramica" aria-expanded="true">
           <h2 class="nav-card-title">FLUJO Y NAVEGACIÓN</h2>
           <span class="nav-card-meta">
             <span class="nav-card-count">04</span>
@@ -3074,12 +3180,71 @@
             </button>
           </li>
         </ul>
+
+        <div class="flow-anim-controls" aria-label="Controles de animación de flujo">
+          <div class="flow-anim-header">
+            <span class="flow-anim-title">Animación de Flujo</span>
+            <button type="button" id="btn-flow-anim-reset" class="flow-anim-reset-btn" title="Restablecer velocidad (1.0×) y densidad (100%)" aria-label="Restablecer velocidad y densidad de flujo">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              <span>1×</span>
+            </button>
+          </div>
+
+          <div class="flow-ctrl-row">
+            <div class="flow-ctrl-top">
+              <label for="flow-speed-slider" class="flow-ctrl-label">Velocidad</label>
+              <span id="flow-speed-val" class="flow-ctrl-val">1.0×</span>
+            </div>
+            <input
+              id="flow-speed-slider"
+              class="telemetry-inline-slider"
+              type="range"
+              min="0"
+              max="2.5"
+              step="0.1"
+              value="1.0"
+              aria-label="Velocidad de la animación de flujo"
+              title="Ajustar velocidad visual de las partículas de flujo (0.0× pausa – 2.5× rápido)"
+            />
+            <div class="flow-ctrl-ticks" aria-hidden="true">
+              <span>0×</span>
+              <span>1.0×</span>
+              <span>2.5×</span>
+            </div>
+          </div>
+
+          <div class="flow-ctrl-row">
+            <div class="flow-ctrl-top">
+              <label for="flow-density-slider" class="flow-ctrl-label">Densidad</label>
+              <span id="flow-density-val" class="flow-ctrl-val">100%</span>
+            </div>
+            <input
+              id="flow-density-slider"
+              class="telemetry-inline-slider"
+              type="range"
+              min="0"
+              max="200"
+              step="5"
+              value="100"
+              aria-label="Densidad de las partículas de flujo"
+              title="Ajustar densidad visual de partículas de crudo, diluente y gas (0% – 200%)"
+            />
+            <div class="flow-ctrl-ticks" aria-hidden="true">
+              <span>0%</span>
+              <span>100%</span>
+              <span>200%</span>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <!-- Sección 4: GEOLOGÍA · BLOQUE JUNÍN 5 -->
+      <!-- Sección 4: GEOLOGÍA · FAJA PETROLÍFERA DEL ORINOCO (FPO) -->
       <section class="nav-card" data-section="geologia">
         <button type="button" class="nav-card-header" data-focus="geo-estructuras" aria-expanded="true">
-          <h2 class="nav-card-title">GEOLOGÍA · JUNÍN 5</h2>
+          <h2 class="nav-card-title">GEOLOGÍA · FPO</h2>
           <span class="nav-card-meta">
             <span class="nav-card-count">06</span>
             <svg class="nav-card-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -3136,7 +3301,7 @@
         <span class="credits-popover-title">Autoría y Créditos</span>
         <button type="button" id="btn-credits-close" class="credits-close-btn" aria-label="Cerrar créditos" title="Cerrar">×</button>
       </div>
-      <div class="credits-popover-sub">Simulador 3D · Sistema BCP · Bloque Junín 5</div>
+      <div class="credits-popover-sub">Simulador 3D · Sistema BCP · Faja Petrolífera del Orinoco (FPO)</div>
       <ul class="credits-list">
         <li class="credits-item">Ing. Procesos Químicos Diego González</li>
         <li class="credits-item">Ing. Geólogo Mirlarys García</li>
@@ -3208,26 +3373,34 @@
         <div class="fault-scenarios-list" role="group" aria-label="Escenarios de fallas operativas">
           <button type="button" class="fault-scenario-btn" data-fault="corte-diluente" data-severity="warn" aria-pressed="false">
             <span class="fault-scenario-head">
-              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Corte / pérdida de diluente (&lt; 5%)</span>
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Corte / falta de diluente (&lt; 15%)</span>
               <span class="fault-scenario-state">Activa</span>
             </span>
-            <span class="fault-scenario-desc">Sin dilución o dilución crítica · alta viscosidad, torque y restricción.</span>
+            <span class="fault-scenario-desc">Sin dilución o dilución insuficiente · alta viscosidad, torque y menor caudal real.</span>
           </button>
 
           <button type="button" class="fault-scenario-btn" data-fault="exceso-diluente" data-severity="warn" aria-pressed="false">
             <span class="fault-scenario-head">
-              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Exceso de diluente (&gt; 28%)</span>
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Exceso de diluente (&gt; 40%)</span>
               <span class="fault-scenario-state">Activa</span>
             </span>
-            <span class="fault-scenario-desc">Viscosidad muy baja · mayor resbalamiento interno y sobrevolumen.</span>
+            <span class="fault-scenario-desc">Viscosidad muy baja · mayor resbalamiento interno y caída de eficiencia.</span>
           </button>
 
           <button type="button" class="fault-scenario-btn" data-fault="baja-sumergencia" data-severity="warn" aria-pressed="false">
             <span class="fault-scenario-head">
-              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Baja sumergencia / arrastre de gas (&lt; 120 ft)</span>
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Baja sumergencia / arrastre de gas (&lt; 100 ft)</span>
               <span class="fault-scenario-state">Activa</span>
             </span>
-            <span class="fault-scenario-desc">Nivel bajo o sobrebombeo · llenado parcial y caudal inestable.</span>
+            <span class="fault-scenario-desc">Nivel &lt; 100 ft o sobrebombeo · llenado parcial y caudal inestable.</span>
+          </button>
+
+          <button type="button" class="fault-scenario-btn" data-fault="alta-sumergencia" data-severity="warn" aria-pressed="false">
+            <span class="fault-scenario-head">
+              <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Exceso de sumergencia / nivel alto (&gt; 200 ft)</span>
+              <span class="fault-scenario-state">Activa</span>
+            </span>
+            <span class="fault-scenario-desc">Columna &gt; 200 ft · contrapresión al yacimiento y capacidad desaprovechada.</span>
           </button>
 
           <button type="button" class="fault-scenario-btn" data-fault="baja-presion" data-severity="warn" aria-pressed="false">
@@ -3375,14 +3548,14 @@
       <div class="fluid-mode-wrap" role="group" aria-label="Selector de tipo de fluido y dosificación de diluente">
         <div class="fluid-mode-header">
           <span class="fluid-mode-label">Tipo de Fluido</span>
-          <span id="fluid-mode-tag" class="fluid-mode-tag">Con diluente (18%)</span>
+          <span id="fluid-mode-tag" class="fluid-mode-tag">Con diluente (30%)</span>
         </div>
         <div class="fluid-segmented">
           <button type="button" id="btn-fluid-extrapesado" class="fluid-btn" data-fluid="extrapesado" aria-pressed="false" title="Crudo Extrapesado (Sin dilución · 0%)">
             <span class="fluid-btn-name"><span class="fluid-btn-dot heavy"></span>Extrapesado</span>
             <span class="fluid-btn-sub">Sin dilución</span>
           </button>
-          <button type="button" id="btn-fluid-diluido" class="fluid-btn active" data-fluid="diluido" aria-pressed="true" title="Crudo Diluido (Con inyección de diluente · ~18%)">
+          <button type="button" id="btn-fluid-diluido" class="fluid-btn active" data-fluid="diluido" aria-pressed="true" title="Crudo Diluido (Punto eficiente · 30%)">
             <span class="fluid-btn-name"><span class="fluid-btn-dot diluted"></span>Diluido</span>
             <span class="fluid-btn-sub">Con diluente</span>
           </button>
@@ -3390,15 +3563,15 @@
         <div class="diluent-slider-block">
           <div class="telemetry-row">
             <label for="diluent-slider" class="telemetry-label">% de Diluente</label>
-            <span id="val-diluent-wrap" class="telemetry-value"><span id="val-diluent">18</span><span class="telemetry-unit">%</span></span>
+            <span id="val-diluent-wrap" class="telemetry-value"><span id="val-diluent">30</span><span class="telemetry-unit">%</span></span>
           </div>
-          <input id="diluent-slider" class="telemetry-inline-slider" type="range" min="0" max="35" step="1" value="18" aria-label="Porcentaje de diluente inyectado" title="Ajustar % de diluente (corte/pérdida: < 5% · normal: 10–25% · exceso: > 28%)" />
-          <div class="telemetry-inline-ticks" title="Corte: < 5% · Óptimo: 10–25% · Exceso: > 28%">
+          <input id="diluent-slider" class="telemetry-inline-slider" type="range" min="0" max="60" step="1" value="30" aria-label="Porcentaje de diluente inyectado" title="Ajustar % de diluente (falta: < 15% · punto eficiente: 30% · exceso: > 40%)" />
+          <div class="telemetry-inline-ticks" title="Falta: < 15% · Punto eficiente: 30% · Exceso: > 40%">
             <span>0%</span>
-            <span>5%</span>
-            <span>18%</span>
-            <span>28%</span>
-            <span>35%</span>
+            <span>15%</span>
+            <span>30%</span>
+            <span>40%</span>
+            <span>60%</span>
           </div>
         </div>
       </div>
@@ -3437,13 +3610,13 @@
         <div class="telemetry-slider-row">
           <div class="telemetry-row">
             <label for="subm-slider" class="telemetry-label">Sumergencia (ft)</label>
-            <span id="val-subm-wrap" class="telemetry-value"><span id="val-subm">320</span><span class="telemetry-unit">ft</span></span>
+            <span id="val-subm-wrap" class="telemetry-value"><span id="val-subm">150</span><span class="telemetry-unit">ft</span></span>
           </div>
-          <input id="subm-slider" class="telemetry-inline-slider" type="range" min="50" max="600" step="5" value="320" aria-label="Control de sumergencia o nivel de fluido sobre la bomba en pies" title="Ajustar sumergencia / nivel de fluido (baja sumergencia: < 120 ft · normal: ≥ 120 ft)" />
-          <div class="telemetry-inline-ticks" title="Baja sumergencia / arrastre de gas: < 120 ft · Normal: ~320 ft">
+          <input id="subm-slider" class="telemetry-inline-slider" type="range" min="50" max="600" step="5" value="150" aria-label="Control de sumergencia o nivel de fluido sobre la bomba en pies" title="Ajustar sumergencia / nivel de fluido (baja: < 100 ft · óptimo: 100–200 ft · alta: > 200 ft)" />
+          <div class="telemetry-inline-ticks" title="Baja sumergencia: < 100 ft · Óptimo: 100–200 ft · Exceso: > 200 ft">
             <span>50</span>
-            <span>120</span>
-            <span>320</span>
+            <span>100</span>
+            <span>200</span>
             <span>600 ft</span>
           </div>
         </div>
@@ -4627,7 +4800,7 @@
     // 5. GEOMETRY HELPERS (WORLD-ALIGNED UVs, CUTAWAY PIPES, FLANGES, VALVES)
     // =========================================================================
     // =========================================================================
-    // Stratigraphic contact horizons for Bloque Junín 5 (Faja Petrolífera del Orinoco)
+    // Stratigraphic contact horizons for Faja Petrolífera del Orinoco (FPO)
     // Includes gentle regional dip (~3-4 deg up-dip toward -X craton), subtle low-throw normal fault on +X wing,
     // and up-dip stratigraphic thinning / pinch-out toward the Guayana Shield margin.
     function juninFaultPlaneX(yRef) {
@@ -4657,7 +4830,7 @@
       return -7.65 + juninDip(x, z) + pinchUp * 0.35 + juninFaultThrow(x, -7.65, 0.28) + wave;
     }
     function horizonMorichalBasamento(x, z) {
-      // Rising Guayana Shield basement up-dip (-X) causing characteristic Junín 5 stratigraphic wedging
+      // Rising Guayana Shield basement up-dip (-X) causing characteristic FPO stratigraphic wedging
       const cratonRise = 0.16 * Math.max(0, -x - 1.5);
       const wave = Math.sin(x * 0.34 - z * 0.22 + 2.1) * 0.08 + Math.cos(x * 0.72 + z * 0.32) * 0.04;
       return -11.02 + juninDip(x, z) * 1.10 + cratonRise + juninFaultThrow(x, -11.02, 0.30) + wave;
@@ -5139,7 +5312,7 @@
     const geoGroup = new THREE.Group();
     rootGroup.add(geoGroup);
 
-    // Bloque Junín 5 (Faja Petrolífera del Orinoco) — 5 Capas Geológicas Diferenciadas
+    // Faja Petrolífera del Orinoco (FPO) — 5 Capas Geológicas Diferenciadas
     const ORINOCO_FORMATIONS = [
       { key: 'mesa',      inspectId: 'formacion-mesa',      yBotFn: horizonMesaFreites,       yTopFn: horizonTop,                mat: mats.mesaStrata,      segY: 6,  sculpt: false, hasCheek: true  },
       { key: 'freites',   inspectId: 'formacion-freites',   yBotFn: horizonFreitesYabo,       yTopFn: horizonMesaFreites,        mat: mats.freitesStrata,   segY: 8,  sculpt: false, hasCheek: true  },
@@ -6448,101 +6621,16 @@
     masterAdapter.position.y = 0.99;
     wellheadGroup.add(masterAdapter);
 
-    // 8.3B Ramal Secundario Amarillo con Válvulas y Soporte Metálico (Left Casing Branch on PadLeft)
-    const yellowBranchGroup = new THREE.Group();
-    surfaceGroup.add(yellowBranchGroup);
-
-    // Galvanized nipple connecting left casing outlet flange (-0.34) to isolation gate valve (-0.46)
+    // 8.3B Válvula Roja de Aislamiento en Salida Lateral Izquierda del Cabezal (se conserva sin ramal secundario amarillo)
     const leftCasingNipple = new THREE.Mesh(new THREE.CylinderGeometry(0.054, 0.054, 0.16, 14), mats.galvanizedPipe);
     leftCasingNipple.rotation.z = Math.PI / 2;
     leftCasingNipple.position.set(-0.40, 0.16, 0);
-    yellowBranchGroup.add(leftCasingNipple);
+    wellheadGroup.add(leftCasingNipple);
 
     // Flanged isolation gate valve directly off left casing outlet
     const leftCasingValve = createGateValve(mats.galvanizedPipe, mats.valveRed, 0.68);
     leftCasingValve.position.set(-0.56, 0.16, 0);
-    yellowBranchGroup.add(leftCasingValve);
-
-    // Galvanized transition riser from cellar outlet (-0.72, 0.16, 0) up over cellar rim onto padLeft (-1.62, 0.40, 0)
-    const leftRiserCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-0.70, 0.16, 0.0),
-      new THREE.Vector3(-0.84, 0.18, 0.0),
-      new THREE.Vector3(-0.92, 0.39, 0.0),
-      new THREE.Vector3(-1.58, 0.40, 0.0),
-      new THREE.Vector3(-1.62, 0.40, 0.12),
-    ]);
-    const leftRiserPipe = new THREE.Mesh(new THREE.TubeGeometry(leftRiserCurve, 28, 0.052, 14, false), mats.galvanizedPipe);
-    leftRiserPipe.castShadow = true;
-    yellowBranchGroup.add(leftRiserPipe);
-
-    // Bolted flange transition from galvanized riser into safety-yellow branch manifold
-    const yellowStartFlange = createFlange(0.13, 0.048, 6, mats.yellowPipe, mats.steelDark, true);
-    yellowStartFlange.rotation.x = Math.PI / 2;
-    yellowStartFlange.position.set(-1.62, 0.40, 0.16);
-    yellowBranchGroup.add(yellowStartFlange);
-
-    // Primary Yellow Manifold Line running forward along Left Concrete Pad (X = -1.62, Z = 0.16 to 1.78)
-    const yellowMainRun = new THREE.Mesh(new THREE.CylinderGeometry(0.054, 0.054, 1.62, 16), mats.yellowPipe);
-    yellowMainRun.rotation.x = Math.PI / 2;
-    yellowMainRun.position.set(-1.62, 0.40, 0.97);
-    yellowMainRun.castShadow = true;
-    yellowBranchGroup.add(yellowMainRun);
-
-    // Yellow Flanged Gate Valve #1 & #2 with upright handwheels (matching foreground yellow valves in reference)
-    const yellowValve1 = createGateValve(mats.yellowPipe, mats.safetyYellow, 0.82);
-    yellowValve1.rotation.y = Math.PI / 2;
-    yellowValve1.position.set(-1.62, 0.40, 0.56);
-    yellowBranchGroup.add(yellowValve1);
-
-    const yellowValve2 = createGateValve(mats.yellowPipe, mats.safetyYellow, 0.78);
-    yellowValve2.rotation.y = Math.PI / 2;
-    yellowValve2.position.set(-1.62, 0.40, 1.18);
-    yellowBranchGroup.add(yellowValve2);
-
-    // Secondary parallel return loop on left concrete pad (X = -1.62 -> -2.36 -> Z = 0.46)
-    const yellowLoopCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-1.62, 0.40, 1.72),
-      new THREE.Vector3(-1.80, 0.40, 1.84),
-      new THREE.Vector3(-2.22, 0.40, 1.84),
-      new THREE.Vector3(-2.36, 0.40, 1.66),
-      new THREE.Vector3(-2.36, 0.40, 0.46),
-    ]);
-    const yellowLoopPipe = new THREE.Mesh(new THREE.TubeGeometry(yellowLoopCurve, 32, 0.050, 14, false), mats.yellowPipe);
-    yellowLoopPipe.castShadow = true;
-    yellowBranchGroup.add(yellowLoopPipe);
-
-    const yellowReturnFlange = createFlange(0.125, 0.045, 6, mats.yellowPipe, mats.steelDark, true);
-    yellowReturnFlange.rotation.x = Math.PI / 2;
-    yellowReturnFlange.position.set(-2.36, 0.40, 1.24);
-    yellowBranchGroup.add(yellowReturnFlange);
-
-    // Vertical steel pipe supports & pressure gauge along yellow branch (X = -1.62, Z = 1.50)
-    const yellowStandpost = createPipeSupport(0.18, 0.056, 'z');
-    yellowStandpost.position.set(-1.62, 0.22, 1.50);
-    yellowBranchGroup.add(yellowStandpost);
-
-    const yellowLoopSupport = createPipeSupport(0.18, 0.054, 'z');
-    yellowLoopSupport.position.set(-2.36, 0.22, 1.04);
-    yellowBranchGroup.add(yellowLoopSupport);
-
-    const yellowInletSupport = createPipeSupport(0.18, 0.054, 'x');
-    yellowInletSupport.position.set(-1.32, 0.22, 0.0);
-    yellowBranchGroup.add(yellowInletSupport);
-
-    // Bolted steel terminal riser at end of yellow loop (-2.36, 0.22..0.75, 0.46)
-    const yellowEndAnchor = createFlange(0.14, 0.04, 6, mats.steelDark, mats.steelPipe, false);
-    yellowEndAnchor.position.set(-2.36, 0.24, 0.46);
-    yellowBranchGroup.add(yellowEndAnchor);
-    const yellowEndPost = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.055, 0.56, 14), mats.galvanizedPipe);
-    yellowEndPost.position.set(-2.36, 0.50, 0.46);
-    yellowEndPost.castShadow = true;
-    yellowBranchGroup.add(yellowEndPost);
-
-    // Vertical Pressure Gauge on yellow manifold branch
-    const gaugeYellow = createPressureGauge('AUX', 600, -0.35, 0.26);
-    gaugeYellow.scale.setScalar(0.84);
-    gaugeYellow.position.set(-1.62, 0.44, 1.68);
-    yellowBranchGroup.add(gaugeYellow);
+    wellheadGroup.add(leftCasingValve);
 
     // 8.4 TE de Producción (Flow Tee at Y = +1.10 to +1.52)
     const teProdGroup = new THREE.Group();
@@ -6571,17 +6659,6 @@
     teRightFlange.rotation.z = Math.PI / 2;
     teRightFlange.position.set(0.35, 1.30, 0);
     teProdGroup.add(teRightFlange);
-
-    // Rear (-Z) injection port for Diluent Injection Line
-    const teBackBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.068, 0.28, 14), mats.galvanizedPipe);
-    teBackBranch.rotation.x = Math.PI / 2;
-    teBackBranch.position.set(0, 1.30, -0.18);
-    teProdGroup.add(teBackBranch);
-
-    const teBackFlange = createFlange(0.135, 0.048, 6, mats.galvanizedPipe, mats.steelDark, true);
-    teBackFlange.rotation.x = Math.PI / 2;
-    teBackFlange.position.set(0, 1.30, -0.32);
-    teProdGroup.add(teBackFlange);
 
     // 8.5 Prensa de Estopas (Stuffing Box, Y = +1.53 to +2.06)
     const stuffingGroup = new THREE.Group();
@@ -6945,7 +7022,7 @@
     prodLineGroup.add(prodPipeMain);
 
     // Mated API bolted flanges along production header
-    for (const fx of [0.50, 1.72, 2.66, 3.54, 4.18]) {
+    for (const fx of [0.50, 1.72, 3.12, 4.18]) {
       const pf = createFlange(0.165, 0.052, 8, mats.galvanizedPipe, mats.steelDark, true);
       pf.rotation.z = Math.PI / 2;
       pf.position.set(fx, 1.30, 0);
@@ -6967,45 +7044,9 @@
     bleedProd.position.set(1.52, 1.23, 0);
     prodLineGroup.add(bleedProd);
 
-    // Choke (Estrangulador Ajustable) at X = 2.18, Y = 1.30
-    const chokeGroup = new THREE.Group();
-    chokeGroup.position.set(2.18, 1.30, 0);
-    prodLineGroup.add(chokeGroup);
-
-    const chokeBody = new THREE.Mesh(new THREE.CylinderGeometry(0.145, 0.145, 0.36, 16), mats.bcpBlue);
-    chokeBody.rotation.z = Math.PI / 2;
-    chokeBody.castShadow = true;
-    chokeGroup.add(chokeBody);
-
-    const chokeFlangeL = createFlange(0.175, 0.055, 8, mats.steelDark, mats.steelPipe, true);
-    chokeFlangeL.rotation.z = Math.PI / 2;
-    chokeFlangeL.position.x = -0.19;
-    chokeGroup.add(chokeFlangeL);
-
-    const chokeFlangeR = createFlange(0.175, 0.055, 8, mats.steelDark, mats.steelPipe, true);
-    chokeFlangeR.rotation.z = Math.PI / 2;
-    chokeFlangeR.position.x = 0.19;
-    chokeGroup.add(chokeFlangeR);
-
-    const chokeBonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.11, 0.26, 16), mats.steelDark);
-    chokeBonnet.position.y = 0.20;
-    chokeGroup.add(chokeBonnet);
-
-    const chokeDial = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.06, 16), mats.brass);
-    chokeDial.position.y = 0.34;
-    chokeGroup.add(chokeDial);
-
-    const chokeStem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.16, 12), mats.chromePolished);
-    chokeStem.position.y = 0.44;
-    chokeGroup.add(chokeStem);
-
-    const chokeWheel = createHandwheel(0.16, mats.safetyYellow);
-    chokeWheel.position.y = 0.52;
-    chokeGroup.add(chokeWheel);
-
-    // Válvula Check de Producción at X = 3.12, Y = 1.30
+    // Válvula Check de Producción at X = 2.18, Y = 1.30 (aguas arriba y separada de la inyección de diluente en X = 3.54)
     const checkProd = createCheckValve(mats.galvanizedPipe, 1.08);
-    checkProd.position.set(3.12, 1.30, 0);
+    checkProd.position.set(2.18, 1.30, 0);
     prodLineGroup.add(checkProd);
 
     // Toma de Muestra (Sample Point) at X = 3.84, Y = 1.24
@@ -7096,7 +7137,7 @@
     gasLineGroup.add(gasIsoValve);
 
     // Bolted flanges along annulus gas manifold & tie-in riser
-    for (const gx of [1.08, 2.38, 3.55]) {
+    for (const gx of [1.08, 3.55]) {
       const gf = createFlange(0.115, 0.042, 6, mats.galvanizedPipe, mats.steelDark, true);
       gf.rotation.z = Math.PI / 2;
       gf.position.set(gx, 0.72, 0.56);
@@ -7118,49 +7159,98 @@
     bleedGas.position.set(2.02, 0.69, 0.56);
     gasLineGroup.add(bleedGas);
 
-    // Válvula Check del Anular
+    // Choke (Estrangulador Ajustable) en la Línea de Gas del Anular, ANTES de la Válvula Check (X = 2.38, Y = 0.72, Z = 0.56)
+    const chokeGroup = new THREE.Group();
+    chokeGroup.position.set(2.38, 0.72, 0.56);
+    chokeGroup.scale.setScalar(0.74);
+    gasLineGroup.add(chokeGroup);
+
+    const chokeBody = new THREE.Mesh(new THREE.CylinderGeometry(0.145, 0.145, 0.36, 16), mats.bcpBlue);
+    chokeBody.rotation.z = Math.PI / 2;
+    chokeBody.castShadow = true;
+    chokeGroup.add(chokeBody);
+
+    const chokeFlangeL = createFlange(0.175, 0.055, 8, mats.steelDark, mats.steelPipe, true);
+    chokeFlangeL.rotation.z = Math.PI / 2;
+    chokeFlangeL.position.x = -0.19;
+    chokeGroup.add(chokeFlangeL);
+
+    const chokeFlangeR = createFlange(0.175, 0.055, 8, mats.steelDark, mats.steelPipe, true);
+    chokeFlangeR.rotation.z = Math.PI / 2;
+    chokeFlangeR.position.x = 0.19;
+    chokeGroup.add(chokeFlangeR);
+
+    const chokeBonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.11, 0.26, 16), mats.steelDark);
+    chokeBonnet.position.y = 0.20;
+    chokeGroup.add(chokeBonnet);
+
+    const chokeDial = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.06, 16), mats.brass);
+    chokeDial.position.y = 0.34;
+    chokeGroup.add(chokeDial);
+
+    const chokeStem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.16, 12), mats.chromePolished);
+    chokeStem.position.y = 0.44;
+    chokeGroup.add(chokeStem);
+
+    const chokeWheel = createHandwheel(0.16, mats.safetyYellow);
+    chokeWheel.position.y = 0.52;
+    chokeGroup.add(chokeWheel);
+
+    // Válvula Check del Anular (aguas abajo del Choke)
     const checkGas = createCheckValve(mats.gasLine, 0.68);
     checkGas.position.set(2.82, 0.72, 0.56);
     gasLineGroup.add(checkGas);
 
     // Dual-line structural steel pipe racks supporting BOTH Production Line (Z=0) and Gas Line (Z=0.56)
-    for (const rx of [1.34, 2.68, 4.08]) {
+    for (const rx of [1.34, 2.62, 4.08]) {
       const rack = createDualPipeRack(1.30, 0.56, 0.72, 0.22);
       rack.position.set(rx, 0.22, 0);
       prodLineGroup.add(rack);
     }
 
-    // 8.13 Línea de Inyección de Diluente (Industrial Amber-Gold piping into Rear TE port)
+    // 8.13 Línea de Inyección de Diluente (Industrial Amber-Gold piping tied into Production Line AFTER Check Valve at X = 3.54)
     const diluentGroup = new THREE.Group();
     surfaceGroup.add(diluentGroup);
 
     const diluentPath = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(3.45, 0.22, -2.35),
-      new THREE.Vector3(3.45, 0.92, -2.35),
-      new THREE.Vector3(3.00, 0.92, -2.10),
-      new THREE.Vector3(0.55, 0.92, -2.10),
-      new THREE.Vector3(0.0, 0.92, -1.65),
-      new THREE.Vector3(0.0, 1.30, -0.95),
-      new THREE.Vector3(0.0, 1.30, -0.32),
+      new THREE.Vector3(1.45, 0.22, -2.25),
+      new THREE.Vector3(1.45, 0.92, -2.25),
+      new THREE.Vector3(1.75, 0.92, -2.10),
+      new THREE.Vector3(3.18, 0.92, -2.10),
+      new THREE.Vector3(3.54, 0.92, -1.78),
+      new THREE.Vector3(3.54, 1.30, -1.05),
+      new THREE.Vector3(3.54, 1.30, -0.10),
     ]);
     const diluentPipe = new THREE.Mesh(new THREE.TubeGeometry(diluentPath, 56, 0.045, 14, false), mats.diluentSightPipe);
     diluentPipe.renderOrder = 3;
     diluentGroup.add(diluentPipe);
 
-    // Diluent skid base anchor flange + bolted flanges along rear header
+    // Diluent skid base anchor flange + bolted flanges along rear header & tie-in into production line
     const dilSkidFlange = createFlange(0.145, 0.05, 6, mats.steelDark, mats.steelPipe, false);
-    dilSkidFlange.position.set(3.45, 0.24, -2.35);
+    dilSkidFlange.position.set(1.45, 0.24, -2.25);
     diluentGroup.add(dilSkidFlange);
 
-    for (const dx of [2.92, 1.92, 0.58]) {
+    for (const dx of [1.88, 2.66, 3.24]) {
       const df = createFlange(0.108, 0.04, 6, mats.galvanizedPipe, mats.steelDark, true);
       df.rotation.z = Math.PI / 2;
       df.position.set(dx, 0.92, -2.10);
       diluentGroup.add(df);
     }
 
+    // Bolted tie-in saddle branch & flange joining Production Line at X = 3.54 (downstream of checkProd at X = 2.18)
+    const dilTieInBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.064, 0.064, 0.22, 14), mats.galvanizedPipe);
+    dilTieInBranch.rotation.x = Math.PI / 2;
+    dilTieInBranch.position.set(3.54, 1.30, -0.14);
+    dilTieInBranch.castShadow = true;
+    diluentGroup.add(dilTieInBranch);
+
+    const dilTieInFlange = createFlange(0.122, 0.044, 6, mats.galvanizedPipe, mats.steelDark, true);
+    dilTieInFlange.rotation.x = Math.PI / 2;
+    dilTieInFlange.position.set(3.54, 1.30, -0.24);
+    diluentGroup.add(dilTieInFlange);
+
     // Structural steel pipe supports for diluent header
-    for (const [dx, dz, axis] of [[2.58, -2.10, 'x'], [1.26, -2.10, 'x'], [0.0, -1.58, 'z']]) {
+    for (const [dx, dz, axis] of [[2.30, -2.10, 'x'], [3.54, -1.52, 'z']]) {
       const dSup = createPipeSupport(0.70, 0.050, axis);
       dSup.position.set(dx, 0.22, dz);
       diluentGroup.add(dSup);
@@ -7169,25 +7259,24 @@
     // Vertical Pressure Gauge on Diluent Line
     const gaugeDil = createPressureGauge('DILUENTE', 1000, 0.1, 0.28);
     gaugeDil.scale.setScalar(0.84);
-    gaugeDil.position.set(2.25, 0.96, -2.10);
+    gaugeDil.position.set(2.14, 0.96, -2.10);
     diluentGroup.add(gaugeDil);
 
     // Válvula de Purga de Diluente
     const bleedDil = createBleedValve(mats.diluentLine);
     bleedDil.scale.setScalar(0.85);
-    bleedDil.position.set(1.62, 0.89, -2.10);
+    bleedDil.position.set(2.46, 0.89, -2.10);
     diluentGroup.add(bleedDil);
 
-    // Válvula Check de Diluente
+    // Válvula Check de Diluente (aligned with +X flow toward production tie-in)
     const checkDil = createCheckValve(mats.diluentLine, 0.65);
-    checkDil.rotation.y = Math.PI;
-    checkDil.position.set(0.95, 0.92, -2.10);
+    checkDil.position.set(2.96, 0.92, -2.10);
     diluentGroup.add(checkDil);
 
-    // Flanged Válvula Dosificadora de Diluente near TE rear port
+    // Flanged Válvula Dosificadora de Diluente just upstream of production line injection tie-in
     const dilChokeGroup = createGateValve(mats.diluentLine, mats.diluentLine, 0.72);
     dilChokeGroup.rotation.y = Math.PI / 2;
-    dilChokeGroup.position.set(0.0, 1.30, -0.74);
+    dilChokeGroup.position.set(3.54, 1.30, -0.64);
     diluentGroup.add(dilChokeGroup);
 
     // =========================================================================
@@ -7239,34 +7328,54 @@
     };
 
     const flowSphereGeo = new THREE.SphereGeometry(1, 10, 8);
+    const GOLDEN_RATIO_CONJ = 0.6180339887498949;
+    let targetFlowAnimSpeed = 1.0;
+    let currentFlowAnimSpeed = 1.0;
+    let targetFlowAnimDensity = 1.0;
+    let currentFlowAnimDensity = 1.0;
+    let submBubbleElapsed = 0;
 
-    // 1. Perforation inflow -> Gas anchor intake -> Dip tube suction (48 instances)
+    // 1. Perforation inflow -> Gas anchor intake -> Dip tube suction (48 base, up to 96 at 200% density)
     const PERF_COUNT = 48;
-    const perfFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.crude, PERF_COUNT);
+    const PERF_MAX_COUNT = PERF_COUNT * 2;
+    const perfFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.crude, PERF_MAX_COUNT);
+    perfFlowMesh.count = PERF_COUNT;
     perfFlowMesh.frustumCulled = false;
     perfFlowMesh.renderOrder = 1;
     processFlowGroup.add(perfFlowMesh);
 
     const perfSeeds = [];
-    for (let i = 0; i < PERF_COUNT; i++) {
+    for (let i = 0; i < PERF_MAX_COUNT; i++) {
       perfSeeds.push({
-        phase: i / PERF_COUNT,
+        phase: (i * GOLDEN_RATIO_CONJ) % 1,
         lane: i % 8,
         angle: 0.22 + ((i % 7) / 6) * (Math.PI - 0.44),
         side: i % 2 === 0 ? -1 : 1,
       });
     }
 
-    // 2. Progressive cavity fluid pockets ascending through Stator/Rotor (24 instances)
+    // 2. Progressive cavity fluid pockets ascending through Stator/Rotor (24 base, up to 48 at 200% density)
     const CAVITY_COUNT = 24;
-    const cavityFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.cavity, CAVITY_COUNT);
+    const CAVITY_MAX_COUNT = CAVITY_COUNT * 2;
+    const cavityFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.cavity, CAVITY_MAX_COUNT);
+    cavityFlowMesh.count = CAVITY_COUNT;
     cavityFlowMesh.frustumCulled = false;
     cavityFlowMesh.renderOrder = 1;
     processFlowGroup.add(cavityFlowMesh);
 
-    // 3. Tubing ascent -> TE de producción -> Surface production line (64 instances)
+    const cavitySeeds = [];
+    for (let i = 0; i < CAVITY_MAX_COUNT; i++) {
+      cavitySeeds.push({
+        phase: (i * GOLDEN_RATIO_CONJ) % 1,
+        lobeOffset: (i % 2) * Math.PI,
+      });
+    }
+
+    // 3. Tubing ascent -> TE de producción -> Surface production line (64 base, up to 128 at 200% density)
     const PROD_COUNT = 64;
-    const prodFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.prodMix, PROD_COUNT);
+    const PROD_MAX_COUNT = PROD_COUNT * 2;
+    const prodFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.prodMix, PROD_MAX_COUNT);
+    prodFlowMesh.count = PROD_COUNT;
     prodFlowMesh.frustumCulled = false;
     prodFlowMesh.renderOrder = 1;
     processFlowGroup.add(prodFlowMesh);
@@ -7289,9 +7398,9 @@
     const _colCrude = new THREE.Color(0x0d0b0a);
     const _colDiluted = new THREE.Color(0x4a2c18);
     const _colScratch = new THREE.Color();
-    for (let i = 0; i < PROD_COUNT; i++) {
+    for (let i = 0; i < PROD_MAX_COUNT; i++) {
       prodSeeds.push({
-        phase: i / PROD_COUNT,
+        phase: (i * GOLDEN_RATIO_CONJ) % 1,
         radialJitter: ((i % 5) - 2) * 0.016,
         angleJitter: (i * 2.399) % (Math.PI * 2),
       });
@@ -7299,26 +7408,37 @@
     }
     if (prodFlowMesh.instanceColor) prodFlowMesh.instanceColor.needsUpdate = true;
 
-    // 4. Diluent injection stream along diluentPath into TE de Producción (28 instances)
+    // 4. Diluent injection stream along diluentPath into Production Line AFTER check valve (28 base, up to 56 at 200% density)
     const DIL_COUNT = 28;
-    const dilFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.diluent, DIL_COUNT);
+    const DIL_MAX_COUNT = DIL_COUNT * 2;
+    const dilFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.diluent, DIL_MAX_COUNT);
+    dilFlowMesh.count = DIL_COUNT;
     dilFlowMesh.frustumCulled = false;
     dilFlowMesh.renderOrder = 1;
     processFlowGroup.add(dilFlowMesh);
 
+    const dilSeeds = [];
+    for (let i = 0; i < DIL_MAX_COUNT; i++) {
+      dilSeeds.push({
+        phase: (i * GOLDEN_RATIO_CONJ) % 1,
+      });
+    }
+
     const diluentFlowCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(3.45, 0.24, -2.35),
-      new THREE.Vector3(3.45, 0.92, -2.35),
-      new THREE.Vector3(3.00, 0.92, -2.10),
-      new THREE.Vector3(0.55, 0.92, -2.10),
-      new THREE.Vector3(0.0, 0.92, -1.65),
-      new THREE.Vector3(0.0, 1.30, -0.95),
-      new THREE.Vector3(0.0, 1.30, -0.02),
+      new THREE.Vector3(1.45, 0.24, -2.25),
+      new THREE.Vector3(1.45, 0.92, -2.25),
+      new THREE.Vector3(1.75, 0.92, -2.10),
+      new THREE.Vector3(3.18, 0.92, -2.10),
+      new THREE.Vector3(3.54, 0.92, -1.78),
+      new THREE.Vector3(3.54, 1.30, -1.05),
+      new THREE.Vector3(3.54, 1.30, -0.02),
     ]);
 
-    // 5. Annulus gas separation bubbles (Gas anchor -> Annulus -> Línea de Gas del Anular) (40 instances)
+    // 5. Annulus gas separation bubbles (Gas anchor -> Annulus -> Línea de Gas del Anular) (40 base, up to 80 at 200% density)
     const GAS_COUNT = 40;
-    const gasFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.gasBubble, GAS_COUNT);
+    const GAS_MAX_COUNT = GAS_COUNT * 2;
+    const gasFlowMesh = new THREE.InstancedMesh(flowSphereGeo, flowMats.gasBubble, GAS_MAX_COUNT);
+    gasFlowMesh.count = GAS_COUNT;
     gasFlowMesh.frustumCulled = false;
     gasFlowMesh.renderOrder = 1;
     processFlowGroup.add(gasFlowMesh);
@@ -7338,9 +7458,9 @@
     ]);
 
     const gasSeeds = [];
-    for (let i = 0; i < GAS_COUNT; i++) {
+    for (let i = 0; i < GAS_MAX_COUNT; i++) {
       gasSeeds.push({
-        phase: i / GAS_COUNT,
+        phase: (i * GOLDEN_RATIO_CONJ) % 1,
         swirlOffset: (i * 1.618) % (Math.PI * 2),
       });
     }
@@ -7352,6 +7472,273 @@
     const _flowQuat = new THREE.Quaternion();
     const _flowScale = new THREE.Vector3();
     const _upAxis = new THREE.Vector3(0, 1, 0);
+
+    // =========================================================================
+    // 8C. DYNAMIC 3D ANNULAR SUBMERGENCE FLUID COLUMN (TRANSLUCENT & NON-INVASIVE)
+    // =========================================================================
+    // Attached to rootGroup (outside pickableRoots) so tooltips/raycasting pass through cleanly.
+    const SUBM_Y_BASE = -10.65;         // Base above bottom reservoir oil pool / perforations
+    const SUBM_Y_SUCTION_TOP = -8.96;   // Pump suction entrance / stator lower collar
+    const SUBM_Y_STATOR_TOP = -5.82;    // Top of stator / rotor assembly (tubing transition)
+    const SUBM_Y_CRIT_MIN = -8.45;      // Visual fluid level at 50 ft (near pump suction)
+    const SUBM_Y_OPT_MIN = -5.60;       // Visual fluid level at 100 ft (minimum efficient, just above stator top)
+    const SUBM_Y_OPT_MAX = -3.50;       // Visual fluid level at 200 ft (upper optimal submergence limit)
+    const SUBM_Y_HIGH_MAX = -0.95;      // Visual fluid level at 600 ft (excess submergence high in tubing annulus)
+
+    function submergenceFtToWorldY(submFt) {
+      if (submFt < 100) {
+        const tLow = THREE.MathUtils.clamp((submFt - 50) / (100 - 50), 0, 1);
+        return THREE.MathUtils.lerp(SUBM_Y_CRIT_MIN, SUBM_Y_OPT_MIN, tLow);
+      }
+      if (submFt <= 200) {
+        const tOpt = THREE.MathUtils.clamp((submFt - 100) / (200 - 100), 0, 1);
+        return THREE.MathUtils.lerp(SUBM_Y_OPT_MIN, SUBM_Y_OPT_MAX, tOpt);
+      }
+      const tHigh = THREE.MathUtils.clamp((submFt - 200) / (600 - 200), 0, 1);
+      return THREE.MathUtils.lerp(SUBM_Y_OPT_MAX, SUBM_Y_HIGH_MAX, tHigh);
+    }
+
+    const submergenceVisualGroup = new THREE.Group();
+    rootGroup.add(submergenceVisualGroup);
+
+    // Deeper translucent crude-amber fluid column (higher contrast while depthWrite:false preserves full internal visibility)
+    const submFluidMat = new THREE.MeshPhysicalMaterial({
+      color: 0x3b220c,
+      emissive: 0x160b03,
+      emissiveIntensity: 0.22,
+      roughness: 0.14,
+      metalness: 0.08,
+      clearcoat: 0.65,
+      clearcoatRoughness: 0.12,
+      transparent: true,
+      opacity: 0.34,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
+    });
+
+    // Glossy translucent dark-amber meniscus surface disc
+    const submMeniscusMat = new THREE.MeshPhysicalMaterial({
+      color: 0x6e3d14,
+      emissive: 0x2e1504,
+      emissiveIntensity: 0.38,
+      roughness: 0.07,
+      metalness: 0.08,
+      clearcoat: 0.94,
+      clearcoatRoughness: 0.08,
+      transparent: true,
+      opacity: 0.56,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+
+    // Crisp capillary rim & level gauge markers along liquid-gas interface
+    const submRimMat = new THREE.MeshStandardMaterial({
+      color: 0xeab308,
+      emissive: 0xa16207,
+      emissiveIntensity: 0.72,
+      roughness: 0.18,
+      metalness: 0.12,
+      transparent: true,
+      opacity: 0.78,
+      depthWrite: false,
+    });
+
+    // Gas-breakout micro-bubbles along the meniscus interface (intensify during low submergence / gas entrainment)
+    const submFoamMat = new THREE.MeshStandardMaterial({
+      color: 0xbae6fd,
+      emissive: 0x38bdf8,
+      emissiveIntensity: 0.55,
+      roughness: 0.18,
+      metalness: 0.08,
+      transparent: true,
+      opacity: 0.30,
+      depthWrite: false,
+    });
+
+    // Lower annular fluid sleeve surrounding gas anchor & torque anchor (Y: -10.65 to min(level, -8.96))
+    const submLowerColGeo = createCutawayPipeGeometry(0.242, 0.418, 1.0, 0, Math.PI, 32);
+    const submLowerColMesh = new THREE.Mesh(submLowerColGeo, submFluidMat);
+    submLowerColMesh.position.y = SUBM_Y_BASE;
+    submLowerColMesh.renderOrder = 0; // Renders after opaque solids & behind gasFlowMesh (renderOrder 1)
+    submLowerColMesh.castShadow = false;
+    submLowerColMesh.receiveShadow = false;
+    submergenceVisualGroup.add(submLowerColMesh);
+
+    // Upper annular fluid column flanking stator & tubing inside casing cutaway (Y: -8.96 to level)
+    const submUpperColGeo = createCutawayPipeGeometry(0.326, 0.418, 1.0, 0, Math.PI, 32);
+    const submUpperColMesh = new THREE.Mesh(submUpperColGeo, submFluidMat);
+    submUpperColMesh.position.y = SUBM_Y_SUCTION_TOP;
+    submUpperColMesh.renderOrder = 0;
+    submUpperColMesh.castShadow = false;
+    submUpperColMesh.receiveShadow = false;
+    submergenceVisualGroup.add(submUpperColMesh);
+
+    // Meniscus assembly riding at live fluid top surface (renderOrder 2: cleanly crisp above fluid & bubbles)
+    const submMeniscusGroup = new THREE.Group();
+    submergenceVisualGroup.add(submMeniscusGroup);
+
+    const meniscusDiscGeo = createCutawayPipeGeometry(0.324, 0.420, 0.022, 0, Math.PI, 36);
+    const meniscusDiscMesh = new THREE.Mesh(meniscusDiscGeo, submMeniscusMat);
+    meniscusDiscMesh.position.y = -0.011;
+    meniscusDiscMesh.renderOrder = 2;
+    submMeniscusGroup.add(meniscusDiscMesh);
+
+    const meniscusOuterArc = new THREE.Mesh(new THREE.TorusGeometry(0.417, 0.010, 10, 32, Math.PI), submRimMat);
+    meniscusOuterArc.rotation.x = -Math.PI / 2;
+    meniscusOuterArc.position.y = 0.004;
+    meniscusOuterArc.renderOrder = 2;
+    submMeniscusGroup.add(meniscusOuterArc);
+
+    const meniscusInnerArc = new THREE.Mesh(new THREE.TorusGeometry(0.325, 0.0085, 10, 32, Math.PI), submRimMat);
+    meniscusInnerArc.rotation.x = -Math.PI / 2;
+    meniscusInnerArc.position.y = 0.004;
+    meniscusInnerArc.renderOrder = 2;
+    submMeniscusGroup.add(meniscusInnerArc);
+
+    // Cutaway plane surface lines on left & right flanks (Z = 0) so the liquid level reads crisply from front view
+    const cutBarGeo = new THREE.CylinderGeometry(0.010, 0.010, 0.096, 10);
+    cutBarGeo.rotateZ(Math.PI / 2);
+    const meniscusCutBarL = new THREE.Mesh(cutBarGeo, submRimMat);
+    meniscusCutBarL.position.set(-0.372, 0.004, 0.003);
+    meniscusCutBarL.renderOrder = 2;
+    submMeniscusGroup.add(meniscusCutBarL);
+
+    const meniscusCutBarR = new THREE.Mesh(cutBarGeo, submRimMat);
+    meniscusCutBarR.position.set(0.372, 0.004, 0.003);
+    meniscusCutBarR.renderOrder = 2;
+    submMeniscusGroup.add(meniscusCutBarR);
+
+    // Discreet side sight-glass level ticks outside casing cutaway rim (readable from panoramic camera)
+    const levelTickGeo = new THREE.ConeGeometry(0.032, 0.088, 4);
+    const levelTickL = new THREE.Mesh(levelTickGeo, submRimMat);
+    levelTickL.rotation.z = -Math.PI / 2;
+    levelTickL.position.set(-0.505, 0.0, 0.022);
+    levelTickL.renderOrder = 2;
+    submMeniscusGroup.add(levelTickL);
+
+    const levelTickR = new THREE.Mesh(levelTickGeo, submRimMat);
+    levelTickR.rotation.z = Math.PI / 2;
+    levelTickR.position.set(0.505, 0.0, 0.022);
+    levelTickR.renderOrder = 2;
+    submMeniscusGroup.add(levelTickR);
+
+    // Meniscus gas-breakout bubbles (16 base, up to 32 at 200% density along the liquid interface arc)
+    const SUBM_FOAM_COUNT = 16;
+    const SUBM_FOAM_MAX_COUNT = SUBM_FOAM_COUNT * 2;
+    const submFoamMesh = new THREE.InstancedMesh(flowSphereGeo, submFoamMat, SUBM_FOAM_MAX_COUNT);
+    submFoamMesh.count = SUBM_FOAM_COUNT;
+    submFoamMesh.frustumCulled = false;
+    submFoamMesh.renderOrder = 2;
+    submMeniscusGroup.add(submFoamMesh);
+
+    const submFoamSeeds = [];
+    for (let i = 0; i < SUBM_FOAM_MAX_COUNT; i++) {
+      submFoamSeeds.push({
+        angle: 0.09 + ((i * GOLDEN_RATIO_CONJ) % 1) * (Math.PI - 0.18),
+        radius: 0.342 + ((i * 7) % 5) * 0.015,
+        phase: i * 1.37,
+        speed: 1.4 + (i % 4) * 0.55,
+      });
+    }
+
+    // Pre-allocated color helpers & live state for zero-GC updates
+    const _submColNormal = new THREE.Color(0x3b220c);
+    const _submColDiluted = new THREE.Color(0x573314);
+    const _submColLow = new THREE.Color(0x6b2c0e);
+    const _submColHigh = new THREE.Color(0x2a1708);
+    const _submRimNormal = new THREE.Color(0xeab308);
+    const _submRimHigh = new THREE.Color(0xf59e0b);
+    const _submRimCrit = new THREE.Color(0xfb7185);
+    const _submRimEmNormal = new THREE.Color(0xa16207);
+    const _submRimEmHigh = new THREE.Color(0xd97706);
+    const _submRimEmCrit = new THREE.Color(0xe11d48);
+    const _submScratchCol = new THREE.Color();
+    let visualSubmY = submergenceFtToWorldY(150);
+
+    function updateSubmergenceVisual(dt, elapsed) {
+      const targetY = submergenceFtToWorldY(effectiveSubmergence);
+      visualSubmY = THREE.MathUtils.damp(visualSubmY, targetY, 7.5, dt);
+
+      const isLowFault = hasFault('baja-sumergencia');
+      const isHighFault = hasFault('alta-sumergencia');
+      const lowRisk = THREE.MathUtils.clamp(
+        Math.max((115 - effectiveSubmergence) / 45, isLowFault ? 0.85 : 0),
+        0,
+        1
+      );
+      const highExcess = THREE.MathUtils.clamp(
+        Math.max((effectiveSubmergence - 200) / 220, isHighFault ? 0.45 : 0),
+        0,
+        1
+      );
+
+      // Calm breathing ripple in optimal/high range; gas-breakout chop when low submergence (< 100 ft) occurs
+      const calmWave = Math.sin(elapsed * 1.85) * 0.011;
+      const gasChop = (Math.sin(elapsed * 5.6) * 0.018 + Math.cos(elapsed * 8.9) * 0.009) * lowRisk;
+      const surfaceY = THREE.MathUtils.clamp(visualSubmY + calmWave + gasChop, SUBM_Y_CRIT_MIN - 0.15, SUBM_Y_HIGH_MAX + 0.08);
+
+      // Update lower & upper cutaway annular columns seamlessly
+      const lowerTop = Math.min(surfaceY, SUBM_Y_SUCTION_TOP);
+      const lowerHeight = Math.max(0.06, lowerTop - SUBM_Y_BASE);
+      submLowerColMesh.scale.y = lowerHeight;
+
+      const upperHeight = surfaceY - SUBM_Y_SUCTION_TOP;
+      const showUpper = upperHeight > 0.015;
+      submUpperColMesh.visible = showUpper;
+      if (showUpper) {
+        submUpperColMesh.scale.y = upperHeight;
+      }
+
+      // Position meniscus group right at dynamic fluid top surface
+      submMeniscusGroup.position.y = surfaceY;
+      submMeniscusGroup.rotation.z = Math.sin(elapsed * (1.7 + lowRisk * 3.8)) * (0.008 + lowRisk * 0.022);
+
+      // Deeper translucent hydrocarbon color with clear visual presence while keeping internal wellbore components crisp
+      const dilFactor = THREE.MathUtils.clamp(currentDiluentPct / 30, 0, 1);
+      _submScratchCol
+        .copy(_submColNormal)
+        .lerp(_submColDiluted, dilFactor * 0.45)
+        .lerp(_submColHigh, highExcess * 0.35)
+        .lerp(_submColLow, lowRisk * 0.45);
+      submFluidMat.color.copy(_submScratchCol);
+      submFluidMat.opacity = 0.33 + highExcess * 0.04 + lowRisk * 0.04;
+
+      submMeniscusMat.opacity = 0.54 + highExcess * 0.05 + lowRisk * 0.10;
+      submRimMat.color.copy(_submRimNormal).lerp(_submRimHigh, highExcess * 0.7).lerp(_submRimCrit, lowRisk * 0.78);
+      submRimMat.emissive.copy(_submRimEmNormal).lerp(_submRimEmHigh, highExcess * 0.7).lerp(_submRimEmCrit, lowRisk * 0.78);
+      submRimMat.emissiveIntensity = 0.68 + highExcess * 0.24 + lowRisk * (0.45 + 0.25 * Math.sin(elapsed * 6.0));
+      submRimMat.opacity = 0.74 + highExcess * 0.10 + lowRisk * 0.16;
+
+      // Animate gas-breakout bubbles skating along the liquid-gas meniscus (respects Flow Speed & Density controls)
+      submBubbleElapsed += dt * currentFlowAnimSpeed;
+      const foamActiveCount = Math.min(SUBM_FOAM_MAX_COUNT, Math.round(SUBM_FOAM_COUNT * currentFlowAnimDensity));
+      submFoamMesh.count = foamActiveCount;
+      submFoamMesh.visible = foamActiveCount > 0;
+      submFoamMat.opacity = 0.22 + lowRisk * 0.56;
+      submFoamMat.emissiveIntensity = 0.38 + lowRisk * 0.58;
+      if (foamActiveCount > 0) {
+        _flowQuat.identity();
+        for (let i = 0; i < foamActiveCount; i++) {
+          const s = submFoamSeeds[i];
+          const ang = s.angle + Math.sin(submBubbleElapsed * (0.7 + lowRisk * 1.9) + s.phase) * (0.06 + lowRisk * 0.10);
+          const bob = Math.sin(submBubbleElapsed * (s.speed * (1 + lowRisk * 2.1)) + s.phase) * (0.008 + lowRisk * 0.024);
+          _flowPos.set(Math.cos(ang) * s.radius, 0.012 + Math.max(-0.006, bob), -Math.sin(ang) * s.radius);
+          const rBub = (0.010 + lowRisk * 0.013) * (0.78 + 0.28 * Math.sin(submBubbleElapsed * 3.5 + s.phase));
+          _flowScale.set(rBub, rBub * (0.85 + lowRisk * 0.35), rBub);
+          _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+          submFoamMesh.setMatrixAt(i, _flowMat4);
+        }
+        submFoamMesh.instanceMatrix.needsUpdate = true;
+      }
+    }
+
+    // Initialize default submergence column height before shader pre-warming
+    submLowerColMesh.scale.y = SUBM_Y_SUCTION_TOP - SUBM_Y_BASE;
+    submUpperColMesh.scale.y = visualSubmY - SUBM_Y_SUCTION_TOP;
+    submMeniscusGroup.position.y = visualSubmY;
 
     // =========================================================================
     // 9. PRE-WARM SHADERS & CAMERA PRESETS
@@ -7702,6 +8089,73 @@
       });
     });
 
+    // Flow Animation Granular Visual Controls (Speed & Density in "FLUJO Y NAVEGACIÓN")
+    const flowSpeedSlider = document.getElementById('flow-speed-slider');
+    const flowSpeedValEl = document.getElementById('flow-speed-val');
+    const flowDensitySlider = document.getElementById('flow-density-slider');
+    const flowDensityValEl = document.getElementById('flow-density-val');
+    const btnFlowAnimReset = document.getElementById('btn-flow-anim-reset');
+
+    function syncFlowAnimControlsUI() {
+      const speedVal = THREE.MathUtils.clamp(targetFlowAnimSpeed, 0, 2.5);
+      const densityPct = Math.round(THREE.MathUtils.clamp(targetFlowAnimDensity * 100, 0, 200));
+
+      if (flowSpeedSlider) {
+        const speedPct = (speedVal / 2.5) * 100;
+        const fillStart = speedVal <= 0.001 ? '#475569' : '#2563eb';
+        const fillEnd = speedVal <= 0.001 ? '#64748b' : '#38bdf8';
+        flowSpeedSlider.style.background = `linear-gradient(90deg, ${fillStart} 0%, ${fillEnd} ${speedPct}%, #1e293b ${speedPct}%)`;
+      }
+      if (flowSpeedValEl) {
+        flowSpeedValEl.textContent = speedVal <= 0.001 ? '0.0×' : `${speedVal.toFixed(1)}×`;
+        flowSpeedValEl.classList.toggle('is-paused', speedVal <= 0.001);
+      }
+
+      if (flowDensitySlider) {
+        const densPct = (densityPct / 200) * 100;
+        const fillStart = densityPct === 0 ? '#475569' : '#2563eb';
+        const fillEnd = densityPct === 0 ? '#64748b' : '#38bdf8';
+        flowDensitySlider.style.background = `linear-gradient(90deg, ${fillStart} 0%, ${fillEnd} ${densPct}%, #1e293b ${densPct}%)`;
+      }
+      if (flowDensityValEl) {
+        flowDensityValEl.textContent = `${densityPct}%`;
+        flowDensityValEl.classList.toggle('is-paused', densityPct === 0);
+      }
+
+      if (btnFlowAnimReset) {
+        const isModified = Math.abs(speedVal - 1.0) > 0.01 || densityPct !== 100;
+        btnFlowAnimReset.classList.toggle('is-modified', isModified);
+      }
+    }
+
+    if (flowSpeedSlider) {
+      flowSpeedSlider.addEventListener('input', (e) => {
+        const parsed = parseFloat(e.target.value);
+        targetFlowAnimSpeed = Number.isFinite(parsed) ? THREE.MathUtils.clamp(parsed, 0, 2.5) : 1.0;
+        syncFlowAnimControlsUI();
+      });
+    }
+
+    if (flowDensitySlider) {
+      flowDensitySlider.addEventListener('input', (e) => {
+        const parsed = parseFloat(e.target.value);
+        targetFlowAnimDensity = Number.isFinite(parsed) ? THREE.MathUtils.clamp(parsed / 100, 0, 2.0) : 1.0;
+        syncFlowAnimControlsUI();
+      });
+    }
+
+    if (btnFlowAnimReset) {
+      btnFlowAnimReset.addEventListener('click', () => {
+        targetFlowAnimSpeed = 1.0;
+        targetFlowAnimDensity = 1.0;
+        if (flowSpeedSlider) flowSpeedSlider.value = '1.0';
+        if (flowDensitySlider) flowDensitySlider.value = '100';
+        syncFlowAnimControlsUI();
+      });
+    }
+
+    syncFlowAnimControlsUI();
+
     stepBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         const stepId = btn.dataset.step;
@@ -7763,13 +8217,13 @@
     const PUMP_DISP_BPD_PER_RPM = 2.75;
 
     const DILUENT_MIN = 0;
-    const DILUENT_MAX = 35;
-    const DILUENT_LOW_FAULT = 5;       // < 5% (0..4%) triggers corte / pérdida de diluente
-    const DILUENT_WARN_LOW = 9;        // 5..9% low-caution band
-    const DILUENT_DEFAULT_NORMAL = 18; // ~18% nominal Orinoco Belt dilution
-    const DILUENT_WARN_HIGH = 26;      // 26..28% high-caution band
-    const DILUENT_HIGH_FAULT = 28;     // > 28% (29..35%) triggers exceso de diluente
-    const DILUENT_FAULT_EXCESS = 32;   // manual fault setpoint
+    const DILUENT_MAX = 60;
+    const DILUENT_LOW_FAULT = 15;      // < 15% (0..14%) triggers corte / falta de diluente
+    const DILUENT_WARN_LOW = 20;       // 15..20% low-caution band
+    const DILUENT_DEFAULT_NORMAL = 30; // 30% efficient optimal dilution point
+    const DILUENT_WARN_HIGH = 38;      // 38..40% high-caution band
+    const DILUENT_HIGH_FAULT = 40;     // > 40% (41..60%) triggers exceso de diluente
+    const DILUENT_FAULT_EXCESS = 48;   // manual fault setpoint
 
     const RPM_MIN_NORMAL = 60;
     const RPM_MAX_NORMAL = 260;
@@ -7789,10 +8243,11 @@
 
     const SUBM_MIN = 50;
     const SUBM_MAX = 600;
-    const SUBM_MIN_NORMAL = 120;
-    const SUBM_WARN_LOW = 160;
-    const SUBM_DEFAULT_NORMAL = 320;
-    const SUBM_FAULT_LOW = 85;
+    const SUBM_MIN_NORMAL = 100;
+    const SUBM_MAX_NORMAL = 200;
+    const SUBM_DEFAULT_NORMAL = 150;
+    const SUBM_FAULT_LOW = 75;
+    const SUBM_FAULT_HIGH = 340;
 
     const TEMP_MIN = 50;
     const TEMP_MAX = 130;
@@ -7903,20 +8358,17 @@
       const pct = THREE.MathUtils.clamp(((targetSubmergence - SUBM_MIN) / (SUBM_MAX - SUBM_MIN)) * 100, 0, 100);
       let fillStart = '#0284c7';
       let fillEnd = '#38bdf8';
-      const isCrit = dynSubm < 75;
-      const isWarn = !isCrit && (targetSubmergence < SUBM_WARN_LOW || dynSubm < SUBM_MIN_NORMAL);
-      if (isCrit) {
-        fillStart = '#d97706';
-        fillEnd = '#f59e0b';
-      } else if (isWarn) {
+      const isLowFault = dynSubm < SUBM_MIN_NORMAL;
+      const isHighFault = !isLowFault && dynSubm > SUBM_MAX_NORMAL;
+      if (isLowFault || isHighFault) {
         fillStart = '#d97706';
         fillEnd = '#f59e0b';
       }
       submSlider.style.background = `linear-gradient(90deg, ${fillStart} 0%, ${fillEnd} ${pct}%, #1e293b ${pct}%)`;
-      submSlider.classList.toggle('is-warn', isWarn || isCrit);
+      submSlider.classList.toggle('is-warn', isLowFault || isHighFault);
       submSlider.classList.toggle('is-crit', false);
       if (valSubmWrap) {
-        valSubmWrap.classList.toggle('is-warn', isWarn || isCrit);
+        valSubmWrap.classList.toggle('is-warn', isLowFault || isHighFault);
         valSubmWrap.classList.toggle('is-crit', false);
       }
     }
@@ -8117,6 +8569,7 @@
       'sobrecarga-torque',
       'parada-retroceso',
       'baja-sumergencia',
+      'alta-sumergencia',
       'corte-diluente',
       'exceso-diluente',
       'baja-presion',
@@ -8129,37 +8582,37 @@
         shortLabel: 'Corte de Diluente',
         statusText: 'Alerta · Sin Diluente',
         bannerPrefix: 'Corte / pérdida de diluente (0%):',
-        bannerSummary: 'crudo extrapesado sin dilución · alta viscosidad, esfuerzo torsional y pérdida de eficiencia.',
-        diagnosis: 'Interrupción total de la inyección de diluente (0%). La viscosidad del crudo extrapesado (~9° API) se dispara de forma no lineal, elevando la pérdida por fricción, el torque en la sarta y restringiendo el llenado eficiente de las cavidades BCP.',
+        bannerSummary: 'crudo extrapesado sin dilución · alta viscosidad, esfuerzo torsional y caída del caudal real.',
+        diagnosis: 'Interrupción total de la inyección de diluente (0%). La viscosidad del crudo extrapesado (~9° API) se dispara de forma no lineal, elevando la pérdida por fricción, el torque en la sarta y reduciendo el caudal real y la eficiencia volumétrica BCP.',
         steps: [
           'Inspeccionar la bomba dosificadora de diluente, filtros en línea y nivel del tanque de nafta/diluente.',
           'Verificar la apertura de la válvula dosificadora y purgar posibles bolsas de gas en la línea de inyección.',
-          'Reducir temporalmente las RPM en el VFD hasta restablecer la dosificación óptima (10–25% de diluente) y estabilizar torque y presión.',
+          'Reducir temporalmente las RPM en el VFD hasta restablecer la dosificación en el punto eficiente (~30% de diluente) y estabilizar caudal, viscosidad y torque.',
         ],
       },
       'corte-diluente-bajo': {
         severity: 'warn',
         shortLabel: 'Dilución Insuficiente',
-        statusText: 'Alerta · Diluente < 5%',
-        bannerPrefix: 'Pérdida parcial de diluente (< 5%):',
-        bannerSummary: 'dosificación insuficiente · viscosidad elevada, alto torque y restricción de flujo.',
-        diagnosis: 'El porcentaje de diluente cayó por debajo del umbral operativo mínimo (< 5%). La mezcla mantiene viscosidad muy elevada, incrementando el torque resistente en la sarta de cabillas y reduciendo la eficiencia volumétrica por restricción en la succión.',
+        statusText: 'Alerta · Diluente < 15%',
+        bannerPrefix: 'Falta de diluente (< 15%):',
+        bannerSummary: 'dosificación por debajo del mínimo · viscosidad elevada, alto torque y caída de caudal real.',
+        diagnosis: 'El porcentaje de diluente cayó por debajo del umbral operativo mínimo (< 15%). La mezcla mantiene viscosidad elevada lejos del punto eficiente (30%), incrementando el torque resistente y reduciendo la eficiencia volumétrica y los barriles reales producidos.',
         steps: [
-          'Incrementar progresivamente la tasa en la bomba dosificadora hasta recuperar el rango normal (15–22% de diluente).',
-          'Revisar presión de suministro de diluente, filtros parcialmente obstruidos y posición de la válvula reguladora.',
-          'Monitorear el descenso de viscosidad (cP) y torque antes de elevar nuevamente las RPM en el VFD.',
+          'Incrementar progresivamente la tasa en la bomba dosificadora hasta alcanzar el punto eficiente (~30% de diluente).',
+          'Revisar presión de suministro de diluente, filtros parcialmente obstruidos y posición de la válvula dosificadora.',
+          'Monitorear el descenso de viscosidad (cP) y la recuperación del Caudal Real (BPD) antes de ajustar nuevamente las RPM en el VFD.',
         ],
       },
       'exceso-diluente': {
         severity: 'warn',
         shortLabel: 'Exceso de Diluente',
         statusText: 'Alerta · Exceso Diluente',
-        bannerPrefix: 'Exceso de diluente (> 28%):',
-        bannerSummary: 'viscosidad muy baja · mayor resbalamiento interno (slippage) y sobrevolumen manejado.',
-        diagnosis: 'La dosificación de diluente supera el límite operativo recomendado (> 28%), reduciendo excesivamente la viscosidad de la mezcla. Esto aumenta el resbalamiento interno (slippage) entre rotor y estator —bajando la Eficiencia Volumétrica (%)—, incrementa el volumen total manejado y eleva el riesgo de hinchamiento químico del elastómero.',
+        bannerPrefix: 'Exceso de diluente (> 40%):',
+        bannerSummary: 'viscosidad muy baja · mayor resbalamiento interno (slippage) y caída de eficiencia.',
+        diagnosis: 'La dosificación de diluente supera el límite operativo recomendado (> 40%) por encima del punto eficiente (30%), reduciendo excesivamente la viscosidad de la mezcla. Esto aumenta el resbalamiento interno (slippage) entre rotor y estator —bajando la Eficiencia Volumétrica (%) y el caudal real efectivo—, desplaza capacidad útil y eleva el riesgo de hinchamiento químico del elastómero.',
         steps: [
-          'Reducir gradualmente la inyección de diluente en la bomba dosificadora o válvula de control hasta retornar al rango óptimo (15–22%).',
-          'Verificar el caudalímetro de diluente y recalibrar la relación diluente/crudo (D/C) según la viscosidad objetivo en cabezal.',
+          'Reducir gradualmente la inyección de diluente en la bomba dosificadora o válvula de control hasta retornar al punto eficiente (~30%).',
+          'Verificar el caudalímetro de diluente y recalibrar la relación diluente/crudo (D/C) según la viscosidad objetivo y el caudal real en cabezal.',
           'Observar la recuperación de la Eficiencia Volumétrica (%) y vigilar signos de hinchamiento (swelling) del elastómero por exposición a aromáticos.',
         ],
       },
@@ -8167,11 +8620,11 @@
         severity: 'warn',
         shortLabel: 'Baja Sumergencia / Gas',
         statusText: 'Alerta · Baja Sumergencia',
-        bannerPrefix: 'Baja sumergencia / arrastre de gas (< 120 ft):',
-        bannerSummary: 'nivel dinámico bajo · fluctuaciones severas de caudal y llenado parcial.',
-        diagnosis: 'El nivel dinámico de fluido cayó por debajo de 120 ft sobre la succión BCP, permitiendo el ingreso de gas libre. Genera bacheo intermitente en caudal/presión y calentamiento del elastómero por lubricación deficiente.',
+        bannerPrefix: 'Baja sumergencia / arrastre de gas (< 100 ft):',
+        bannerSummary: 'nivel dinámico por debajo de 100 ft · fluctuaciones de caudal y llenado parcial.',
+        diagnosis: 'El nivel dinámico de fluido cayó por debajo del mínimo eficiente de 100 ft sobre la succión BCP, permitiendo el ingreso de gas libre. Genera bacheo intermitente en caudal/presión y calentamiento del elastómero por lubricación deficiente.',
         steps: [
-          'Disminuir las RPM en el VFD para permitir la recuperación del nivel dinámico de fluido sobre la bomba.',
+          'Disminuir las RPM en el VFD para permitir la recuperación del nivel dinámico hacia el rango óptimo (100–200 ft).',
           'Ventear o regular la contrapresión del espacio anular (casing) para facilitar la separación del gas en el ancla.',
           'Confirmar sumergencia con medición acústica (echometer) antes de incrementar nuevamente la velocidad.',
         ],
@@ -8180,13 +8633,26 @@
         severity: 'warn',
         shortLabel: 'Sobrebombeo / Baja Sumergencia',
         statusText: 'Alerta · Sobrebombeo',
-        bannerPrefix: 'Sobrebombeo / riesgo de baja sumergencia:',
-        bannerSummary: 'altas RPM con baja presión de aporte · abatimiento del nivel dinámico y arrastre de gas.',
-        diagnosis: 'La velocidad de bombeo supera la capacidad de reposición del yacimiento bajo baja presión de sistema, abatiendo el nivel dinámico por debajo de 120 ft. Esto reduce la eficiencia volumétrica e induce arrastre de gas en la succión.',
+        bannerPrefix: 'Sobrebombeo / baja sumergencia (< 100 ft):',
+        bannerSummary: 'altas RPM con baja presión de aporte · abatimiento del nivel por debajo de 100 ft y arrastre de gas.',
+        diagnosis: 'La velocidad de bombeo supera la capacidad de reposición del yacimiento bajo baja presión de sistema, abatiendo el nivel dinámico por debajo de 100 ft. Esto reduce la eficiencia volumétrica e induce arrastre de gas en la succión.',
         steps: [
           'Reducir gradualmente las RPM en el VFD hasta igualar el caudal de extracción con el aporte real del yacimiento.',
-          'Monitorear la recuperación del nivel de fluido (sumergencia > 120 ft) y la estabilización de la presión en cabezal.',
+          'Monitorear la recuperación del nivel de fluido hacia el rango eficiente (100–200 ft) y la estabilización de la presión en cabezal.',
           'Verificar el venteo del anular y el ancla de gas para evitar operación en seco del elastómero.',
+        ],
+      },
+      'alta-sumergencia': {
+        severity: 'warn',
+        shortLabel: 'Exceso de Sumergencia',
+        statusText: 'Alerta · Sumergencia Alta',
+        bannerPrefix: 'Exceso de sumergencia / nivel alto (> 200 ft):',
+        bannerSummary: 'columna anular > 200 ft · contrapresión excesiva al yacimiento y producción desaprovechada.',
+        diagnosis: 'La sumergencia supera el límite óptimo operativo (100–200 ft). Aunque garantiza llenado completo de cavidades, la columna hidrostática excesiva ejerce contrapresión sobre la formación, limita el diferencial de aporte (drawdown) y refleja potencial de producción desaprovechado o bombeo por debajo del aporte del pozo.',
+        steps: [
+          'Incrementar progresivamente las RPM en el VFD (dentro de 60–260 RPM) para aumentar la extracción y llevar el nivel dinámico a la franja eficiente (100–200 ft).',
+          'Confirmar el nivel real en el anular mediante medición acústica (echometer) y contrastar contra la curva de afluencia (IPR) del yacimiento.',
+          'Evaluar si la bomba BCP instalada requiere mayor desplazamiento volumétrico en el próximo servicio para optimizar la producción.',
         ],
       },
       'baja-presion': {
@@ -8548,6 +9014,7 @@
       const submDirectLow = targetSubmergence < SUBM_MIN_NORMAL;
       const submOverpumpLow = !submDirectLow && dynSubm < SUBM_MIN_NORMAL;
       const submLow = submDirectLow || submOverpumpLow;
+      const submHigh = !submLow && dynSubm > SUBM_MAX_NORMAL;
 
       const syncEntry = (key, isOn) => {
         if (isOn) activeFaults.add(key);
@@ -8557,6 +9024,7 @@
       syncEntry('corte-diluente', diluentLow);
       syncEntry('exceso-diluente', diluentExcess);
       syncEntry('baja-sumergencia', submLow);
+      syncEntry('alta-sumergencia', submHigh);
       syncEntry('baja-presion', psiLow);
       syncEntry('baja-temperatura', tempLow);
       syncEntry('alta-presion', psiHigh);
@@ -8600,8 +9068,9 @@
         if (changedSource === 'fluid' || changedSource === 'diluent') {
           if (diluentLow) focusCandidate = 'corte-diluente';
           else if (diluentExcess) focusCandidate = 'exceso-diluente';
-        } else if (changedSource === 'subm' && submLow) {
-          focusCandidate = 'baja-sumergencia';
+        } else if (changedSource === 'subm') {
+          if (submLow) focusCandidate = 'baja-sumergencia';
+          else if (submHigh) focusCandidate = 'alta-sumergencia';
         } else if (changedSource === 'temp') {
           if (tempHigh || comboElastomer) focusCandidate = 'dano-elastomero';
           else if (tempLow) focusCandidate = 'baja-temperatura';
@@ -8610,10 +9079,12 @@
           else if (psiLow) focusCandidate = 'baja-presion';
           else if (comboElastomer) focusCandidate = 'dano-elastomero';
           else if (submLow) focusCandidate = 'baja-sumergencia';
+          else if (submHigh && !prevActive.has('alta-sumergencia')) focusCandidate = 'alta-sumergencia';
         } else if (changedSource === 'rpm') {
           if (rpmOver) focusCandidate = 'sobrecarga-torque';
           else if (rpmLow) focusCandidate = 'parada-retroceso';
           else if (submLow && !prevActive.has('baja-sumergencia')) focusCandidate = 'baja-sumergencia';
+          else if (submHigh && !prevActive.has('alta-sumergencia')) focusCandidate = 'alta-sumergencia';
           else if (comboElastomer) focusCandidate = 'dano-elastomero';
         }
 
@@ -8653,6 +9124,8 @@
           setDiluentSliderValue(DILUENT_FAULT_EXCESS, { snapCurrent: true });
         } else if (faultKey === 'baja-sumergencia') {
           setSubmergenceSliderValue(SUBM_FAULT_LOW);
+        } else if (faultKey === 'alta-sumergencia') {
+          setSubmergenceSliderValue(SUBM_FAULT_HIGH);
         } else if (faultKey === 'baja-presion') {
           setPsiSliderValue(PSI_FAULT_LOW);
         } else if (faultKey === 'baja-temperatura') {
@@ -8677,10 +9150,13 @@
         // Turn off ONLY this fault by returning its own parameter to normal band
         if (faultKey === 'corte-diluente' || faultKey === 'exceso-diluente') {
           setDiluentSliderValue(DILUENT_DEFAULT_NORMAL, { snapCurrent: true });
-        } else if (faultKey === 'baja-sumergencia') {
+        } else if (faultKey === 'baja-sumergencia' || faultKey === 'alta-sumergencia') {
           setSubmergenceSliderValue(SUBM_DEFAULT_NORMAL);
-          if (computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi) < SUBM_MIN_NORMAL) {
-            setSubmergenceSliderValue(460);
+          if (faultKey === 'baja-sumergencia' && computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi) < SUBM_MIN_NORMAL) {
+            setSubmergenceSliderValue(SUBM_MAX_NORMAL);
+            if (computeEffectiveSubmergence(targetSubmergence, targetRpm, targetPsi) < SUBM_MIN_NORMAL) {
+              setRpmSliderValue(RPM_DEFAULT_NORMAL);
+            }
           }
         } else if (faultKey === 'baja-presion' || faultKey === 'alta-presion') {
           setPsiSliderValue(PSI_DEFAULT_NORMAL);
@@ -8825,7 +9301,7 @@
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'TE de Producción (Flow Tee)',
-        desc: 'Derivación principal que redirige el crudo bombeado desde la tubería de producción hacia la línea de flujo superficial e integra el puerto posterior de inyección de diluente.',
+        desc: 'Derivación principal en el cabezal que redirige el crudo bombeado desde la tubería de producción hacia la línea de flujo superficial.',
         preset: 'acometida-te',
       },
       'prensa-estopas': {
@@ -8887,9 +9363,9 @@
       'choke': {
         category: 'SUPERFICIE',
         catKey: 'superficie',
-        title: 'Choke (Estrangulador Ajustable)',
-        desc: 'Válvula de orificio regulable que controla la contrapresión en cabeza de pozo, estabiliza el régimen de producción y protege la bomba frente a cambios bruscos de presión.',
-        preset: 'lineas-valvulas',
+        title: 'Choke del Anular (Estrangulador de Gas)',
+        desc: 'Válvula de orificio regulable ubicada en la línea de gas del anular, aguas arriba (antes) de la válvula check. Controla el venteo y la contrapresión del espacio anular casing–tubing para estabilizar el nivel dinámico de fluido y evitar bloqueo por gas.',
+        preset: 'manifold-descarga',
       },
       'valvula-check-prod': {
         category: 'SUPERFICIE',
@@ -8951,21 +9427,21 @@
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Línea de Inyección de Diluente',
-        desc: 'Suministra nafta o crudo liviano hacia la TE de producción para reducir la viscosidad del crudo pesado/extrapesado y disminuir la caída de presión en superficie.',
+        desc: 'Suministra nafta o crudo liviano e inyecta el diluente directamente en la línea de producción después de la válvula check para reducir la viscosidad del crudo pesado/extrapesado y disminuir la caída de presión en superficie.',
         preset: 'manifold-descarga',
       },
       'valvula-check-dil': {
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Válvula Check de Diluente',
-        desc: 'Bloquea cualquier retorno de petróleo a presión desde la TE de producción hacia el patín de diluente en caso de parada de la bomba de inyección.',
+        desc: 'Bloquea cualquier retorno de petróleo a presión desde la línea de producción hacia el patín de diluente en caso de parada de la bomba de inyección.',
         preset: 'manifold-descarga',
       },
       'manometro-dil': {
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Manómetro de Diluente',
-        desc: 'Verifica que la presión de inyección del diluente supere la presión de cabeza del pozo, garantizando una mezcla continua y homogénea en la TE de producción.',
+        desc: 'Verifica que la presión de inyección del diluente supere la presión de la línea de producción aguas abajo de la válvula check, garantizando una mezcla continua y homogénea.',
         preset: 'manifold-descarga',
       },
       'valvula-purga-dil': {
@@ -8979,8 +9455,8 @@
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Válvula Dosificadora de Diluente',
-        desc: 'Regula la tasa exacta de inyección de diluente en el puerto posterior de la TE de producción según la gravedad API y viscosidad del crudo extraído.',
-        preset: 'acometida-te',
+        desc: 'Regula la tasa exacta de inyección de diluente en la línea de producción (después de la válvula check) según la gravedad API y viscosidad del crudo extraído.',
+        preset: 'manifold-descarga',
       },
       'valvula-compuerta-prod': {
         category: 'SUPERFICIE',
@@ -9076,19 +9552,19 @@
         preset: 'zona-canoneada',
       },
 
-      // GEOLOGÍA BLOQUE JUNÍN 5 (FAJA PETROLÍFERA DEL ORINOCO)
+      // GEOLOGÍA · FAJA PETROLÍFERA DEL ORINOCO (FPO)
       'formacion-mesa': {
-        category: 'GEOLOGÍA · JUNÍN 5',
+        category: 'GEOLOGÍA · FPO',
         catKey: 'geologia',
         title: 'Formación Mesa / Las Piedras',
         lithology: 'Arenas gruesas, gravas conglomeráticas, limos y arcillas someras poco consolidadas.',
         role: 'Sobrecarga sedimentaria y acuíferos someros sobre la secuencia sellante.',
-        desc: 'Cubre el intervalo superficial del Bloque Junín 5 aportando carga litostática moderada y niveles de agua dulce someros aislados por el revestimiento superficial.',
+        desc: 'Cubre el intervalo superficial de la Faja Petrolífera del Orinoco (FPO) aportando carga litostática moderada y niveles de agua dulce someros aislados por el revestimiento superficial.',
         preset: 'geo-mesa',
         worldAnchor: new THREE.Vector3(-4.2, -1.05, 4.4),
       },
       'formacion-freites': {
-        category: 'GEOLOGÍA · JUNÍN 5',
+        category: 'GEOLOGÍA · FPO',
         catKey: 'geologia',
         title: 'Formación Freites',
         lithology: 'Lutitas gris-verdosas marinas intercaladas con lentes finos de arena.',
@@ -9098,7 +9574,7 @@
         worldAnchor: new THREE.Vector3(4.2, -3.55, 4.4),
       },
       'formacion-yabo-jobo': {
-        category: 'GEOLOGÍA · JUNÍN 5',
+        category: 'GEOLOGÍA · FPO',
         catKey: 'geologia',
         title: 'Formación Oficina — Miembro Yabo / Jobo',
         lithology: 'Arenas finas a medias y lutitas gris-pardas intercaladas en transición.',
@@ -9108,17 +9584,17 @@
         worldAnchor: new THREE.Vector3(-4.2, -6.25, 4.4),
       },
       'formacion-morichal': {
-        category: 'GEOLOGÍA · JUNÍN 5',
+        category: 'GEOLOGÍA · FPO',
         catKey: 'geologia',
         title: 'Formación Oficina — Miembro Morichal',
         lithology: 'Arenas no consolidadas de alta porosidad y permeabilidad saturadas con crudo extrapesado (~8°–10° API).',
         role: 'Roca reservorio principal conectada con la zona cañoneada.',
-        desc: 'Intervalo productor de Junín 5 en contacto directo con las perforaciones del cañoneo, desde donde fluye el crudo extrapesado hacia el ancla de gas y la bomba BCP.',
+        desc: 'Intervalo productor de la Faja Petrolífera del Orinoco (FPO) en contacto directo con las perforaciones del cañoneo, desde donde fluye el crudo extrapesado hacia el ancla de gas y la bomba BCP.',
         preset: 'geo-morichal',
         worldAnchor: new THREE.Vector3(4.2, -9.25, 4.4),
       },
       'basamento-guayana': {
-        category: 'GEOLOGÍA · JUNÍN 5',
+        category: 'GEOLOGÍA · FPO',
         catKey: 'geologia',
         title: 'Basamento Ígneo-Metamórfico (Cratón de Guayana)',
         lithology: 'Rocas cristalinas graníticas y gneísicas profundas con fracturamiento cristalino.',
@@ -9128,17 +9604,17 @@
         worldAnchor: new THREE.Vector3(-4.2, -11.55, 4.4),
       },
       'trampa-estratigrafica': {
-        category: 'ESTRUCTURA · JUNÍN 5',
+        category: 'ESTRUCTURA · FPO',
         catKey: 'geologia',
         title: 'Acuñamiento y Trampa Estratigráfica',
         lithology: 'Cuña de arenas basales que se adelgazan buzamiento arriba entre lutitas sellantes.',
-        role: 'Trampa estratigráfica característica del Bloque Junín 5.',
+        role: 'Trampa estratigráfica característica de la Faja Petrolífera del Orinoco (FPO).',
         desc: 'El buzamiento suave combinado con el ascenso del basamento provoca el acuñamiento lateral de las arenas productoras contra el sello superior, entrampando el crudo.',
         preset: 'geo-estructuras',
         worldAnchor: new THREE.Vector3(-3.35, -7.25, 4.42),
       },
       'falla-normal': {
-        category: 'ESTRUCTURA · JUNÍN 5',
+        category: 'ESTRUCTURA · FPO',
         catKey: 'geologia',
         title: 'Falla Normal de Bajo Salto',
         lithology: 'Plano de fractura extensional con desplazamiento vertical moderado y zona de falla.',
@@ -9197,9 +9673,6 @@
     gaugeGas.userData.inspectId = 'manometro-gas';
     bleedGas.userData.inspectId = 'valvula-purga-gas';
     checkGas.userData.inspectId = 'valvula-check-gas';
-
-    yellowBranchGroup.userData.inspectId = 'linea-amarilla';
-    gaugeYellow.userData.inspectId = 'manometro-gas';
 
     diluentGroup.userData.inspectId = 'linea-diluente';
     gaugeDil.userData.inspectId = 'manometro-dil';
@@ -9597,7 +10070,7 @@
     });
 
     // =========================================================================
-    // 10B-2. JUNÍN 5 GEOLOGICAL LAYER LABELS (TOGGLEABLE & COLLISION-FREE)
+    // 10B-2. FPO GEOLOGICAL LAYER LABELS (TOGGLEABLE & COLLISION-FREE)
     // =========================================================================
     const geoLabelsLayerEl = document.getElementById('geo-labels-layer');
     const btnGeoLabels = document.getElementById('btn-geo-labels');
@@ -9630,7 +10103,7 @@
       {
         id: 'trampa-estratigrafica',
         name: 'Acuñamiento Estratigráfico',
-        role: 'Trampa Junín 5',
+        role: 'Trampa FPO',
         swatch: '#d97706',
         anchor: new THREE.Vector3(-5.55, -7.25, 5.65),
       },
@@ -11051,22 +11524,34 @@
       }
       slugMod = Math.max(0.12, slugMod);
 
+      // Smoothly damp user-controlled flow animation visual speed & density (purely visual, does not alter telemetry)
+      currentFlowAnimSpeed = THREE.MathUtils.damp(currentFlowAnimSpeed, targetFlowAnimSpeed, 10.0, dt);
+      if (Math.abs(currentFlowAnimSpeed - targetFlowAnimSpeed) < 0.002) currentFlowAnimSpeed = targetFlowAnimSpeed;
+      currentFlowAnimDensity = THREE.MathUtils.damp(currentFlowAnimDensity, targetFlowAnimDensity, 10.0, dt);
+      if (Math.abs(currentFlowAnimDensity - targetFlowAnimDensity) < 0.002) currentFlowAnimDensity = targetFlowAnimDensity;
+
+      const densitySizeScale = THREE.MathUtils.lerp(
+        1.06,
+        0.90,
+        THREE.MathUtils.clamp((currentFlowAnimDensity - 0.1) / 1.9, 0, 1)
+      );
+
       // Allow subtle downward fluid slip during reverse backspin; keep flowProgress positive-wrapped
-      flowProgress += dt * rpmRatio * 0.28 * viscositySpeedFactor * slugMod;
+      flowProgress += dt * rpmRatio * 0.28 * viscositySpeedFactor * slugMod * currentFlowAnimSpeed;
       if (flowProgress < 0) flowProgress = ((flowProgress % 1) + 1) % 1;
 
       if (currentDiluentPct > 0.4 && !isBackspin) {
-        dilProgress += dt * Math.max(0.18, Math.max(0, rpmRatio)) * 0.28 * THREE.MathUtils.clamp(0.55 + dilRatio * 0.55, 0.35, 1.85);
+        dilProgress += dt * Math.max(0.18, Math.max(0, rpmRatio)) * 0.28 * THREE.MathUtils.clamp(0.55 + dilRatio * 0.55, 0.35, 1.85) * currentFlowAnimSpeed;
       }
       const gasBoost = isGasLock ? 2.45 : (isLowPress ? 1.45 : 1.0);
-      gasProgress += dt * (0.08 + Math.abs(rpmRatio) * 0.68) * 0.16 * gasBoost;
+      gasProgress += dt * (0.08 + Math.abs(rpmRatio) * 0.68) * 0.16 * gasBoost * currentFlowAnimSpeed;
 
       // Subtle emissivity shift so #0d0b0a stays pure deep black at 0% and #4a2c18 reads richly as diluent increases
       flowMats.prodMix.emissiveIntensity = 0.03 + 0.14 * dilutionBlend + Math.max(0, dilRatio - 1) * 0.04;
 
       // Reservoir fluid level tracks live effective submergence (drops cleanly during low submergence / over-pumping)
       const activeFactor = THREE.MathUtils.clamp(Math.abs(currentRpm) / 350, 0, 1);
-      poolPhase += dt * (1.2 + activeFactor * 3.0);
+      poolPhase += dt * (1.2 + activeFactor * 3.0) * currentFlowAnimSpeed;
       const submNorm = THREE.MathUtils.clamp((effectiveSubmergence - SUBM_MIN) / (SUBM_MAX - SUBM_MIN), 0, 1);
       const targetPoolY = THREE.MathUtils.lerp(-11.12, -10.82, submNorm) - (isGasLock ? 0.04 : 0);
       oilPool.position.y = THREE.MathUtils.damp(oilPool.position.y, targetPoolY + Math.sin(poolPhase) * 0.008 * activeFactor, 3.2, dt);
@@ -11074,103 +11559,127 @@
       reservoirGlow.intensity = 4.8 + activeFactor * 1.8;
 
       // 1. Crude inflow from Cañoneo -> Gas Anchor bottom -> Dip Tube up into Pump
-      for (let i = 0; i < PERF_COUNT; i++) {
-        const s = perfSeeds[i];
-        const t = (((s.phase + flowProgress * 1.15) % 1) + 1) % 1;
+      const perfActiveCount = Math.min(PERF_MAX_COUNT, Math.round(PERF_COUNT * currentFlowAnimDensity));
+      perfFlowMesh.count = perfActiveCount;
+      perfFlowMesh.visible = perfActiveCount > 0;
+      if (perfActiveCount > 0) {
+        for (let i = 0; i < perfActiveCount; i++) {
+          const s = perfSeeds[i];
+          const t = (((s.phase + flowProgress * 1.15) % 1) + 1) % 1;
 
-        if (t < 0.42) {
-          const k = t / 0.42;
-          const r = THREE.MathUtils.lerp(1.06, 0.26, k);
-          const yStart = -10.42 + (s.lane % 5) * 0.22;
-          const y = THREE.MathUtils.lerp(yStart, -10.74, k * k);
-          _flowPos.set(Math.cos(s.angle) * r, y, -Math.sin(s.angle) * r);
-          _flowTan.set(-Math.cos(s.angle), -0.45 * k, Math.sin(s.angle)).normalize();
-          _flowScale.set(0.030, 0.052, 0.030);
-        } else {
-          const k = (t - 0.42) / 0.58;
-          const y = THREE.MathUtils.lerp(-10.72, -8.90, k);
-          const swirl = s.angle + k * 2.2;
-          const rad = 0.032 * (1 - k * 0.35);
-          _flowPos.set(Math.cos(swirl) * rad, y, -Math.sin(swirl) * rad);
-          _flowTan.set(0, 1, 0);
-          _flowScale.set(0.034, 0.058, 0.034);
+          if (t < 0.42) {
+            const k = t / 0.42;
+            const r = THREE.MathUtils.lerp(1.06, 0.26, k);
+            const yStart = -10.42 + (s.lane % 5) * 0.22;
+            const y = THREE.MathUtils.lerp(yStart, -10.74, k * k);
+            _flowPos.set(Math.cos(s.angle) * r, y, -Math.sin(s.angle) * r);
+            _flowTan.set(-Math.cos(s.angle), -0.45 * k, Math.sin(s.angle)).normalize();
+            _flowScale.set(0.030 * densitySizeScale, 0.052 * densitySizeScale, 0.030 * densitySizeScale);
+          } else {
+            const k = (t - 0.42) / 0.58;
+            const y = THREE.MathUtils.lerp(-10.72, -8.90, k);
+            const swirl = s.angle + k * 2.2;
+            const rad = 0.032 * (1 - k * 0.35);
+            _flowPos.set(Math.cos(swirl) * rad, y, -Math.sin(swirl) * rad);
+            _flowTan.set(0, 1, 0);
+            _flowScale.set(0.034 * densitySizeScale, 0.058 * densitySizeScale, 0.034 * densitySizeScale);
+          }
+
+          _flowQuat.setFromUnitVectors(_upAxis, _flowTan);
+          _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+          perfFlowMesh.setMatrixAt(i, _flowMat4);
         }
-
-        _flowQuat.setFromUnitVectors(_upAxis, _flowTan);
-        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
-        perfFlowMesh.setMatrixAt(i, _flowMat4);
+        perfFlowMesh.instanceMatrix.needsUpdate = true;
       }
-      perfFlowMesh.instanceMatrix.needsUpdate = true;
 
       // 2. Progressive cavity fluid pockets climbing inside cutaway Stator/Elastomer
       const rotorAngle = -rotatingRodAssembly.rotation.y;
-      for (let i = 0; i < CAVITY_COUNT; i++) {
-        const t = ((((i / CAVITY_COUNT) + flowProgress * 0.95) % 1) + 1) % 1;
-        const y = -8.86 + t * 2.98;
-        const cavityPhi = t * Math.PI * 2 * 2.25 + (i % 2) * Math.PI;
-        const cavityAngle = cavityPhi + rotorAngle * 0.5;
-        const rad = 0.118;
-        _flowPos.set(
-          Math.cos(cavityAngle) * rad,
-          y,
-          -Math.abs(Math.sin(cavityAngle)) * rad * 0.85
-        );
-        _flowTan.set(-Math.sin(cavityAngle) * 0.25, 1.0, -Math.cos(cavityAngle) * 0.20).normalize();
-        _flowQuat.setFromUnitVectors(_upAxis, _flowTan);
+      const cavityActiveCount = Math.min(CAVITY_MAX_COUNT, Math.round(CAVITY_COUNT * currentFlowAnimDensity));
+      cavityFlowMesh.count = cavityActiveCount;
+      cavityFlowMesh.visible = cavityActiveCount > 0;
+      if (cavityActiveCount > 0) {
         let cavityFillScale = 1.0;
         if (isGasLock) cavityFillScale *= (0.58 + 0.42 * slugMod);
         if (isLowPress) cavityFillScale *= 0.84;
         if (isDilExcess) cavityFillScale *= 0.88;
         if (isElastomerDamage) cavityFillScale *= (0.72 + 0.18 * slugMod);
-        cavityFillScale = Math.max(0.42, cavityFillScale);
-        _flowScale.set(0.056 * cavityFillScale, 0.088 * cavityFillScale, 0.050 * cavityFillScale);
-        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
-        cavityFlowMesh.setMatrixAt(i, _flowMat4);
+        cavityFillScale = Math.max(0.42, cavityFillScale) * densitySizeScale;
+
+        for (let i = 0; i < cavityActiveCount; i++) {
+          const s = cavitySeeds[i];
+          const t = (((s.phase + flowProgress * 0.95) % 1) + 1) % 1;
+          const y = -8.86 + t * 2.98;
+          const cavityPhi = t * Math.PI * 2 * 2.25 + s.lobeOffset;
+          const cavityAngle = cavityPhi + rotorAngle * 0.5;
+          const rad = 0.118;
+          _flowPos.set(
+            Math.cos(cavityAngle) * rad,
+            y,
+            -Math.abs(Math.sin(cavityAngle)) * rad * 0.85
+          );
+          _flowTan.set(-Math.sin(cavityAngle) * 0.25, 1.0, -Math.cos(cavityAngle) * 0.20).normalize();
+          _flowQuat.setFromUnitVectors(_upAxis, _flowTan);
+          _flowScale.set(0.056 * cavityFillScale, 0.088 * cavityFillScale, 0.050 * cavityFillScale);
+          _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+          cavityFlowMesh.setMatrixAt(i, _flowMat4);
+        }
+        cavityFlowMesh.instanceMatrix.needsUpdate = true;
       }
-      cavityFlowMesh.instanceMatrix.needsUpdate = true;
 
       // 3. Tubing ascent -> TE de Producción -> Surface production line
-      for (let i = 0; i < PROD_COUNT; i++) {
-        const s = prodSeeds[i];
-        const t = (((s.phase + flowProgress * 0.55) % 1) + 1) % 1;
-        prodCurve.getPointAt(t, _flowPos);
-        prodCurve.getTangentAt(t, _flowTan);
+      const prodActiveCount = Math.min(PROD_MAX_COUNT, Math.round(PROD_COUNT * currentFlowAnimDensity));
+      prodFlowMesh.count = prodActiveCount;
+      prodFlowMesh.visible = prodActiveCount > 0;
+      if (prodActiveCount > 0) {
+        for (let i = 0; i < prodActiveCount; i++) {
+          const s = prodSeeds[i];
+          const t = (((s.phase + flowProgress * 0.55) % 1) + 1) % 1;
+          prodCurve.getPointAt(t, _flowPos);
+          prodCurve.getTangentAt(t, _flowTan);
 
-        if (t < 0.56) {
-          const swirlA = s.angleJitter + t * 18.0 + rotorAngle * 0.4;
-          const rTubing = 0.135 + s.radialJitter;
-          _flowPos.x = Math.cos(swirlA) * rTubing;
-          _flowPos.z = -Math.abs(Math.sin(swirlA)) * rTubing * 0.85 - 0.02;
-        } else {
-          _flowPos.y += Math.sin(s.angleJitter + t * 12) * 0.024;
-          _flowPos.z += Math.cos(s.angleJitter) * 0.024;
+          if (t < 0.56) {
+            const swirlA = s.angleJitter + t * 18.0 + rotorAngle * 0.4;
+            const rTubing = 0.135 + s.radialJitter;
+            _flowPos.x = Math.cos(swirlA) * rTubing;
+            _flowPos.z = -Math.abs(Math.sin(swirlA)) * rTubing * 0.85 - 0.02;
+          } else {
+            _flowPos.y += Math.sin(s.angleJitter + t * 12) * 0.024;
+            _flowPos.z += Math.cos(s.angleJitter) * 0.024;
+          }
+
+          _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
+          const dropletThickness = 1 + (1 - dilutionBlend) * 0.14 + (isLowTemp ? 0.08 : 0) + (isDilExcess ? 0.06 : 0);
+          const gasGap = isGasLock ? (0.62 + 0.38 * Math.sin(s.phase * 18 + elapsed * 4.5)) : (isLowPress ? 0.86 : 1.0);
+          _flowScale.set(
+            0.036 * dropletThickness * gasGap * densitySizeScale,
+            0.068 * gasGap * densitySizeScale,
+            0.036 * dropletThickness * gasGap * densitySizeScale
+          );
+          _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+          prodFlowMesh.setMatrixAt(i, _flowMat4);
+
+          // Crude mixes with diluent downstream of checkProd at X = 3.54 (t ≈ 0.81..0.89 along prodCurve)
+          const mixFactor = THREE.MathUtils.smoothstep(t, 0.81, 0.89) * THREE.MathUtils.clamp(dilutionBlend * (isDilExcess ? 1.15 : 1.0), 0, 1);
+          _colScratch.copy(_colCrude).lerp(_colDiluted, mixFactor);
+          prodFlowMesh.setColorAt(i, _colScratch);
         }
-
-        _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
-        const dropletThickness = 1 + (1 - dilutionBlend) * 0.14 + (isLowTemp ? 0.08 : 0) + (isDilExcess ? 0.06 : 0);
-        const gasGap = isGasLock ? (0.62 + 0.38 * Math.sin(s.phase * 18 + elapsed * 4.5)) : (isLowPress ? 0.86 : 1.0);
-        _flowScale.set(0.036 * dropletThickness * gasGap, 0.068 * gasGap, 0.036 * dropletThickness * gasGap);
-        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
-        prodFlowMesh.setMatrixAt(i, _flowMat4);
-
-        const mixFactor = THREE.MathUtils.smoothstep(t, 0.56, 0.68) * THREE.MathUtils.clamp(dilutionBlend * (isDilExcess ? 1.15 : 1.0), 0, 1);
-        _colScratch.copy(_colCrude).lerp(_colDiluted, mixFactor);
-        prodFlowMesh.setColorAt(i, _colScratch);
+        prodFlowMesh.instanceMatrix.needsUpdate = true;
+        if (prodFlowMesh.instanceColor) prodFlowMesh.instanceColor.needsUpdate = true;
       }
-      prodFlowMesh.instanceMatrix.needsUpdate = true;
-      if (prodFlowMesh.instanceColor) prodFlowMesh.instanceColor.needsUpdate = true;
 
-      // 4. Diluent injection stream entering TE de Producción (scales dynamically with % de diluente: 0% hidden -> 35% surge)
-      const dilActive = currentDiluentPct > 0.4;
+      // 4. Diluent injection stream entering Production Line AFTER check valve (scales dynamically with % de diluente & flow density)
+      const dilActiveCount = Math.min(DIL_MAX_COUNT, Math.round(DIL_COUNT * currentFlowAnimDensity));
+      const dilActive = currentDiluentPct > 0.4 && dilActiveCount > 0;
+      dilFlowMesh.count = dilActive ? dilActiveCount : 0;
       dilFlowMesh.visible = dilActive;
       flowMats.diluent.opacity = dilActive ? THREE.MathUtils.clamp(0.32 + dilutionBlend * 0.64, 0, 0.98) : 0;
       if (dilActive) {
-        for (let i = 0; i < DIL_COUNT; i++) {
-          const t = ((i / DIL_COUNT) + dilProgress * 0.82) % 1;
+        const dScale = THREE.MathUtils.clamp(0.35 + dilRatio * 0.65, 0.35, 1.38) * densitySizeScale;
+        for (let i = 0; i < dilActiveCount; i++) {
+          const t = (dilSeeds[i].phase + dilProgress * 0.82) % 1;
           diluentFlowCurve.getPointAt(t, _flowPos);
           diluentFlowCurve.getTangentAt(t, _flowTan);
           _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
-          const dScale = THREE.MathUtils.clamp(0.35 + dilRatio * 0.65, 0.35, 1.38);
           _flowScale.set(0.024 * dScale, 0.050 * dScale, 0.024 * dScale);
           _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
           dilFlowMesh.setMatrixAt(i, _flowMat4);
@@ -11179,27 +11688,32 @@
       }
 
       // 5. Annulus gas separation bubbles: Gas Anchor vents -> Casing Annulus -> Línea de Gas del Anular
-      const gasBubbleMult = isGasLock ? 1.48 : (isLowPress ? 1.18 : 1.0);
-      for (let i = 0; i < GAS_COUNT; i++) {
-        const s = gasSeeds[i];
-        const t = (s.phase + gasProgress) % 1;
-        gasFullCurve.getPointAt(t, _flowPos);
-        gasFullCurve.getTangentAt(t, _flowTan);
+      const gasActiveCount = Math.min(GAS_MAX_COUNT, Math.round(GAS_COUNT * currentFlowAnimDensity));
+      gasFlowMesh.count = gasActiveCount;
+      gasFlowMesh.visible = gasActiveCount > 0;
+      if (gasActiveCount > 0) {
+        const gasBubbleMult = (isGasLock ? 1.48 : (isLowPress ? 1.18 : 1.0)) * densitySizeScale;
+        for (let i = 0; i < gasActiveCount; i++) {
+          const s = gasSeeds[i];
+          const t = (s.phase + gasProgress) % 1;
+          gasFullCurve.getPointAt(t, _flowPos);
+          gasFullCurve.getTangentAt(t, _flowTan);
 
-        if (t < 0.42) {
-          const rAnn = 0.36;
-          const arcA = 0.25 + ((Math.sin(s.swirlOffset + t * 10) * 0.5 + 0.5) * (Math.PI - 0.50));
-          _flowPos.x = Math.cos(arcA) * rAnn;
-          _flowPos.z = -Math.sin(arcA) * rAnn;
+          if (t < 0.42) {
+            const rAnn = 0.36;
+            const arcA = 0.25 + ((Math.sin(s.swirlOffset + t * 10) * 0.5 + 0.5) * (Math.PI - 0.50));
+            _flowPos.x = Math.cos(arcA) * rAnn;
+            _flowPos.z = -Math.sin(arcA) * rAnn;
+          }
+
+          _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
+          const bSize = (t < 0.42 ? 0.028 : 0.024) * gasBubbleMult;
+          _flowScale.set(bSize, bSize * 1.25, bSize);
+          _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
+          gasFlowMesh.setMatrixAt(i, _flowMat4);
         }
-
-        _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
-        const bSize = (t < 0.42 ? 0.028 : 0.024) * gasBubbleMult;
-        _flowScale.set(bSize, bSize * 1.25, bSize);
-        _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
-        gasFlowMesh.setMatrixAt(i, _flowMat4);
+        gasFlowMesh.instanceMatrix.needsUpdate = true;
       }
-      gasFlowMesh.instanceMatrix.needsUpdate = true;
     }
 
     function stepScene(dt, elapsed) {
@@ -11288,8 +11802,9 @@
         elastomerMat.emissiveIntensity = 0.22 + elastHeat * 0.58 + heatPulse;
       }
 
-      // Update synchronized 3D fluid, progressive cavity, diluent & annulus gas flows
+      // Update synchronized 3D fluid, progressive cavity, diluent, annulus gas & submergence level
       updateProcessFlow(dt, elapsed);
+      updateSubmergenceVisual(dt, elapsed);
 
       // Manometer needle reaction directly driven by live pressure & composed active faults
       let normLoad = THREE.MathUtils.clamp((currentPsi - 220) / 860, 0.08, 1.32);
@@ -11394,7 +11909,7 @@
       let tempNum = currentTemp + jitter * 0.15;
       const dynSubm = Math.round(effectiveSubmergence);
 
-      // Realistic non-linear viscosity model: exponential dilution curve (0% -> ~3,850 cP, 18% -> ~240 cP, 35% -> ~20 cP) × Arrhenius thermal coupling
+      // Realistic non-linear viscosity model calibrated to 0..60% with 30% efficient point (0% -> ~3,700 cP, 30% -> ~234 cP, 60% -> ~16 cP)
       const coldDelta = Math.max(0, TEMP_DEFAULT_NORMAL - currentTemp);
       const hotDelta = Math.max(0, currentTemp - TEMP_DEFAULT_NORMAL);
       const tempViscFactor = THREE.MathUtils.clamp(
@@ -11403,23 +11918,24 @@
         2.35
       );
       const shearFactor = 1 - 0.14 * THREE.MathUtils.clamp(absRpm / 350, 0, 1);
-      const baseDilVisc = 3980 * Math.exp(-0.154 * dilPct);
+      const baseDilVisc = 3980 * Math.exp(-0.092 * dilPct);
       let visc = Math.max(16, Math.round(baseDilVisc * tempViscFactor * shearFactor + jitter * (1.5 + heavyFactor * 18)));
 
       // Theoretical flow strictly proportional to pump geometric displacement & forward speed
       const bpdTeorico = currentRpm <= 0.5 ? 0 : Math.round(currentRpm * PUMP_DISP_BPD_PER_RPM);
 
-      // Physics-based Volumetric Efficiency: accounts for ΔP slippage, low-viscosity slippage (excess diluent), high-viscosity intake restriction & submergence fill
+      // Physics-based Volumetric Efficiency peaking at 30% dilution (~234 cP -> ~91-92% eff):
+      // drops below 30% due to rising viscosity/intake friction and drops above 30% due to low-viscosity internal slippage
       const baseDpFactor = THREE.MathUtils.clamp((currentPsi - 260) / 760, 0.12, 1.45);
-      // Thin fluids (visc < 180 cP) slip much faster across rotor-stator sealing lines; normal ~240 cP @ 545 PSI gives ~90% efficiency
-      const lowViscSlipPenalty = visc < 180
-        ? THREE.MathUtils.clamp(Math.pow((180 - visc) / 165, 1.45) * 0.24 * (0.65 + 0.55 * baseDpFactor), 0, 0.38)
+      const lowViscSlipPenalty = visc < 200
+        ? THREE.MathUtils.clamp(Math.pow((200 - visc) / 185, 1.35) * 0.26 * (0.65 + 0.55 * baseDpFactor), 0, 0.42)
         : 0;
-      const dpSlipLoss = THREE.MathUtils.clamp(0.065 + Math.max(0, currentPsi - 545) / 2100 + lowViscSlipPenalty, 0.04, 0.62);
-      const highViscFillLoss = visc > 1200
-        ? THREE.MathUtils.clamp(Math.log10(visc / 1200) * 0.17, 0, 0.24)
+      const dpSlipLoss = THREE.MathUtils.clamp(0.065 + Math.max(0, currentPsi - 545) / 2100 + lowViscSlipPenalty, 0.04, 0.64);
+      const highViscFillLoss = visc > 260
+        ? THREE.MathUtils.clamp(Math.log10(visc / 260) * 0.21, 0, 0.28)
         : 0;
-      const submFillFactor = THREE.MathUtils.clamp((effectiveSubmergence - 35) / 140, 0.34, 1.0);
+      // Full cavity fill at or above minimum efficient submergence (100 ft); drops sharply below 100 ft
+      const submFillFactor = THREE.MathUtils.clamp((effectiveSubmergence - 30) / 70, 0.34, 1.0);
 
       let effFactor = THREE.MathUtils.clamp((1 - dpSlipLoss) * (1 - highViscFillLoss) * submFillFactor, 0.05, 0.96);
 
