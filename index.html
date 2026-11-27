@@ -1153,6 +1153,91 @@
       gap: 3px;
     }
 
+    .coriolis-card {
+      margin-top: 6px;
+      padding: 5px 7px 6px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.56);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: border-color 150ms ease;
+    }
+
+    .coriolis-card.is-warn {
+      border-color: rgba(245, 158, 11, 0.42);
+    }
+
+    .coriolis-card.is-crit {
+      border-color: rgba(239, 68, 68, 0.48);
+    }
+
+    .coriolis-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .coriolis-card-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+
+    .coriolis-led-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 5px rgba(34, 197, 94, 0.65);
+      flex-shrink: 0;
+      transition: background-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .coriolis-card.is-warn .coriolis-led-dot {
+      background: #f59e0b;
+      box-shadow: 0 0 5px rgba(245, 158, 11, 0.7);
+    }
+
+    .coriolis-card.is-crit .coriolis-led-dot {
+      background: #ef4444;
+      box-shadow: 0 0 5px rgba(239, 68, 68, 0.75);
+    }
+
+    .coriolis-status-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.8px;
+      font-weight: 700;
+      color: #34d399;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .coriolis-card.is-warn .coriolis-status-text {
+      color: #fbbf24;
+    }
+
+    .coriolis-card.is-crit .coriolis-status-text {
+      color: #f87171;
+    }
+
+    .coriolis-meta {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2px 8px;
+      align-items: baseline;
+      padding-top: 2px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
     .flow-eff-card {
       padding: 5px 7px 6px;
       margin-bottom: 3px;
@@ -3376,7 +3461,7 @@
               <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Corte / falta de diluente (&lt; 15%)</span>
               <span class="fault-scenario-state">Activa</span>
             </span>
-            <span class="fault-scenario-desc">Sin dilución o dilución insuficiente · alta viscosidad, torque y menor caudal real.</span>
+            <span class="fault-scenario-desc">Inyección en superficie insuficiente · alta viscosidad/fricción en línea, alerta Coriolis y mayor contrapresión.</span>
           </button>
 
           <button type="button" class="fault-scenario-btn" data-fault="exceso-diluente" data-severity="warn" aria-pressed="false">
@@ -3384,7 +3469,7 @@
               <span class="fault-scenario-name"><span class="fault-sev-dot" aria-hidden="true"></span>Exceso de diluente (&gt; 40%)</span>
               <span class="fault-scenario-state">Activa</span>
             </span>
-            <span class="fault-scenario-desc">Viscosidad muy baja · mayor resbalamiento interno y caída de eficiencia.</span>
+            <span class="fault-scenario-desc">Mayor volumen total de mezcla en línea de producción, muy baja viscosidad en superficie y exceso en Coriolis.</span>
           </button>
 
           <button type="button" class="fault-scenario-btn" data-fault="baja-sumergencia" data-severity="warn" aria-pressed="false">
@@ -3565,13 +3650,30 @@
             <label for="diluent-slider" class="telemetry-label">% de Diluente</label>
             <span id="val-diluent-wrap" class="telemetry-value"><span id="val-diluent">30</span><span class="telemetry-unit">%</span></span>
           </div>
-          <input id="diluent-slider" class="telemetry-inline-slider" type="range" min="0" max="60" step="1" value="30" aria-label="Porcentaje de diluente inyectado" title="Ajustar % de diluente (falta: < 15% · punto eficiente: 30% · exceso: > 40%)" />
-          <div class="telemetry-inline-ticks" title="Falta: < 15% · Punto eficiente: 30% · Exceso: > 40%">
+          <input id="diluent-slider" class="telemetry-inline-slider" type="range" min="0" max="60" step="1" value="30" aria-label="Porcentaje de diluente inyectado en superficie en la línea de producción" title="Ajustar % de diluente en superficie (aguas abajo de la válvula check y medidor Coriolis · falta: < 15% · punto eficiente: 30% · exceso: > 40%)" />
+          <div class="telemetry-inline-ticks" title="Inyección en superficie (Coriolis): Falta < 15% · Punto eficiente 30% · Exceso > 40%">
             <span>0%</span>
             <span>15%</span>
             <span>30%</span>
             <span>40%</span>
             <span>60%</span>
+          </div>
+        </div>
+
+        <div id="coriolis-readout-card" class="coriolis-card" role="region" aria-label="Lecturas en tiempo real del medidor de flujo Coriolis">
+          <div class="coriolis-card-head">
+            <span class="coriolis-card-title"><span class="coriolis-led-dot" aria-hidden="true"></span>Medidor Coriolis</span>
+            <span id="val-coriolis-status" class="coriolis-status-text">Óptimo (~30%)</span>
+          </div>
+          <div class="telemetry-row">
+            <span class="telemetry-label">Flujo de Diluente</span>
+            <span id="val-coriolis-bpd-wrap" class="telemetry-value"><span id="val-coriolis-bpd">133.8</span><span class="telemetry-unit">BPD</span></span>
+          </div>
+          <div class="coriolis-meta">
+            <span class="flow-eff-sublabel">Mezcla en Línea</span>
+            <span class="flow-eff-subval telemetry-value"><span id="val-coriolis-mix">580</span><span class="telemetry-unit">BPD</span></span>
+            <span class="flow-eff-sublabel">Relación D/C · Densidad</span>
+            <span class="flow-eff-subval telemetry-value"><span id="val-coriolis-ratio">0.30</span> · <span id="val-coriolis-dens">0.95</span><span class="telemetry-unit">g/cm³</span></span>
           </div>
         </div>
       </div>
@@ -3621,8 +3723,8 @@
           </div>
         </div>
 
-        <div class="telemetry-row">
-          <span class="telemetry-label">Viscosidad (cP)</span>
+        <div class="telemetry-row" title="Viscosidad de la mezcla crudo + diluente en la línea de producción en superficie (aguas abajo de la válvula check y el medidor Coriolis)">
+          <span class="telemetry-label">Viscosidad en Línea (cP)</span>
           <span id="val-visc-wrap" class="telemetry-value visc-low"><span id="val-visc">232</span><span class="telemetry-unit">cP</span></span>
         </div>
 
@@ -5055,7 +5157,7 @@
       needlePivot.rotation.z = baseAngleRad;
       g.add(needlePivot);
 
-      gaugeNeedles.push({ pivot: needlePivot, baseAngle: baseAngleRad });
+      gaugeNeedles.push({ pivot: needlePivot, baseAngle: baseAngleRad, label });
       return g;
     }
 
@@ -7208,22 +7310,44 @@
       prodLineGroup.add(rack);
     }
 
-    // 8.13 Línea de Inyección de Diluente (Industrial Amber-Gold piping tied into Production Line AFTER Check Valve at X = 3.54)
+    // 8.13 Línea de Inyección de Diluente (Industrial Amber-Gold piping with inline Coriolis Mass Flow Meter tied into Production Line AFTER Check Valve at X = 3.54)
     const diluentGroup = new THREE.Group();
     surfaceGroup.add(diluentGroup);
 
-    const diluentPath = new THREE.CatmullRomCurve3([
+    // Upstream amber sight pipe: Diluent skid -> rear header (checkDil) -> clean 90° bend -> Coriolis inlet flange at Z = -1.76
+    const diluentUpstreamPath = new THREE.CatmullRomCurve3([
       new THREE.Vector3(1.45, 0.22, -2.25),
       new THREE.Vector3(1.45, 0.92, -2.25),
-      new THREE.Vector3(1.75, 0.92, -2.10),
+      new THREE.Vector3(1.72, 0.92, -2.10),
       new THREE.Vector3(3.18, 0.92, -2.10),
-      new THREE.Vector3(3.54, 0.92, -1.78),
-      new THREE.Vector3(3.54, 1.30, -1.05),
+      new THREE.Vector3(3.36, 0.92, -2.10),
+      new THREE.Vector3(3.50, 0.92, -2.02),
+      new THREE.Vector3(3.54, 0.92, -1.88),
+      new THREE.Vector3(3.54, 0.92, -1.76),
+    ]);
+    const diluentPipeUpstream = new THREE.Mesh(
+      new THREE.TubeGeometry(diluentUpstreamPath, 48, 0.045, 14, false),
+      mats.diluentSightPipe
+    );
+    diluentPipeUpstream.renderOrder = 3;
+    diluentGroup.add(diluentPipeUpstream);
+
+    // Downstream amber sight pipe: Coriolis outlet flange at Z = -1.20 -> compact S-riser -> dilChokeGroup -> Production tie-in
+    const diluentDownstreamPath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(3.54, 0.92, -1.20),
+      new THREE.Vector3(3.54, 0.92, -1.10),
+      new THREE.Vector3(3.54, 1.04, -1.01),
+      new THREE.Vector3(3.54, 1.24, -0.94),
+      new THREE.Vector3(3.54, 1.30, -0.84),
+      new THREE.Vector3(3.54, 1.30, -0.64),
       new THREE.Vector3(3.54, 1.30, -0.10),
     ]);
-    const diluentPipe = new THREE.Mesh(new THREE.TubeGeometry(diluentPath, 56, 0.045, 14, false), mats.diluentSightPipe);
-    diluentPipe.renderOrder = 3;
-    diluentGroup.add(diluentPipe);
+    const diluentPipeDownstream = new THREE.Mesh(
+      new THREE.TubeGeometry(diluentDownstreamPath, 36, 0.045, 14, false),
+      mats.diluentSightPipe
+    );
+    diluentPipeDownstream.renderOrder = 3;
+    diluentGroup.add(diluentPipeDownstream);
 
     // Diluent skid base anchor flange + bolted flanges along rear header & tie-in into production line
     const dilSkidFlange = createFlange(0.145, 0.05, 6, mats.steelDark, mats.steelPipe, false);
@@ -7249,12 +7373,434 @@
     dilTieInFlange.position.set(3.54, 1.30, -0.24);
     diluentGroup.add(dilTieInFlange);
 
-    // Structural steel pipe supports for diluent header
-    for (const [dx, dz, axis] of [[2.30, -2.10, 'x'], [3.54, -1.52, 'z']]) {
-      const dSup = createPipeSupport(0.70, 0.050, axis);
-      dSup.position.set(dx, 0.22, dz);
-      diluentGroup.add(dSup);
+    // Structural steel pipe support for rear diluent header
+    const dSupRear = createPipeSupport(0.70, 0.050, 'x');
+    dSupRear.position.set(2.30, 0.22, -2.10);
+    diluentGroup.add(dSupRear);
+
+    // Dedicated industrial twin-saddle cradle stanchion flanking the Coriolis meter at (3.54, 0.22, -1.48)
+    // Clears the downward U-sensor housing completely while supporting both pipe stubs flush at Y = 0.92
+    const coriolisSupport = new THREE.Group();
+    coriolisSupport.position.set(3.54, 0.22, -1.48);
+    {
+      const basePlate = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.032, 0.28), mats.steelDark);
+      basePlate.position.y = 0.016;
+      basePlate.castShadow = true;
+      basePlate.receiveShadow = true;
+      coriolisSupport.add(basePlate);
+
+      const anchorGeo = new THREE.CylinderGeometry(0.014, 0.014, 0.045, 6);
+      for (const [bx, bz] of [[-0.095, -0.095], [0.095, -0.095], [-0.095, 0.095], [0.095, 0.095]]) {
+        const ab = new THREE.Mesh(anchorGeo, mats.steelPipe);
+        ab.position.set(bx, 0.032, bz);
+        coriolisSupport.add(ab);
+      }
+
+      const mainCol = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.30, 0.085), mats.steelDark);
+      mainCol.position.y = 0.182;
+      mainCol.castShadow = true;
+      coriolisSupport.add(mainCol);
+
+      for (const sx of [-0.068, 0.068]) {
+        const gus = new THREE.Mesh(new THREE.BoxGeometry(0.052, 0.14, 0.018), mats.steelDark);
+        gus.position.set(sx, 0.102, 0);
+        coriolisSupport.add(gus);
+      }
+
+      const crossBeam = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.052, 0.76), mats.steelDark);
+      crossBeam.position.y = 0.338;
+      crossBeam.castShadow = true;
+      coriolisSupport.add(crossBeam);
+
+      for (const sz of [-0.35, 0.35]) {
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.068, 0.28, 0.068), mats.steelDark);
+        arm.position.set(0, 0.495, sz);
+        arm.castShadow = true;
+        coriolisSupport.add(arm);
+
+        const saddle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.028, 0.095), mats.steelDark);
+        saddle.position.set(0, 0.642, sz);
+        saddle.castShadow = true;
+        coriolisSupport.add(saddle);
+
+        const uBolt = new THREE.Mesh(
+          new THREE.TorusGeometry(0.057, 0.010, 8, 18, Math.PI),
+          mats.galvanizedPipe
+        );
+        uBolt.position.set(0, 0.70, sz);
+        coriolisSupport.add(uBolt);
+      }
     }
+    diluentGroup.add(coriolisSupport);
+
+    // Inline Coriolis Mass Flow Meter (L-Cor style) centered at (3.54, 0.92, -1.48) aligned with +Z diluent flow
+    const coriolisSteelMat = new THREE.MeshStandardMaterial({
+      color: 0xd0d8e2,
+      metalness: 0.88,
+      roughness: 0.24,
+    });
+    const coriolisDarkMat = new THREE.MeshStandardMaterial({
+      color: 0x3b4858,
+      metalness: 0.62,
+      roughness: 0.42,
+    });
+    const coriolisBezelWhiteMat = new THREE.MeshStandardMaterial({
+      color: 0xf1f5f9,
+      metalness: 0.06,
+      roughness: 0.34,
+    });
+    const coriolisLedMat = new THREE.MeshStandardMaterial({
+      color: 0x22c55e,
+      emissive: 0x22c55e,
+      emissiveIntensity: 1.35,
+      metalness: 0.1,
+      roughness: 0.2,
+    });
+
+    // Procedural circular side nameplate texture for U-sensor housing
+    const coriolisBadgeCanvas = document.createElement('canvas');
+    coriolisBadgeCanvas.width = 256;
+    coriolisBadgeCanvas.height = 256;
+    const cbCtx = coriolisBadgeCanvas.getContext('2d');
+    cbCtx.fillStyle = '#f8fafc';
+    cbCtx.beginPath();
+    cbCtx.arc(128, 128, 124, 0, Math.PI * 2);
+    cbCtx.fill();
+    cbCtx.strokeStyle = '#94a3b8';
+    cbCtx.lineWidth = 5;
+    cbCtx.stroke();
+    cbCtx.fillStyle = '#dc2626';
+    cbCtx.fillRect(24, 134, 208, 7);
+    cbCtx.fillStyle = '#0f172a';
+    cbCtx.font = 'bold 30px sans-serif';
+    cbCtx.textAlign = 'center';
+    cbCtx.fillText('CORIOLIS', 128, 110);
+    cbCtx.fillStyle = '#dc2626';
+    cbCtx.font = 'bold 22px monospace';
+    cbCtx.fillText('L-COR 4000', 128, 174);
+    cbCtx.fillStyle = '#475569';
+    cbCtx.font = 'bold 16px sans-serif';
+    cbCtx.fillText('MASS FLOW', 128, 202);
+    const coriolisBadgeTex = new THREE.CanvasTexture(coriolisBadgeCanvas);
+    coriolisBadgeTex.colorSpace = THREE.SRGBColorSpace;
+    coriolisBadgeTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    const coriolisBadgeMat = new THREE.MeshStandardMaterial({
+      map: coriolisBadgeTex,
+      roughness: 0.38,
+      metalness: 0.08,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
+    });
+
+    // Live procedural LCD CanvasTexture for digital transmitter display (zero-GC dirty-cached updates)
+    const coriolisLcdCanvas = document.createElement('canvas');
+    coriolisLcdCanvas.width = 256;
+    coriolisLcdCanvas.height = 256;
+    const clCtx = coriolisLcdCanvas.getContext('2d');
+    const coriolisLcdTex = new THREE.CanvasTexture(coriolisLcdCanvas);
+    coriolisLcdTex.colorSpace = THREE.SRGBColorSpace;
+    coriolisLcdTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    const coriolisLcdMat = new THREE.MeshStandardMaterial({
+      map: coriolisLcdTex,
+      emissiveMap: coriolisLcdTex,
+      emissive: 0xffffff,
+      emissiveIntensity: 0.28,
+      roughness: 0.22,
+      metalness: 0.05,
+    });
+
+    const coriolisCardEl = document.getElementById('coriolis-readout-card');
+    const valCoriolisStatusEl = document.getElementById('val-coriolis-status');
+    const valCoriolisBpdEl = document.getElementById('val-coriolis-bpd');
+    const valCoriolisBpdWrapEl = document.getElementById('val-coriolis-bpd-wrap');
+    const valCoriolisMixEl = document.getElementById('val-coriolis-mix');
+    const valCoriolisRatioEl = document.getElementById('val-coriolis-ratio');
+    const valCoriolisDensEl = document.getElementById('val-coriolis-dens');
+
+    let lastCoriolisLcdKey = '';
+    function updateCoriolisDisplay(dilPct, bpdReal, lowThresh = 15, highThresh = 40) {
+      const pctClamped = THREE.MathUtils.clamp(Math.round(dilPct), 0, 60);
+      const isZero = dilPct <= 0.4;
+      const baseBpd = bpdReal > 0 ? bpdReal : 120;
+      const dilBpd = isZero ? 0 : (baseBpd * (dilPct / 100));
+      const bpdStr = dilBpd.toFixed(1);
+      const mixBpd = Math.round(Math.max(0, bpdReal) + dilBpd);
+      const dcRatio = isZero ? 0 : (dilPct / 100);
+      const dcRatioStr = dcRatio.toFixed(2);
+      // Volume-weighted surface mixture density (9° API extra-heavy crude ~1.007 g/cm³ + naphtha diluent ~0.755 g/cm³)
+      const volFracDil = dcRatio / (1 + dcRatio);
+      const mixDensity = 1.007 * (1 - volFracDil) + 0.755 * volFracDil;
+      const densStr = mixDensity.toFixed(2);
+
+      let statusLabel = 'OPTIMO (30%)';
+      let panelStatusLabel = pctClamped >= 27 && pctClamped <= 33 ? 'Óptimo (~30%)' : `Normal (${pctClamped}%)`;
+      let statusHex = '#16a34a';
+      let ledColor = 0x22c55e;
+      let lcdBg = '#c6d1b0';
+      let panelState = 'good';
+      if (isZero) {
+        statusLabel = 'SIN FLUJO';
+        panelStatusLabel = 'Corte / Sin flujo';
+        statusHex = '#dc2626';
+        ledColor = 0xef4444;
+        lcdBg = '#cbd5e1';
+        panelState = 'crit';
+      } else if (dilPct < lowThresh) {
+        statusLabel = 'BAJO DIL';
+        panelStatusLabel = `Dilución baja (${pctClamped}%)`;
+        statusHex = '#d97706';
+        ledColor = 0xf59e0b;
+        lcdBg = '#e8d7a8';
+        panelState = 'warn';
+      } else if (dilPct > highThresh) {
+        statusLabel = 'EXCESO DIL';
+        panelStatusLabel = `Exceso (${pctClamped}%)`;
+        statusHex = '#ea580c';
+        ledColor = 0xf97316;
+        lcdBg = '#ebd1b4';
+        panelState = 'warn';
+      }
+
+      const key = `${bpdStr}|${pctClamped}|${mixBpd}|${densStr}|${panelStatusLabel}`;
+      if (key === lastCoriolisLcdKey) return;
+      lastCoriolisLcdKey = key;
+
+      // Sync dedicated Coriolis readout card inside "Datos en tiempo real"
+      if (valCoriolisBpdEl) valCoriolisBpdEl.textContent = bpdStr;
+      if (valCoriolisMixEl) valCoriolisMixEl.textContent = String(mixBpd);
+      if (valCoriolisRatioEl) valCoriolisRatioEl.textContent = dcRatioStr;
+      if (valCoriolisDensEl) valCoriolisDensEl.textContent = densStr;
+      if (valCoriolisStatusEl) valCoriolisStatusEl.textContent = panelStatusLabel;
+      if (coriolisCardEl) {
+        coriolisCardEl.classList.toggle('is-warn', panelState === 'warn');
+        coriolisCardEl.classList.toggle('is-crit', panelState === 'crit');
+      }
+      if (valCoriolisBpdWrapEl) {
+        valCoriolisBpdWrapEl.classList.toggle('is-warn', panelState === 'warn');
+        valCoriolisBpdWrapEl.classList.toggle('is-crit', panelState === 'crit');
+      }
+
+      coriolisLedMat.color.setHex(ledColor);
+      coriolisLedMat.emissive.setHex(ledColor);
+
+      clCtx.clearRect(0, 0, 256, 256);
+      // White instrument faceplate circle
+      clCtx.fillStyle = '#f1f5f9';
+      clCtx.beginPath();
+      clCtx.arc(128, 128, 126, 0, Math.PI * 2);
+      clCtx.fill();
+      clCtx.strokeStyle = '#cbd5e1';
+      clCtx.lineWidth = 6;
+      clCtx.stroke();
+
+      // Top instrument header
+      clCtx.fillStyle = '#dc2626';
+      clCtx.fillRect(68, 44, 120, 4);
+      clCtx.fillStyle = '#1e293b';
+      clCtx.font = 'bold 17px sans-serif';
+      clCtx.textAlign = 'center';
+      clCtx.fillText('CORIOLIS DIL', 128, 38);
+
+      // Recessed digital LCD screen
+      clCtx.fillStyle = '#1e293b';
+      clCtx.fillRect(42, 58, 172, 122);
+      clCtx.fillStyle = lcdBg;
+      clCtx.fillRect(48, 64, 160, 110);
+
+      // LCD micro-labels and primary live readings (Diluent BPD + Dosis % + Surface Mix BPD)
+      clCtx.fillStyle = '#334155';
+      clCtx.font = 'bold 12px monospace';
+      clCtx.textAlign = 'left';
+      clCtx.fillText('CAUDAL DIL', 55, 79);
+      clCtx.textAlign = 'right';
+      clCtx.fillText('BPD', 201, 79);
+
+      clCtx.fillStyle = '#0f172a';
+      clCtx.font = 'bold 32px monospace';
+      clCtx.textAlign = 'right';
+      clCtx.fillText(bpdStr, 201, 110);
+
+      clCtx.strokeStyle = 'rgba(15,23,42,0.22)';
+      clCtx.lineWidth = 1.5;
+      clCtx.beginPath();
+      clCtx.moveTo(55, 118);
+      clCtx.lineTo(201, 118);
+      clCtx.stroke();
+
+      clCtx.fillStyle = '#0f172a';
+      clCtx.font = 'bold 15px monospace';
+      clCtx.textAlign = 'left';
+      clCtx.fillText(`DOSIS ${pctClamped}%`, 55, 136);
+      clCtx.fillStyle = '#334155';
+      clCtx.font = 'bold 12px monospace';
+      clCtx.textAlign = 'left';
+      clCtx.fillText(`MEZCLA ${mixBpd} BPD`, 55, 152);
+
+      // Status strip inside bottom of LCD
+      clCtx.fillStyle = statusHex;
+      clCtx.fillRect(48, 158, 160, 16);
+      clCtx.fillStyle = '#ffffff';
+      clCtx.font = 'bold 11px sans-serif';
+      clCtx.textAlign = 'center';
+      clCtx.fillText(statusLabel, 128, 170);
+
+      // Bottom keypad indicators & red L-Cor accent
+      clCtx.fillStyle = '#dc2626';
+      clCtx.fillRect(88, 187, 80, 5);
+      clCtx.fillStyle = '#475569';
+      clCtx.fillRect(82, 200, 14, 12);
+      clCtx.fillRect(160, 200, 14, 12);
+      clCtx.fillStyle = statusHex;
+      clCtx.beginPath();
+      clCtx.arc(128, 206, 7, 0, Math.PI * 2);
+      clCtx.fill();
+
+      coriolisLcdTex.needsUpdate = true;
+    }
+
+    const coriolisDilMeter = new THREE.Group();
+    coriolisDilMeter.position.set(3.54, 0.92, -1.48);
+    {
+      // 1. Inlet & Outlet bolted stainless API flanges + tapered weld-neck cones (z = -0.28 and +0.28)
+      for (const sz of [-0.28, 0.28]) {
+        const fl = createFlange(0.106, 0.042, 6, coriolisSteelMat, mats.steelDark, true);
+        fl.rotation.x = Math.PI / 2;
+        fl.position.z = sz;
+        coriolisDilMeter.add(fl);
+
+        const neck = new THREE.Mesh(
+          new THREE.CylinderGeometry(sz < 0 ? 0.046 : 0.058, sz < 0 ? 0.058 : 0.046, 0.072, 18),
+          coriolisSteelMat
+        );
+        neck.rotation.x = Math.PI / 2;
+        neck.position.z = sz * 0.83;
+        neck.castShadow = true;
+        coriolisDilMeter.add(neck);
+      }
+
+      // 2. Upper horizontal sensor manifold cylinder aligned with +Z flow
+      const upperManifold = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.062, 0.062, 0.41, 24),
+        coriolisSteelMat
+      );
+      upperManifold.rotation.x = Math.PI / 2;
+      upperManifold.castShadow = true;
+      upperManifold.receiveShadow = true;
+      coriolisDilMeter.add(upperManifold);
+
+      // 3. Signature downward U-shaped curved metallic Coriolis sensor housing (ExtrudeGeometry with bevels)
+      const uShape = new THREE.Shape();
+      uShape.moveTo(-0.20, 0.01);
+      uShape.lineTo(-0.20, -0.062);
+      uShape.bezierCurveTo(-0.155, -0.070, -0.105, -0.245, 0.0, -0.245);
+      uShape.bezierCurveTo(0.105, -0.245, 0.155, -0.070, 0.20, -0.062);
+      uShape.lineTo(0.20, 0.01);
+      uShape.closePath();
+
+      const uExtrudeGeo = new THREE.ExtrudeGeometry(uShape, {
+        depth: 0.088,
+        bevelEnabled: true,
+        bevelThickness: 0.016,
+        bevelSize: 0.015,
+        bevelSegments: 4,
+        curveSegments: 24,
+      });
+      uExtrudeGeo.translate(0, 0, -0.044);
+      uExtrudeGeo.rotateY(Math.PI / 2);
+      const uBodyMesh = new THREE.Mesh(uExtrudeGeo, coriolisSteelMat);
+      uBodyMesh.castShadow = true;
+      uBodyMesh.receiveShadow = true;
+      coriolisDilMeter.add(uBodyMesh);
+
+      // Bottom machined purge/drain boss at apex of U-curve
+      const drainBoss = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.013, 0.010, 0.030, 12),
+        coriolisDarkMat
+      );
+      drainBoss.position.set(0, -0.264, 0);
+      coriolisDilMeter.add(drainBoss);
+
+      // 4. Side circular technical nameplates & directional flow-arrow badges on both +X and -X faces
+      const badgeGeo = new THREE.CircleGeometry(0.056, 28);
+      for (const side of [1, -1]) {
+        const badge = new THREE.Mesh(badgeGeo, coriolisBadgeMat);
+        badge.position.set(side * 0.062, -0.130, 0);
+        badge.rotation.y = side > 0 ? Math.PI / 2 : -Math.PI / 2;
+        coriolisDilMeter.add(badge);
+
+        const arrowPlate = new THREE.Mesh(
+          new THREE.BoxGeometry(0.008, 0.018, 0.068),
+          coriolisDarkMat
+        );
+        arrowPlate.position.set(side * 0.063, -0.014, 0);
+        coriolisDilMeter.add(arrowPlate);
+
+        const arrowTip = new THREE.Mesh(
+          new THREE.ConeGeometry(0.008, 0.018, 4),
+          coriolisBezelWhiteMat
+        );
+        arrowTip.rotation.x = Math.PI / 2;
+        arrowTip.position.set(side * 0.068, -0.014, 0.018);
+        coriolisDilMeter.add(arrowTip);
+      }
+
+      // 5. Machined vertical transmitter neck stem, locking nut & dark cylindrical junction base
+      const stemBoss = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.052, 0.030, 18), coriolisSteelMat);
+      stemBoss.position.y = 0.064;
+      coriolisDilMeter.add(stemBoss);
+
+      const stemCol = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.088, 16), coriolisSteelMat);
+      stemCol.position.y = 0.118;
+      stemCol.castShadow = true;
+      coriolisDilMeter.add(stemCol);
+
+      const lockNut = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.030, 8), coriolisDarkMat);
+      lockNut.position.y = 0.166;
+      coriolisDilMeter.add(lockNut);
+
+      const txBase = new THREE.Mesh(new THREE.CylinderGeometry(0.066, 0.062, 0.088, 22), coriolisDarkMat);
+      txBase.position.y = 0.222;
+      txBase.castShadow = true;
+      coriolisDilMeter.add(txBase);
+
+      // Rear electrical cable gland on transmitter base
+      const cableGland = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.020, 0.046, 12), coriolisDarkMat);
+      cableGland.rotation.x = Math.PI / 2;
+      cableGland.position.set(0, 0.222, -0.072);
+      coriolisDilMeter.add(cableGland);
+
+      // 6. Cylindrical Digital Transmitter Head facing +X (readable from front-right & rear-right camera views)
+      const txDrum = new THREE.Mesh(new THREE.CylinderGeometry(0.110, 0.110, 0.112, 28), coriolisDarkMat);
+      txDrum.rotation.z = Math.PI / 2;
+      txDrum.position.set(0, 0.345, 0);
+      txDrum.castShadow = true;
+      coriolisDilMeter.add(txDrum);
+
+      const rearCap = new THREE.Mesh(new THREE.CylinderGeometry(0.104, 0.110, 0.018, 24), coriolisDarkMat);
+      rearCap.rotation.z = Math.PI / 2;
+      rearCap.position.set(-0.062, 0.345, 0);
+      coriolisDilMeter.add(rearCap);
+
+      // White front bezel ring & recessed live digital LCD display face
+      const whiteBezel = new THREE.Mesh(new THREE.TorusGeometry(0.104, 0.018, 12, 32), coriolisBezelWhiteMat);
+      whiteBezel.rotation.y = Math.PI / 2;
+      whiteBezel.position.set(0.056, 0.345, 0);
+      whiteBezel.castShadow = true;
+      coriolisDilMeter.add(whiteBezel);
+
+      const lcdDisc = new THREE.Mesh(new THREE.CircleGeometry(0.098, 32), coriolisLcdMat);
+      lcdDisc.rotation.y = Math.PI / 2;
+      lcdDisc.position.set(0.060, 0.345, 0);
+      coriolisDilMeter.add(lcdDisc);
+
+      // Top bezel status indicator LED synced with % de diluente
+      const statusLed = new THREE.Mesh(new THREE.SphereGeometry(0.011, 12, 12), coriolisLedMat);
+      statusLed.position.set(0.064, 0.436, 0);
+      coriolisDilMeter.add(statusLed);
+    }
+    diluentGroup.add(coriolisDilMeter);
+    updateCoriolisDisplay(30, 395, 15, 40);
 
     // Vertical Pressure Gauge on Diluent Line
     const gaugeDil = createPressureGauge('DILUENTE', 1000, 0.1, 0.28);
@@ -7427,10 +7973,19 @@
     const diluentFlowCurve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(1.45, 0.24, -2.25),
       new THREE.Vector3(1.45, 0.92, -2.25),
-      new THREE.Vector3(1.75, 0.92, -2.10),
+      new THREE.Vector3(1.72, 0.92, -2.10),
       new THREE.Vector3(3.18, 0.92, -2.10),
-      new THREE.Vector3(3.54, 0.92, -1.78),
-      new THREE.Vector3(3.54, 1.30, -1.05),
+      new THREE.Vector3(3.36, 0.92, -2.10),
+      new THREE.Vector3(3.50, 0.92, -2.02),
+      new THREE.Vector3(3.54, 0.92, -1.88),
+      new THREE.Vector3(3.54, 0.92, -1.76),
+      new THREE.Vector3(3.54, 0.92, -1.48),
+      new THREE.Vector3(3.54, 0.92, -1.20),
+      new THREE.Vector3(3.54, 0.92, -1.10),
+      new THREE.Vector3(3.54, 1.04, -1.01),
+      new THREE.Vector3(3.54, 1.24, -0.94),
+      new THREE.Vector3(3.54, 1.30, -0.84),
+      new THREE.Vector3(3.54, 1.30, -0.64),
       new THREE.Vector3(3.54, 1.30, -0.02),
     ]);
 
@@ -7696,11 +8251,9 @@
       submMeniscusGroup.position.y = surfaceY;
       submMeniscusGroup.rotation.z = Math.sin(elapsed * (1.7 + lowRisk * 3.8)) * (0.008 + lowRisk * 0.022);
 
-      // Deeper translucent hydrocarbon color with clear visual presence while keeping internal wellbore components crisp
-      const dilFactor = THREE.MathUtils.clamp(currentDiluentPct / 30, 0, 1);
+      // Deeper translucent hydrocarbon color in the downhole annulus (surface diluent never enters the annulus)
       _submScratchCol
         .copy(_submColNormal)
-        .lerp(_submColDiluted, dilFactor * 0.45)
         .lerp(_submColHigh, highExcess * 0.35)
         .lerp(_submColLow, lowRisk * 0.45);
       submFluidMat.color.copy(_submScratchCol);
@@ -7866,7 +8419,7 @@
       },
       '03': {
         preset: 'lineas-valvulas',
-        html: '<strong>03 / Componentes:</strong> Integra cabezal de rotación, prensa de estopas, TE de producción, líneas de producción, gas anular y diluente con choke, válvulas check, purgas y manómetros.',
+        html: '<strong>03 / Componentes:</strong> Integra cabezal de rotación, prensa de estopas, TE de producción, línea de gas del anular (con choke antes de su check) y línea de diluente en superficie (con medidor Coriolis, válvula check y dosificadora inyectando en la línea de producción tras la válvula check).',
       },
       '04': {
         preset: 'isometrica-superficie',
@@ -8488,14 +9041,14 @@
       }
 
       // Bidirectional sync with diluent faults when changed by user in "Datos en tiempo real"
+      if (options.fromUser) {
+        currentDiluentPct = targetDiluentPct;
+        dilutionBlend = targetDilution;
+      }
       if (options.fromUser && typeof evaluateControlFaults === 'function') {
         evaluateControlFaults('fluid', { prevFluidMode: prevMode });
       }
       if (typeof triggerInstantTelemetry === 'function') {
-        if (options.fromUser) {
-          currentDiluentPct = THREE.MathUtils.lerp(currentDiluentPct, targetDiluentPct, 0.72);
-          dilutionBlend = THREE.MathUtils.lerp(dilutionBlend, targetDilution, 0.72);
-        }
         triggerInstantTelemetry();
       } else {
         lastTelemetryUpdate = -1;
@@ -8592,40 +9145,40 @@
       'corte-diluente': {
         severity: 'warn',
         shortLabel: 'Corte de Diluente',
-        statusText: 'Alerta · Sin Diluente',
-        bannerPrefix: 'Corte / pérdida de diluente (0%):',
-        bannerSummary: 'crudo extrapesado sin dilución · alta viscosidad, esfuerzo torsional y caída del caudal real.',
-        diagnosis: 'Interrupción total de la inyección de diluente (0%). La viscosidad del crudo extrapesado (~9° API) se dispara de forma no lineal, elevando la pérdida por fricción, el torque en la sarta y reduciendo el caudal real y la eficiencia volumétrica BCP.',
+        statusText: 'Alerta · Sin Diluente (Superficie)',
+        bannerPrefix: 'Corte / pérdida de diluente en superficie (0%):',
+        bannerSummary: 'alta viscosidad y fricción en la línea de producción · lectura en cero en el Coriolis y mayor contrapresión de transporte.',
+        diagnosis: 'Interrupción total de la inyección de diluente en superficie (0%, lectura en 0.0 BPD / SIN FLUJO en el medidor Coriolis). Como el diluente se incorpora directamente en la línea de producción aguas abajo de la válvula check, su ausencia dispara la viscosidad y la resistencia al flujo en la línea de recolección/transporte, elevando la contrapresión en superficie y el esfuerzo de descarga sin deberse a falta de sumergencia en fondo.',
         steps: [
-          'Inspeccionar la bomba dosificadora de diluente, filtros en línea y nivel del tanque de nafta/diluente.',
-          'Verificar la apertura de la válvula dosificadora y purgar posibles bolsas de gas en la línea de inyección.',
-          'Restablecer la dosificación en la franja normal (15–40%, punto eficiente 30%) y moderar las RPM dentro de 60–260 RPM para estabilizar caudal, viscosidad y torque.',
+          'Confirmar la lectura en cero (0.0 BPD / SIN FLUJO) en el medidor másico Coriolis y revisar presión en el manómetro de diluente, bomba dosificadora y nivel del tanque.',
+          'Inspeccionar la válvula dosificadora, la válvula check de diluente, filtros en línea y purgar posibles bolsas de gas en el cabezal de inyección en superficie.',
+          'Restablecer la inyección en superficie hacia el punto eficiente de 30% (franja normal 15–40%) y verificar la reducción de viscosidad en línea y de contrapresión manteniendo las RPM dentro de 60–260 RPM.',
         ],
       },
       'corte-diluente-bajo': {
         severity: 'warn',
         shortLabel: 'Dilución Insuficiente',
         statusText: 'Alerta · Diluente < 15%',
-        bannerPrefix: 'Falta de diluente (< 15%):',
-        bannerSummary: 'dosificación por debajo del mínimo · viscosidad elevada, alto torque y caída de caudal real.',
-        diagnosis: 'El porcentaje de diluente cayó por debajo del umbral operativo mínimo (< 15%). La mezcla mantiene viscosidad elevada lejos del punto eficiente (30%), incrementando el torque resistente y reduciendo la eficiencia volumétrica y los barriles reales producidos.',
+        bannerPrefix: 'Falta de diluente en superficie (< 15%):',
+        bannerSummary: 'dosificación insuficiente en línea de producción · mayor viscosidad/fricción de transporte y alerta BAJO DIL en Coriolis.',
+        diagnosis: 'La dosificación de diluente en superficie cayó por debajo del mínimo operativo (< 15%, lejos del punto eficiente de 30%, alerta BAJO DIL en el medidor Coriolis). Al incorporarse aguas abajo de la válvula check, la baja dilución mantiene elevada la viscosidad en la línea de producción, aumentando la fricción de transporte, la contrapresión superficial y el esfuerzo de descarga (condición independiente de la sumergencia de fondo).',
         steps: [
-          'Incrementar progresivamente la tasa en la bomba dosificadora hasta la franja normal (15–40%, punto eficiente 30%).',
-          'Revisar presión de suministro de diluente, filtros parcialmente obstruidos y posición de la válvula dosificadora.',
-          'Monitorear el descenso de viscosidad (cP) y la recuperación del Caudal Real (BPD) manteniendo las RPM dentro de 60–260 RPM.',
+          'Incrementar gradualmente la inyección en superficie desde la válvula/bomba dosificadora hasta el punto eficiente de 30% (franja 15–40%) confirmando el caudal en el medidor Coriolis.',
+          'Verificar presión de suministro en el manómetro de diluente, estado de la válvula check de diluente y filtros parcialmente obstruidos antes del ingreso a la línea de producción.',
+          'Supervisar el descenso de la viscosidad en línea (cP) y la estabilización de la presión de descarga (355–860 PSI) manteniendo las RPM dentro de 60–260 RPM.',
         ],
       },
       'exceso-diluente': {
         severity: 'warn',
         shortLabel: 'Exceso de Diluente',
         statusText: 'Alerta · Exceso Diluente',
-        bannerPrefix: 'Exceso de diluente (> 40%):',
-        bannerSummary: 'viscosidad muy baja · mayor resbalamiento interno (slippage) y caída de eficiencia.',
-        diagnosis: 'La dosificación de diluente supera el límite operativo recomendado (> 40%) por encima del punto eficiente (30%), reduciendo excesivamente la viscosidad de la mezcla. Esto aumenta el resbalamiento interno (slippage) entre rotor y estator —bajando la Eficiencia Volumétrica (%) y el caudal real efectivo—, desplaza capacidad útil y eleva el riesgo de hinchamiento químico del elastómero.',
+        bannerPrefix: 'Exceso de diluente en superficie (> 40%):',
+        bannerSummary: 'mayor volumen total de mezcla en la línea de producción, caída marcada de viscosidad en superficie y alerta EXCESO en Coriolis.',
+        diagnosis: 'La inyección de diluente en superficie supera el rango operativo recomendado (> 40%, por encima del punto eficiente de 30%, alerta EXCESO DIL en el medidor Coriolis). Al inyectarse aguas abajo de la válvula check no ingresa al fondo ni afecta el elastómero BCP, pero reduce en exceso la viscosidad en la línea de producción, incrementa el volumen total de mezcla a transportar (crudo + diluente) y sobrecarga innecesariamente las líneas de recolección aguas abajo y el consumo de diluente.',
         steps: [
-          'Reducir gradualmente la inyección de diluente hasta retornar a la franja normal (15–40%, punto eficiente 30%).',
-          'Verificar el caudalímetro de diluente y recalibrar la relación diluente/crudo (D/C) según la viscosidad objetivo y el caudal real en cabezal.',
-          'Observar la recuperación de la Eficiencia Volumétrica (%) y vigilar signos de hinchamiento (swelling) del elastómero por exposición a aromáticos.',
+          'Reducir progresivamente la inyección desde la válvula dosificadora hasta retornar a la franja normal (15–40%, punto eficiente 30%).',
+          'Verificar las lecturas de caudal de diluente (BPD), % de dosis y caudal total de mezcla en el medidor Coriolis, recalibrando la relación diluente/crudo (D/C).',
+          'Comprobar la presión, capacidad hidráulica y balance de volumen en la línea de producción y múltiple de recolección aguas abajo hasta estabilizar la viscosidad en línea.',
         ],
       },
       'baja-sumergencia': {
@@ -8686,10 +9239,10 @@
         statusText: 'Alerta · Alta Viscosidad',
         bannerPrefix: 'Baja temperatura / alta viscosidad (≤ 55 °C):',
         bannerSummary: 'aumento de viscosidad del crudo pesado/extrapesado · mayor resistencia y esfuerzo torsional.',
-        diagnosis: 'Al operar en temperatura baja (≤ 55 °C; rango normal 56–98 °C), la viscosidad del crudo pesado/extrapesado se incrementa notablemente, elevando la resistencia viscosa, la carga torsional sobre la sarta de cabillas y la pérdida de carga en la tubería.',
+        diagnosis: 'Al operar en temperatura baja (≤ 55 °C; rango normal 56–98 °C), la viscosidad del crudo pesado/extrapesado aumenta tanto en la tubería de producción como en superficie, elevando el torque sobre la sarta de cabillas y la caída de presión en el transporte.',
         steps: [
           'Moderar las RPM en el VFD dentro de la ventana segura (60–260 RPM) para evitar picos de torque excesivos y proteger la sarta de cabillas.',
-          'Mantener la dosificación de diluente cerca del punto eficiente (~30%, dentro de 15–40% sin superar 40%) y verificar calentamiento/traza térmica en línea.',
+          'Asegurar la dosificación de diluente en superficie cerca del punto eficiente (~30% en el medidor Coriolis, rango 15–40%) para aliviar la fricción en la línea de producción y verificar traza térmica.',
           'Restablecer la temperatura operativa dentro de 56–98 °C vigilando en continuo torque, presión (355–860 PSI) y caudal (BPD).',
         ],
       },
@@ -8702,7 +9255,7 @@
         diagnosis: 'Corte de giro en superficie o falla del freno anti-retroceso. La energía elástica acumulada en las cabillas y la columna hidrostática invierten el giro de la sarta antes de detenerse en 0 RPM.',
         steps: [
           'Mantener despejada el área del cabezal hasta verificar que la sarta se haya detenido por completo (0 RPM).',
-          'Inspeccionar el sistema de freno hidráulico/mecánico anti-backspin, correas y válvula check en línea de descarga.',
+          'Inspeccionar el sistema de freno hidráulico/mecánico anti-backspin, correas y la válvula check de producción (aguas arriba de la inyección de diluente) para confirmar cierre sin retorno.',
           'Despresurizar controladamente si es necesario y arrancar en rampa suave desde el VFD al rango normal (60–260 RPM).',
         ],
       },
@@ -8728,7 +9281,7 @@
         diagnosis: 'Velocidad y torque resistente por encima del límite operativo seguro (60–260 RPM; o > 300 RPM incluso durante abatimiento temporal de sumergencia alta). El exceso de RPM y fricción viscosa sobrecalienta el elastómero y exige al límite la sarta de cabillas y el VFD.',
         steps: [
           'Reducir inmediatamente las RPM en el VFD al rango seguro (60–260 RPM) para aliviar el par torsional y el calentamiento del estator.',
-          'Verificar la inyección de diluente en el punto eficiente (~30%, rango 15–40%) y descartar acumulación de sólidos/arena o rozamiento mecánico en fondo.',
+          'Confirmar en el medidor Coriolis que la inyección de diluente en superficie esté cerca del punto eficiente (~30%, rango 15–40%) para reducir contrapresión en la línea de producción, y descartar sólidos/arena o rozamiento en fondo.',
           'Confirmar la presión de descarga (≤ 860 PSI) y ajustar el límite de protección de torque en el VFD para prevenir rotura de cabillas.',
         ],
       },
@@ -8741,7 +9294,7 @@
         diagnosis: 'La presión de descarga supera el límite seguro de operación (> 860 PSI; rango normal 355–860 PSI), incrementando el diferencial de presión (ΔP) por etapa rotor–estator. Esto dispara el torque y esfuerzo axial en la sarta, induce resbalamiento interno (caída de BPD) y acelera la fatiga del elastómero.',
         steps: [
           'Inspeccionar válvulas de descarga, manifold y línea de producción en superficie por bloqueos, válvulas semicerradas o tapones de crudo viscoso.',
-          'Reducir gradualmente las RPM en el VFD (dentro de 60–260 RPM) y asegurar inyección de diluente cerca del punto eficiente (~30%) para disminuir pérdidas por fricción.',
+          'Reducir gradualmente las RPM en el VFD (dentro de 60–260 RPM) y verificar en el medidor Coriolis que la inyección de diluente en superficie esté en ~30% (15–40%) para disminuir la fricción en la línea de recolección.',
           'Verificar la presión de cabezal (THP) y la válvula de alivio/seguridad (PSV) hasta retornar al rango seguro (355–860 PSI).',
         ],
       },
@@ -8754,7 +9307,7 @@
         diagnosis: 'La temperatura excede el límite térmico del elastómero del estator (> 98 °C; rango seguro 56–98 °C), provocando ablandamiento, hinchamiento (swelling), pérdida de interferencia rotor–estator y desgarro/desgaste del caucho. El caudal cae por resbalamiento interno mientras el hinchamiento genera torque anómalo.',
         steps: [
           'Bajar de inmediato las RPM en el VFD (dentro de 60–260 RPM) y enfriar el sistema hasta retornar a ≤ 98 °C; si el torque o la temperatura no ceden, ejecutar parada controlada.',
-          'Confirmar sumergencia óptima (100–200 ft) para asegurar lubricación continua y mantener diluente en 15–40% (~30%) compatible con el elastómero (NBR/HNBR).',
+          'Confirmar sumergencia óptima (100–200 ft) para asegurar lubricación y refrigeración continua en fondo, y mantener la presión de descarga dentro de 355–860 PSI (verificando ~30% de diluente en superficie para evitar contrapresión extra).',
           'Realizar prueba de eficiencia volumétrica y programar servicio (pull-out) para reemplazar el estator por un elastómero de mayor grado térmico (HNBR/FKM) si persiste el desgaste.',
         ],
       },
@@ -8767,7 +9320,7 @@
         diagnosis: 'La combinación simultánea de temperatura elevada (≥ 88 °C), alto diferencial de presión (≥ 760 PSI) y altas RPM (≥ 235 RPM) dispara el calentamiento interno por histéresis del elastómero, causando hinchamiento, fatiga acelerada y desprendimiento de caucho (chunking).',
         steps: [
           'Reducir primero las RPM por debajo de 235 RPM (dentro de 60–260 RPM) y aliviar la presión de descarga por debajo de 760 PSI para bajar el ΔP por etapa.',
-          'Restablecer refrigeración por debajo de 88 °C verificando sumergencia óptima (100–200 ft) y diluente controlado (~30%, rango 15–40%).',
+          'Restablecer refrigeración en fondo por debajo de 88 °C verificando sumergencia óptima (100–200 ft) y evitando contrapresión en la línea de producción mediante dilución controlada en superficie (~30% en Coriolis).',
           'Monitorear recuperación de eficiencia volumétrica; si persiste alto resbalamiento, planificar cambio de estator a compuesto de alta temperatura.',
         ],
       },
@@ -9143,7 +9696,7 @@
         if (faultKey === 'corte-diluente') {
           setDiluentSliderValue(0, { snapCurrent: true });
           if (targetPsi > PSI_MIN_NORMAL && targetPsi <= PSI_MAX_NORMAL) {
-            setPsiSliderValue(Math.max(targetPsi, 785));
+            setPsiSliderValue(Math.max(targetPsi, 685));
           }
         } else if (faultKey === 'exceso-diluente') {
           setDiluentSliderValue(DILUENT_FAULT_EXCESS, { snapCurrent: true });
@@ -9391,7 +9944,7 @@
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Línea de Producción (Flujo Superficial)',
-        desc: 'Tubería de descarga que transporta el petróleo crudo mezclado con diluente desde la TE de producción hasta el múltiple de recolección y la estación de flujo.',
+        desc: 'Tubería de descarga superficial que conduce el crudo desde la TE de producción a través de la válvula check y, aguas abajo de esta, incorpora el diluente medido por el Coriolis para reducir la viscosidad y la fricción hacia el múltiple de recolección.',
         preset: 'lineas-valvulas',
       },
       'choke': {
@@ -9405,7 +9958,7 @@
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Válvula Check de Producción',
-        desc: 'Válvula antirretorno que permite el flujo únicamente hacia la estación de recolección, evitando el contraflujo de presión y el giro inverso (backspin) al detener la bomba.',
+        desc: 'Válvula antirretorno ubicada aguas arriba del punto de inyección de diluente en superficie. Permite el paso unidireccional hacia la estación de flujo e impide tanto el retroceso (backspin) como el ingreso de diluente hacia el cabezal y fondo del pozo.',
         preset: 'lineas-valvulas',
       },
       'toma-muestra': {
@@ -9460,36 +10013,43 @@
       'linea-diluente': {
         category: 'SUPERFICIE',
         catKey: 'superficie',
-        title: 'Línea de Inyección de Diluente',
-        desc: 'Suministra nafta o crudo liviano e inyecta el diluente directamente en la línea de producción después de la válvula check para reducir la viscosidad del crudo pesado/extrapesado y disminuir la caída de presión en superficie.',
+        title: 'Línea de Inyección de Diluente (Superficie)',
+        desc: 'Suministra nafta o crudo liviano en superficie (pasando por su válvula check, medidor Coriolis y válvula dosificadora) e inyecta directamente en la línea de producción aguas abajo de la válvula check (punto eficiente 30%) para reducir la viscosidad y fricción en el transporte superficial.',
         preset: 'manifold-descarga',
       },
       'valvula-check-dil': {
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Válvula Check de Diluente',
-        desc: 'Bloquea cualquier retorno de petróleo a presión desde la línea de producción hacia el patín de diluente en caso de parada de la bomba de inyección.',
+        desc: 'Válvula antirretorno aguas arriba del medidor Coriolis que bloquea cualquier retorno de crudo a presión desde la línea de producción hacia el patín de diluente al detener la inyección.',
         preset: 'manifold-descarga',
       },
       'manometro-dil': {
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Manómetro de Diluente',
-        desc: 'Verifica que la presión de inyección del diluente supere la presión de la línea de producción aguas abajo de la válvula check, garantizando una mezcla continua y homogénea.',
+        desc: 'Verifica que la presión de inyección de diluente en superficie supere la presión de la línea de producción aguas abajo de la válvula check, asegurando flujo continuo hacia el medidor Coriolis y mezcla homogénea.',
         preset: 'manifold-descarga',
       },
       'valvula-purga-dil': {
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Válvula de Purga de Diluente',
-        desc: 'Permite despresurizar y drenar el cabezal de diluente con seguridad durante ajustes o mantenimiento de la línea de dosificación.',
+        desc: 'Permite despresurizar y drenar el cabezal de diluente en superficie con seguridad durante ajustes o mantenimiento de la línea de dosificación.',
+        preset: 'manifold-descarga',
+      },
+      'medidor-coriolis-dil': {
+        category: 'SUPERFICIE',
+        catKey: 'superficie',
+        title: 'Medidor de Flujo Másico Coriolis (Diluente)',
+        desc: 'Instrumento de medición directa por efecto Coriolis instalado en superficie entre la válvula check de diluente y la válvula dosificadora. Mide en tiempo real el caudal inyectado (BPD), la dosis (0%–60%, punto eficiente 30%) y el caudal total de mezcla antes de ingresar a la línea de producción.',
         preset: 'manifold-descarga',
       },
       'valvula-dosificadora-dil': {
         category: 'SUPERFICIE',
         catKey: 'superficie',
         title: 'Válvula Dosificadora de Diluente',
-        desc: 'Regula la tasa exacta de inyección de diluente en la línea de producción (después de la válvula check) según la gravedad API y viscosidad del crudo extraído.',
+        desc: 'Regula la tasa de inyección de diluente en superficie (verificada en el medidor Coriolis) justo antes de su ingreso a la línea de producción aguas abajo de la válvula check, optimizando la viscosidad de transporte en ~30%.',
         preset: 'manifold-descarga',
       },
       'valvula-compuerta-prod': {
@@ -9712,6 +10272,7 @@
     gaugeDil.userData.inspectId = 'manometro-dil';
     bleedDil.userData.inspectId = 'valvula-purga-dil';
     checkDil.userData.inspectId = 'valvula-check-dil';
+    coriolisDilMeter.userData.inspectId = 'medidor-coriolis-dil';
     dilChokeGroup.userData.inspectId = 'valvula-dosificadora-dil';
 
     // Tooltip DOM references & zero-GC raycast helpers
@@ -11533,10 +12094,11 @@
       const dilRatio = THREE.MathUtils.clamp(currentDiluentPct / DILUENT_DEFAULT_NORMAL, 0, 1.95);
       const rpmRatio = currentRpm / 180;
 
-      let viscositySpeedFactor = 0.50 + 0.74 * dilutionBlend + Math.max(0, dilRatio - 1) * 0.16;
-      if (isDilLoss) viscositySpeedFactor *= 0.80;
-      if (isDilExcess) viscositySpeedFactor *= 0.86; // internal slippage slows net forward progression despite thin fluid
-      if (isLowTemp) viscositySpeedFactor *= 0.76;
+      // Downhole & tubing progression is governed by pump speed, reservoir temperature, submergence & pressure (not downhole dilution);
+      // surface diluent loss only applies a mild backpressure resistance factor on discharge speed
+      let viscositySpeedFactor = 1.05;
+      if (isDilLoss) viscositySpeedFactor *= 0.90;
+      if (isLowTemp) viscositySpeedFactor *= 0.74;
       if (isLowSlip) viscositySpeedFactor *= 0.48;
       if (isHighPressure) viscositySpeedFactor *= 0.80;
       if (isLowPress) viscositySpeedFactor *= 0.84;
@@ -11635,7 +12197,6 @@
         let cavityFillScale = 1.0;
         if (isGasLock) cavityFillScale *= (0.58 + 0.42 * slugMod);
         if (isLowPress) cavityFillScale *= 0.84;
-        if (isDilExcess) cavityFillScale *= 0.88;
         if (isElastomerDamage) cavityFillScale *= (0.72 + 0.18 * slugMod);
         cavityFillScale = Math.max(0.42, cavityFillScale) * densitySizeScale;
 
@@ -11682,18 +12243,21 @@
           }
 
           _flowQuat.setFromUnitVectors(_upAxis, _flowTan.normalize());
-          const dropletThickness = 1 + (1 - dilutionBlend) * 0.14 + (isLowTemp ? 0.08 : 0) + (isDilExcess ? 0.06 : 0);
+          // Surface dilution takes effect strictly downstream of checkProd tie-in at X = 3.54 (t ≈ 0.81..0.89 along prodCurve)
+          const postDilMix = THREE.MathUtils.smoothstep(t, 0.81, 0.89);
+          const excessVolBoost = postDilMix * Math.max(0, dilRatio - 1) * 0.22;
+          const surfaceHeavyThick = postDilMix * (1 - dilutionBlend) * 0.14;
+          const dropletThickness = 1 + (isLowTemp ? 0.08 : 0) + surfaceHeavyThick + excessVolBoost;
           const gasGap = isGasLock ? (0.62 + 0.38 * Math.sin(s.phase * 18 + elapsed * 4.5)) : (isLowPress ? 0.86 : 1.0);
           _flowScale.set(
             0.036 * dropletThickness * gasGap * densitySizeScale,
-            0.068 * gasGap * densitySizeScale,
+            0.068 * (1 + excessVolBoost * 0.5) * gasGap * densitySizeScale,
             0.036 * dropletThickness * gasGap * densitySizeScale
           );
           _flowMat4.compose(_flowPos, _flowQuat, _flowScale);
           prodFlowMesh.setMatrixAt(i, _flowMat4);
 
-          // Crude mixes with diluent downstream of checkProd at X = 3.54 (t ≈ 0.81..0.89 along prodCurve)
-          const mixFactor = THREE.MathUtils.smoothstep(t, 0.81, 0.89) * THREE.MathUtils.clamp(dilutionBlend * (isDilExcess ? 1.15 : 1.0), 0, 1);
+          const mixFactor = postDilMix * THREE.MathUtils.clamp(dilutionBlend * (isDilExcess ? 1.15 : 1.0), 0, 1);
           _colScratch.copy(_colCrude).lerp(_colDiluted, mixFactor);
           prodFlowMesh.setColorAt(i, _colScratch);
         }
@@ -11806,7 +12370,8 @@
             : THREE.MathUtils.lerp(145, 118, THREE.MathUtils.clamp((currentRpm - RPM_MAX_NORMAL) / (350 - RPM_MAX_NORMAL), 0, 1));
 
           if (effectiveSubmergence > eqEffSubm + 0.5) {
-            const viscBrake = (hasFault('corte-diluente') || hasFault('baja-temperatura')) ? 0.75 : 1.0;
+            // Downhole drawdown brake depends strictly on downhole temperature / high discharge pressure (not surface diluent)
+            const viscBrake = hasFault('baja-temperatura') ? 0.78 : (hasFault('alta-presion') ? 0.86 : 1.0);
             const dropFt = Math.min(effectiveSubmergence - eqEffSubm, (rpmExcess / 80) * 30 * viscBrake * dt);
             const prevWasHigh = hasFault('alta-sumergencia');
 
@@ -11941,8 +12506,16 @@
         : ((hasFault('sobrecarga-torque') || hasFault('alta-presion')) ? 0.062 : (hasFault('baja-presion') ? 0.05 : 0.03));
       const pulseFreq = (hasFault('sobrecarga-torque') || hasFault('alta-presion')) ? 3.2 : 1.0;
       const pulse = Math.sin(pulsePhase * pulseFreq) * pulseMag * normLoad;
+      const dilGaugeLoad = currentDiluentPct <= 0.4
+        ? 0.04
+        : THREE.MathUtils.clamp(
+            normLoad + 0.14 + (currentDiluentPct / DILUENT_MAX) * 0.24,
+            0.22,
+            1.36
+          );
       for (const g of gaugeNeedles) {
-        g.pivot.rotation.z = g.baseAngle - normLoad * 1.45 + pulse;
+        const loadVal = g.label === 'DILUENTE' ? dilGaugeLoad : normLoad;
+        g.pivot.rotation.z = g.baseAngle - loadVal * 1.45 + pulse * (g.label === 'DILUENTE' && currentDiluentPct <= 0.4 ? 0.15 : 1.0);
       }
 
       // Free vertical wellbore travel via W/S or ArrowUp/ArrowDown keys
@@ -12029,7 +12602,7 @@
       let tempNum = currentTemp + jitter * 0.15;
       const dynSubm = Math.round(effectiveSubmergence);
 
-      // Realistic non-linear viscosity model calibrated to 0..60% with 30% efficient point (0% -> ~3,700 cP, 30% -> ~234 cP, 60% -> ~16 cP)
+      // Temperature & shear effects on viscosity
       const coldDelta = Math.max(0, TEMP_DEFAULT_NORMAL - currentTemp);
       const hotDelta = Math.max(0, currentTemp - TEMP_DEFAULT_NORMAL);
       const tempViscFactor = THREE.MathUtils.clamp(
@@ -12038,32 +12611,44 @@
         2.35
       );
       const shearFactor = 1 - 0.14 * THREE.MathUtils.clamp(absRpm / 350, 0, 1);
+
+      // 1) SURFACE production-line mixture viscosity (after diluent tie-in downstream of checkProd & Coriolis):
+      // Calibrated to 0..60% with 30% efficient transport point (0% -> ~3,700 cP, 30% -> ~234 cP, 60% -> ~16 cP)
       const baseDilVisc = 3980 * Math.exp(-0.092 * dilPct);
       let visc = Math.max(16, Math.round(baseDilVisc * tempViscFactor * shearFactor + jitter * (1.5 + heavyFactor * 18)));
+
+      // 2) DOWNHOLE crude viscosity in pump intake/tubing (unaffected by surface diluent; governed by wellbore temperature)
+      const downholeColdFillLoss = coldDelta > 0
+        ? THREE.MathUtils.clamp((coldDelta / (TEMP_DEFAULT_NORMAL - TEMP_MIN)) * 0.14, 0, 0.16)
+        : 0;
+
+      // 3) Surface line frictional backpressure induced by surface dilution state:
+      // Below 30% (especially < 15% / 0%): higher surface viscosity & friction raise line backpressure up to +65 PSI.
+      // Above 40% (41..60%): larger total mixed volume (crude + diluent) in gathering line adds mild hydraulic load (+4..+16 PSI).
+      const surfaceFrictionBackpressure = dilPct < DILUENT_DEFAULT_NORMAL
+        ? Math.pow(heavyFactor, 1.35) * 65
+        : (dilPct > DILUENT_HIGH_FAULT
+            ? THREE.MathUtils.clamp(((dilPct - DILUENT_HIGH_FAULT) / (DILUENT_MAX - DILUENT_HIGH_FAULT)) * 16, 0, 16)
+            : 0);
+
+      const effectiveDischargePsi = currentPsi + surfaceFrictionBackpressure;
 
       // Theoretical flow strictly proportional to pump geometric displacement & forward speed
       const bpdTeorico = currentRpm <= 0.5 ? 0 : Math.round(currentRpm * PUMP_DISP_BPD_PER_RPM);
 
-      // Physics-based Volumetric Efficiency peaking at 30% dilution (~234 cP -> ~91-92% eff):
-      // drops below 30% due to rising viscosity/intake friction and drops above 30% due to low-viscosity internal slippage
-      const baseDpFactor = THREE.MathUtils.clamp((currentPsi - 260) / 760, 0.12, 1.45);
-      const lowViscSlipPenalty = visc < 200
-        ? THREE.MathUtils.clamp(Math.pow((200 - visc) / 185, 1.35) * 0.26 * (0.65 + 0.55 * baseDpFactor), 0, 0.42)
-        : 0;
-      const dpSlipLoss = THREE.MathUtils.clamp(0.065 + Math.max(0, currentPsi - 545) / 2100 + lowViscSlipPenalty, 0.04, 0.64);
-      const highViscFillLoss = visc > 260
-        ? THREE.MathUtils.clamp(Math.log10(visc / 260) * 0.21, 0, 0.28)
-        : 0;
-      // Full cavity fill at or above minimum efficient submergence (100 ft); drops sharply below 100 ft
+      // Physics-based Volumetric Efficiency of downhole BCP pump:
+      // Governed by downhole submergence, wellbore temperature, and total discharge ΔP (including surface line backpressure).
+      // Surface excess diluent does NOT enter the downhole pump, so it does NOT induce rotor-stator slippage or elastomer swelling.
+      const dpSlipLoss = THREE.MathUtils.clamp(0.068 + Math.max(0, effectiveDischargePsi - 545) / 1850, 0.04, 0.52);
       const submFillFactor = THREE.MathUtils.clamp((effectiveSubmergence - 30) / 70, 0.34, 1.0);
 
-      let effFactor = THREE.MathUtils.clamp((1 - dpSlipLoss) * (1 - highViscFillLoss) * submFillFactor, 0.05, 0.96);
+      let effFactor = THREE.MathUtils.clamp((1 - dpSlipLoss) * (1 - downholeColdFillLoss) * submFillFactor, 0.05, 0.96);
 
-      // Sucker-rod torque responds non-linearly to viscosity (log scale), RPM, and differential pressure (ΔP)
-      const dpTorqueBoost = (currentPsi - PSI_DEFAULT_NORMAL) * 0.056;
-      const viscTorqueBoost = THREE.MathUtils.clamp(Math.log10(Math.max(18, visc) / 240) * 20, -10, 32);
+      // Sucker-rod torque responds to RPM, total discharge ΔP (including surface transport backpressure), and downhole cold viscosity
+      const dpTorqueBoost = (effectiveDischargePsi - PSI_DEFAULT_NORMAL) * 0.058;
+      const downholeTempTorqueBoost = coldDelta * 0.65 - hotDelta * 0.14;
       let torquePct = Math.round(THREE.MathUtils.clamp(
-        18 + (absRpm / 350) * 44 + dpTorqueBoost + viscTorqueBoost + jitter * 1.5,
+        20 + (absRpm / 350) * 44 + dpTorqueBoost + downholeTempTorqueBoost + jitter * 1.5,
         6,
         108
       ));
@@ -12080,24 +12665,23 @@
       const isElastDamage = hasFault('dano-elastomero');
 
       if (isDilLoss) {
+        // Surface line friction raises backpressure and discharge effort (does NOT alter downhole submergence)
         const lossSev = THREE.MathUtils.clamp((DILUENT_LOW_FAULT - dilPct) / DILUENT_LOW_FAULT, 0.25, 1);
-        effFactor *= (0.90 - lossSev * 0.12);
-        if (!isLowPress && !isHighPress) psi = Math.round(psi + lossSev * 22 + jitter * 5);
-        torquePct += Math.round(10 + lossSev * 10);
+        effFactor *= (0.96 - lossSev * 0.05);
+        if (!isLowPress && !isHighPress) psi = Math.round(psi + surfaceFrictionBackpressure * 0.85 + jitter * 4);
+        torquePct += Math.round(5 + lossSev * 7);
       }
 
       if (isDilExcess) {
-        const excessNorm = THREE.MathUtils.clamp((dilPct - DILUENT_HIGH_FAULT) / (DILUENT_MAX - DILUENT_HIGH_FAULT), 0.2, 1);
-        // Low viscosity increases internal slippage AND excess diluent displaces useful crude capacity (total handled volume rises)
-        effFactor *= (0.88 - excessNorm * 0.16);
-        const swellDrag = excessNorm * 5;
-        torquePct = Math.max(10, Math.round(torquePct - 4 + swellDrag));
+        // Excess surface diluent increases total mixed volume in the surface production line & mild downstream hydraulic load,
+        // without causing downhole pump slippage or downhole elastomer swelling
+        if (!isLowPress && !isHighPress) psi = Math.round(psi + surfaceFrictionBackpressure * 0.75 + jitter * 2);
       }
 
       if (isLowTemp) {
         const coldSeverity = THREE.MathUtils.clamp((TEMP_MIN_NORMAL - currentTemp) / (TEMP_MIN_NORMAL - TEMP_MIN), 0.25, 1);
-        effFactor *= (0.92 - coldSeverity * (0.07 + heavyFactor * 0.09));
-        torquePct += Math.round(9 + coldSeverity * (9 + heavyFactor * 12));
+        effFactor *= (0.92 - coldSeverity * (0.08 + heavyFactor * 0.04));
+        torquePct += Math.round(9 + coldSeverity * (11 + heavyFactor * 5));
       }
 
       if (isGasLock) {
@@ -12127,9 +12711,9 @@
       if (isHighPress) {
         const overP = THREE.MathUtils.clamp((currentPsi - PSI_MAX_NORMAL) / (PSI_MAX - PSI_MAX_NORMAL), 0, 1);
         effFactor *= (0.82 - overP * 0.22);
-        psi = Math.round(currentPsi + jitter * 9);
+        psi = Math.round(currentPsi + surfaceFrictionBackpressure * 0.4 + jitter * 9);
         if (!isLowTemp) tempNum += 2.4 + overP * 4.2;
-        torquePct = Math.max(torquePct + Math.round(10 + overP * 14), Math.round(82 + overP * 22 + heavyFactor * 5));
+        torquePct = Math.max(torquePct + Math.round(10 + overP * 14), Math.round(82 + overP * 22 + heavyFactor * 4));
       }
 
       if (isElastDamage) {
@@ -12148,9 +12732,9 @@
           const lowRatio = THREE.MathUtils.clamp(absRpm / RPM_MIN_NORMAL, 0, 1);
           effFactor *= Math.pow(lowRatio, 1.6) * 0.48;
           if (!isHighPress && !isLowPress) {
-            psi = Math.round(240 + lowRatio * 95 + heavyFactor * 42 + jitter * 4);
+            psi = Math.round(240 + lowRatio * 95 + surfaceFrictionBackpressure * 0.35 + jitter * 4);
           }
-          torquePct = Math.round(THREE.MathUtils.clamp(12 + lowRatio * 18 + heavyFactor * 14 + (isLowTemp ? 10 : 0), 8, 62));
+          torquePct = Math.round(THREE.MathUtils.clamp(12 + lowRatio * 18 + (isDilLoss ? 6 : 0) + (isLowTemp ? 10 : 0), 8, 62));
         } else {
           effFactor = 0;
           const bleed = THREE.MathUtils.clamp(Math.exp(-faultElapsed * 0.55), 0, 1);
@@ -12222,6 +12806,7 @@
         faultTorqueFill.classList.toggle('is-crit', isOverCrit);
       }
 
+      updateCoriolisDisplay(dilPct, bpdReal, DILUENT_LOW_FAULT, DILUENT_HIGH_FAULT);
       telemetryTrendChart.recordSample(bpdReal, psi, roundedRpm, forceChart);
     }
 
